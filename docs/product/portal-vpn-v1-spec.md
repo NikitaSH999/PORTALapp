@@ -1,49 +1,74 @@
 # PORTAL VPN v1 Product Spec
 
-Last updated: 2026-03-18
+Last updated: 2026-03-20
+
+## Document Status
+
+This file is the living client product spec for `PORTAL VPN`.
 
 ## Summary
 
 `PORTAL VPN` is a `consumer-first`, `app-first` VPN application for `Android` and `Windows`.
 
-The product goal is simple:
+The target journey is:
 
 - open the app
 - tap `Try free`
 - receive a real working trial subscription
 - tap `Connect`
 
-The app must not require Telegram for first use. Telegram remains an optional growth and recovery channel.
+Telegram must remain optional for first use. It is a growth, recovery, and reward channel, not the primary login wall.
 
-## Product Decisions
+## Locked Product Decisions
 
-### Final product name
-
-- `PORTAL VPN`
-
-### Core strategy
-
+- product name: `PORTAL VPN`
 - UX direction: `consumer-first`
-- Account model: `app-first`
-- Platforms in scope for v1: `Android`, `Windows`
-- Default runtime core: `sing-box`
+- account model: `app-first`
+- default runtime core: `sing-box`
 - `xray` support: advanced compatibility fallback only
-
-### Trial
-
-- Free trial duration: `5 days`
+- free trial: `5 days`
 - Telegram reward: `+10 days`
-- Trial must create a real device account and a real working subscription profile
-- Trial state must never be a decorative UI-only state
 
-### Telegram role
+## Target User Experience
 
-Telegram is not required for:
+### First launch
 
-- first launch
-- trial activation
-- normal VPN usage
-- renewal inside the app
+The user sees:
+
+- brand and trust message
+- `Try free` primary CTA
+- short explanation that the trial activates on this device
+
+The app should not ask for:
+
+- keys
+- subscription URLs
+- Telegram login
+- manual import as the primary path
+
+### After trial activation
+
+The app receives a real subscription payload, imports it silently, and switches to a `Quick Connect` home screen.
+
+The home screen should show:
+
+- a large `Connect` button
+- `Auto-select` location by default
+- current location or best location
+- trial or subscription state
+- quick access to devices, profile, and support
+
+## Information Architecture
+
+Primary tabs:
+
+1. `VPN`
+2. `Locations`
+3. `Devices`
+4. `Profile`
+5. `Support`
+
+## Telegram Role
 
 Telegram is used for:
 
@@ -52,134 +77,26 @@ Telegram is used for:
 - recovery flows
 - community and announcements
 
-## Target User Experience
+Current aligned channel and bot:
 
-### First launch
+- channel: `@pokrov_vpn`
+- main bot: `@portal_service_bot`
 
-The user sees a clean screen with:
+## Support Direction
 
-- brand
-- trust message
-- `Try free` primary CTA
-- a short explanation that the app will activate a trial on this device
+Support should be reachable from:
 
-The app does not ask for:
-
-- keys
-- subscription URLs
-- Telegram login
-- manual config import
-
-### After trial activation
-
-The app silently receives a real subscription payload, imports the working profile, and switches to a `Quick Connect` home screen.
-
-The home screen must show:
-
-- a large `Connect` button
-- `Auto-select` server as the default
-- current location or best location
-- trial or subscription status
-- quick access to devices, profile, and support
-
-## Information Architecture
-
-### Main tabs
-
-1. `VPN`
-2. `Locations`
-3. `Devices`
-4. `Profile`
-5. `Support`
-
-### VPN
-
-Primary responsibilities:
-
-- show `Try free` before activation
-- show `Connect` after activation
-- show connection state
-- show selected or auto-selected location
-- show trial or subscription status
-- show Telegram reward CTA
-
-### Locations
-
-Primary responsibilities:
-
-- `Auto-select`
-- countries and cities
-- `Free` / `Premium` segmentation
-- latency and node health
-- favorites
-
-### Devices
-
-Primary responsibilities:
-
-- show all linked devices
-- show current device
-- rename device
-- unlink device
-- show owner device
-- show recent activity
-
-### Profile
-
-Primary responsibilities:
-
-- current plan and expiry
-- trial status
-- renewal and purchase
-- Telegram binding
-- promo and reward status
-- legal links
-
-### Support
-
-Primary responsibilities:
-
-- in-app tickets or chat
-- FAQ
-- send diagnostics
-
-## Advanced Settings Policy
-
-Advanced settings remain in the product but are not part of the first-layer user journey.
-
-### Hidden from first layer
-
-- block ads
-- bypass LAN
-- resolve destination
-- strict route
-- DNS routing details
-- inbound settings
-- TLS tricks
-- WARP
-- logs
-- Clash API
-- core switching
-
-### Visible in Advanced
-
-- use xray when possible
-- DNS settings
-- WARP settings
-- TLS tricks
-- logs
-- LAN options
-- custom subscription import
-- debug and compatibility switches
+- the app itself
+- WebApp if the user is already in the platform
+- helpbot `@portal_privacy_helpbot`
 
 ## Branding Requirements
 
 The app must be fully rebranded away from Hiddify.
 
-### Must be replaced
+Replace:
 
 - app name strings
-- package-facing display names
 - launcher icons
 - splash assets
 - tray icons
@@ -187,24 +104,13 @@ The app must be fully rebranded away from Hiddify.
 - release asset names
 - visible `Hiddify` references in UI
 
-### Brand source
+Brand source:
 
-- primary logo asset: [logogo.png](C:/Users/kiwun/Documents/ai/VPN/external/logogo.png)
-
-## Localization
-
-Russian must be a first-class user-facing language.
-
-Requirements:
-
-- natural Russian wording
-- no machine-like literal phrasing
-- no advanced networking jargon on first-layer screens
-- clear consumer copy for trial, billing, devices, and support
+- [logogo.png](C:/Users/kiwun/Documents/ai/VPN/external/logogo.png)
 
 ## v1 Scope
 
-### In scope
+In scope:
 
 - app-first trial activation
 - silent profile provisioning
@@ -216,20 +122,9 @@ Requirements:
 - Telegram reward `+10 days`
 - full rebrand cleanup for Android and Windows
 
-### Out of scope
+Out of scope:
 
-- mandatory Telegram login
+- forced Telegram sign-in as the primary gate
 - admin panel inside the client
 - power-user-first navigation
 - manual config import as the primary onboarding path
-
-## Success Criteria
-
-The product is successful when a new store user can:
-
-1. install the app
-2. tap `Try free`
-3. get a real working trial
-4. connect without importing a key
-5. understand the rest of the app without technical knowledge
-

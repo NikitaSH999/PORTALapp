@@ -1,6 +1,10 @@
 # App-First Session Flow
 
-Last updated: 2026-03-19
+Last updated: 2026-03-20
+
+## Document Status
+
+This file is the living client architecture note for app-first identity and provisioning.
 
 ## Goal
 
@@ -8,79 +12,11 @@ Replace Telegram-first access with an app-native identity and provisioning flow.
 
 ## Core Principle
 
-The app must provision a real VPN profile after `Try free`.
+After `Try free`, the app must receive a real working VPN profile.
 
-UI state alone is not enough. The backend must create a working account, a working device record, and a working subscription payload.
+UI state alone is not enough. The backend must create a working account, a working device record, and a working subscription source.
 
-## Entities
-
-### app_account
-
-Represents the primary account identity inside the app.
-
-Suggested fields:
-
-- `id`
-- `status`
-- `plan_code`
-- `trial_expires_at`
-- `subscription_expires_at`
-- `telegram_user_id` nullable
-- `reward_balance_days`
-- `created_at`
-- `updated_at`
-
-### device_record
-
-Represents one installation or device linked to an app account.
-
-Suggested fields:
-
-- `id`
-- `app_account_id`
-- `install_id`
-- `fingerprint_signal`
-- `device_name`
-- `platform`
-- `model`
-- `app_version`
-- `locale`
-- `timezone`
-- `last_ip`
-- `last_seen_at`
-- `is_owner`
-- `is_active`
-
-### app_session
-
-Represents a renewable authenticated app session.
-
-Suggested fields:
-
-- `id`
-- `app_account_id`
-- `device_record_id`
-- `session_token`
-- `refresh_token`
-- `expires_at`
-- `created_at`
-- `revoked_at`
-
-### reward_claim
-
-Represents reward campaigns such as Telegram bonus.
-
-Suggested fields:
-
-- `id`
-- `app_account_id`
-- `type`
-- `status`
-- `granted_days`
-- `metadata`
-- `created_at`
-
-## First Launch Flow
+## Current Flow
 
 1. App generates and persists `install_id`.
 2. App collects soft device context.
@@ -91,165 +27,58 @@ Suggested fields:
    - `app_account`
    - `device_record`
    - `app_session`
-7. Backend provisions a real VPN subscription or profile source.
+7. Backend provisions a real subscription source.
 8. Backend returns:
    - `session_token`
    - `trial_expires_at`
    - `subscription_url`
-   - `best_location`
-   - `available_locations`
-   - `device_limit`
+   - experience payload
 9. App silently imports the subscription URL and activates the profile.
 10. Home screen changes to `Quick Connect`.
 
-## Suggested API Surface
+## Client-Side Foundation Already Present
 
-### `POST /api/client/session/start-trial`
+As of 2026-03-20, the client-side foundation already covers:
 
-Purpose:
+- stable `install_id`
+- runtime app `session_token`
+- device context headers on portal API calls
+- `Try free` action from the empty home screen
+- silent subscription import into the existing profile pipeline
+- automatic activation of the imported profile
 
-- create a trial-backed account and a device
+That means the remaining work is mostly final UX polish and backend contract alignment rather than first-principles plumbing.
 
-Request:
+## Related Flows
 
-- `install_id`
-- `device_name`
-- `platform`
-- `os_version`
-- `app_version`
-- `locale`
-- `time_zone`
-- `trial_days`
+### Telegram linking
 
-Response:
+Current platform contract:
 
-- `session_token`
-- optional inline `experience` payload with:
-  - `session`
-  - `dashboard`
-  - `user`
-  - `plans`
-  - `tickets`
-  - `apps`
-  - `node_status`
+- `POST /api/client/telegram/link`
 
-## Current app implementation
+### Telegram bonus claim
 
-As of `2026-03-19`, the client already implements the app-side foundation for this flow:
+Current platform contract:
 
-- persists a stable `install_id`
-- stores a runtime app `session_token`
-- sends `install_id` and device context headers on portal API calls
-- activates trial from the empty home screen via `Try free`
-- silently imports the returned subscription URL into the existing profile pipeline
-- marks the imported profile active automatically
+- `POST /api/bonuses/channel/claim`
 
-This means the remaining work for full Phase 2 is now mostly backend contract alignment and final UX polish, not the core client plumbing.
+Linked Telegram identity and membership in `@pokrov_vpn` can grant `+10 days`.
 
-### `POST /app/session/refresh`
+### Support
 
-Purpose:
+Support payloads should carry:
 
-- refresh app auth session
-
-### `GET /app/me`
-
-Purpose:
-
-- return current app account, plan, and reward state
-
-### `GET /app/locations`
-
-Purpose:
-
-- return available free and premium locations
-
-### `GET /app/devices`
-
-Purpose:
-
-- return linked devices with names and status
-
-### `PATCH /app/devices/{id}`
-
-Purpose:
-
-- rename a device
-
-### `DELETE /app/devices/{id}`
-
-Purpose:
-
-- unlink a device
-
-### `POST /app/rewards/claim-telegram`
-
-Purpose:
-
-- verify Telegram campaign completion and add `+10 days`
-
-### `POST /app/support/thread`
-
-Purpose:
-
-- create a support conversation
-
-### `POST /app/support/message`
-
-Purpose:
-
-- send an in-app support message with device context
+- app account context
+- device record context
+- platform
+- app version
+- last known IP when available
 
 ## Identity Strategy
 
-### Primary identifier
+- primary identifier: `install_id`
+- secondary anti-abuse signal: `fingerprint_signal`
+- human-readable identity: `device_name`
 
-- `install_id`
-
-### Secondary anti-abuse signal
-
-- `fingerprint_signal`
-
-### Human-readable identity
-
-- `device_name`
-
-This balance is preferred over hard-only HWID because it is more resilient to normal user changes while still supporting abuse detection.
-
-## Device Limit Policy
-
-Suggested defaults:
-
-- trial: `1 device`
-- paid: up to `5 devices`
-
-The device limit should be enforced at the `app_account` level, not only by opaque profile links.
-
-## Telegram Reward Flow
-
-1. User taps `Get +10 days`.
-2. App opens Telegram deep link.
-3. User completes campaign action.
-4. User returns to app.
-5. App calls `POST /app/rewards/claim-telegram`.
-6. Backend validates eligibility and idempotency.
-7. Backend extends access by `10 days`.
-
-## Failure Handling
-
-If trial provisioning fails:
-
-- show a friendly retry state
-- do not show a fake active trial
-- do not require manual key import as fallback on the first screen
-
-## Observability
-
-Every support and provisioning event should include:
-
-- `app_account_id`
-- `device_record_id`
-- `device_name`
-- `platform`
-- `app_version`
-- `last_ip`
+This is preferred over a Telegram-only identity model.
