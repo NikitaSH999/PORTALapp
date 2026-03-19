@@ -44,7 +44,7 @@ class IntroPage extends HookConsumerWidget with PresLogger {
                 height: 224,
                 child: Padding(
                   padding: const EdgeInsets.all(24),
-                  child: Assets.images.logo.svg(),
+                  child: Assets.images.logo.image(filterQuality: FilterQuality.high),
                 ),
               ),
             ),

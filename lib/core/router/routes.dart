@@ -2,24 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/router/app_router.dart';
 import 'package:hiddify/features/common/adaptive_root_scaffold.dart';
-import 'package:hiddify/features/config_option/overview/config_options_page.dart';
 import 'package:hiddify/features/config_option/widget/quick_settings_modal.dart';
-
 import 'package:hiddify/features/home/widget/home_page.dart';
 import 'package:hiddify/features/intro/widget/intro_page.dart';
-import 'package:hiddify/features/log/overview/logs_overview_page.dart';
 import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_page.dart';
+import 'package:hiddify/features/portal/widget/devices_page.dart';
+import 'package:hiddify/features/portal/widget/locations_page.dart';
+import 'package:hiddify/features/portal/widget/profile_page.dart';
+import 'package:hiddify/features/portal/widget/support_page.dart';
 import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/details/profile_details_page.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
-import 'package:hiddify/features/proxy/overview/proxies_overview_page.dart';
-import 'package:hiddify/features/settings/about/about_page.dart';
 import 'package:hiddify/features/settings/overview/settings_overview_page.dart';
 import 'package:hiddify/utils/utils.dart';
 
 part 'routes.g.dart';
 
-GlobalKey<NavigatorState>? _dynamicRootKey = useMobileRouter ? rootNavigatorKey : null;
+final GlobalKey<NavigatorState>? _dynamicRootKey =
+    useMobileRouter ? rootNavigatorKey : null;
 
 @TypedShellRoute<MobileWrapperRoute>(
   routes: [
@@ -125,7 +125,6 @@ class MobileWrapperRoute extends ShellRouteData {
     TypedGoRoute<SettingsRoute>(
       path: "/settings",
       name: SettingsRoute.name,
-      routes: [],
     ),
     TypedGoRoute<LogsOverviewRoute>(
       path: "/logs",
@@ -182,7 +181,7 @@ class ProxiesRoute extends GoRouteData {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return const NoTransitionPage(
       name: name,
-      child: ProxiesOverviewPage(),
+      child: LocationsPage(),
     );
   }
 }
@@ -268,10 +267,10 @@ class LogsOverviewRoute extends GoRouteData {
     if (useMobileRouter) {
       return const MaterialPage(
         name: name,
-        child: LogsOverviewPage(),
+        child: SupportPage(),
       );
     }
-    return const NoTransitionPage(name: name, child: LogsOverviewPage());
+    return const NoTransitionPage(name: name, child: SupportPage());
   }
 }
 
@@ -319,14 +318,14 @@ class ConfigOptionsRoute extends GoRouteData {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     if (useMobileRouter) {
-      return MaterialPage(
+      return const MaterialPage(
         name: name,
-        child: ConfigOptionsPage(section: section),
+        child: DevicesPage(),
       );
     }
-    return NoTransitionPage(
+    return const NoTransitionPage(
       name: name,
-      child: ConfigOptionsPage(section: section),
+      child: DevicesPage(),
     );
   }
 }
@@ -358,9 +357,9 @@ class AboutRoute extends GoRouteData {
     if (useMobileRouter) {
       return const MaterialPage(
         name: name,
-        child: AboutPage(),
+        child: ProfilePage(),
       );
     }
-    return const NoTransitionPage(name: name, child: AboutPage());
+    return const NoTransitionPage(name: name, child: ProfilePage());
   }
 }

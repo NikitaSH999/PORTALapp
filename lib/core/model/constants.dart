@@ -1,15 +1,15 @@
 abstract class Constants {
-  static const appName = "Hiddify";
-  static const githubUrl = "https://github.com/hiddify/hiddify-next";
+  static const appName = "PORTAL VPN";
+  static const githubUrl = "https://github.com/NikitaSH999/PORTALapp";
   static const githubReleasesApiUrl =
-      "https://api.github.com/repos/hiddify/hiddify-next/releases";
+      "https://api.github.com/repos/NikitaSH999/PORTALapp/releases";
   static const githubLatestReleaseUrl =
-      "https://github.com/hiddify/hiddify-next/releases/latest";
+      "https://github.com/NikitaSH999/PORTALapp/releases/latest";
   static const appCastUrl =
-      "https://raw.githubusercontent.com/hiddify/hiddify-next/main/appcast.xml";
-  static const telegramChannelUrl = "https://t.me/hiddify";
-  static const privacyPolicyUrl = "https://hiddify.com/privacy-policy/";
-  static const termsAndConditionsUrl = "https://hiddify.com/terms/";
+      "https://raw.githubusercontent.com/NikitaSH999/PORTALapp/main/appcast.xml";
+  static const telegramChannelUrl = "https://t.me/portalvpn";
+  static const privacyPolicyUrl = "https://portalvpn.app/privacy";
+  static const termsAndConditionsUrl = "https://portalvpn.app/terms";
   static const cfWarpPrivacyPolicy =
       "https://www.cloudflare.com/application/privacypolicy/";
   static const cfWarpTermsOfService =

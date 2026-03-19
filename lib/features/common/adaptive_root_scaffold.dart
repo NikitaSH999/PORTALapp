@@ -1,7 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
-import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,34 +19,28 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final t = ref.watch(translationsProvider);
-
     final selectedIndex = getCurrentIndex(context);
 
-    final destinations = [
+    const destinations = <NavigationDestination>[
       NavigationDestination(
         icon: const Icon(FluentIcons.power_20_filled),
-        label: t.home.pageTitle,
+        label: 'Connect',
       ),
       NavigationDestination(
-        icon: const Icon(FluentIcons.filter_20_filled),
-        label: t.proxies.pageTitle,
+        icon: const Icon(FluentIcons.globe_20_filled),
+        label: 'Locations',
       ),
       NavigationDestination(
-        icon: const Icon(FluentIcons.box_edit_20_filled),
-        label: t.config.pageTitle,
+        icon: const Icon(FluentIcons.phone_laptop_20_filled),
+        label: 'Devices',
       ),
       NavigationDestination(
-        icon: const Icon(FluentIcons.settings_20_filled),
-        label: t.settings.pageTitle,
+        icon: const Icon(FluentIcons.headset_20_filled),
+        label: 'Support',
       ),
       NavigationDestination(
-        icon: const Icon(FluentIcons.document_text_20_filled),
-        label: t.logs.pageTitle,
-      ),
-      NavigationDestination(
-        icon: const Icon(FluentIcons.info_20_filled),
-        label: t.about.pageTitle,
+        icon: const Icon(FluentIcons.person_20_filled),
+        label: 'Profile',
       ),
     ];
 
@@ -58,8 +51,9 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
         switchTab(index, context);
       },
       destinations: destinations,
-      drawerDestinationRange: useMobileRouter ? (2, null) : (0, null),
-      bottomDestinationRange: (0, 2),
+      drawerDestinationRange:
+          useMobileRouter ? (destinations.length, null) : (0, null),
+      bottomDestinationRange: (0, null),
       useBottomSheet: useMobileRouter,
       sidebarTrailing: const Expanded(
         child: Align(
@@ -108,15 +102,16 @@ class _CustomAdaptiveScaffold extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final drawerDestinations = destinationsSlice(drawerDestinationRange);
     return Scaffold(
       key: RootScaffold.stateKey,
-      drawer: Breakpoints.small.isActive(context)
+      drawer: Breakpoints.small.isActive(context) && drawerDestinations.isNotEmpty
           ? Drawer(
               width: (MediaQuery.sizeOf(context).width * 0.88).clamp(1, 304),
               child: NavigationRail(
                 extended: true,
                 selectedIndex: selectedWithOffset(drawerDestinationRange),
-                destinations: destinationsSlice(drawerDestinationRange)
+                destinations: drawerDestinations
                     .map((dest) => AdaptiveScaffold.toRailDestination(dest))
                     .toList(),
                 onDestinationSelected: (index) =>

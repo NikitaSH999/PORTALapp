@@ -153,11 +153,10 @@ class _ConnectionButton extends StatelessWidget {
                       if (useImage) {
                         return image.image(filterQuality: FilterQuality.medium);
                       } else {
-                        return Assets.images.logo.svg(
-                          colorFilter: ColorFilter.mode(
-                            value!,
-                            BlendMode.srcIn,
-                          ),
+                        return Assets.images.logo.image(
+                          color: value,
+                          colorBlendMode: BlendMode.srcIn,
+                          filterQuality: FilterQuality.medium,
                         );
                       }
                     },

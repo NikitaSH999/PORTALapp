@@ -1,0 +1,349 @@
+name: Fork Android + Windows Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag (example: v1.0.0)"
+        required: true
+        type: string
+      channel:
+        description: "Core channel used by Makefile"
+        required: true
+        default: "prod"
+        type: choice
+        options:
+          - prod
+          - dev
+      create_github_release:
+        description: "Create/update GitHub release with produced artifacts"
+        required: true
+        default: true
+        type: boolean
+      upload_to_play:
+        description: "Upload generated AAB to Google Play"
+        required: true
+        default: false
+        type: boolean
+      play_track:
+        description: "Google Play track"
+        required: true
+        default: "beta"
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      push_to_mirror:
+        description: "Copy artifacts to mirror host through SCP"
+        required: true
+        default: false
+        type: boolean
+      mirror_target_dir:
+        description: "Target directory on mirror host"
+        required: false
+        default: "/var/www/downloads/portalapp"
+        type: string
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+env:
+  IS_GITHUB_ACTIONS: 1
+  FLUTTER_VERSION: "3.24.0"
+  NDK_VERSION: "r26d"
+  APP_SLUG: "portalapp"
+  APP_ANDROID_PACKAGE: ${{ vars.ANDROID_PACKAGE_NAME || 'app.hiddify.com' }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+      channel: ${{ steps.meta.outputs.channel }}
+      create_release: ${{ steps.meta.outputs.create_release }}
+      upload_to_play: ${{ steps.meta.outputs.upload_to_play }}
+      play_track: ${{ steps.meta.outputs.play_track }}
+      push_to_mirror: ${{ steps.meta.outputs.push_to_mirror }}
+      mirror_target_dir: ${{ steps.meta.outputs.mirror_target_dir }}
+    steps:
+      - name: Resolve metadata
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            TAG="${{ inputs.release_tag }}"
+            CHANNEL="${{ inputs.channel }}"
+            CREATE_RELEASE="${{ inputs.create_github_release }}"
+            UPLOAD_TO_PLAY="${{ inputs.upload_to_play }}"
+            PLAY_TRACK="${{ inputs.play_track }}"
+            PUSH_TO_MIRROR="${{ inputs.push_to_mirror }}"
+            MIRROR_TARGET="${{ inputs.mirror_target_dir }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+            CHANNEL="prod"
+            CREATE_RELEASE="true"
+            UPLOAD_TO_PLAY="false"
+            PLAY_TRACK="beta"
+            PUSH_TO_MIRROR="false"
+            MIRROR_TARGET="/var/www/downloads/${APP_SLUG}"
+          fi
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "channel=${CHANNEL}" >> "$GITHUB_OUTPUT"
+          echo "create_release=${CREATE_RELEASE}" >> "$GITHUB_OUTPUT"
+          echo "upload_to_play=${UPLOAD_TO_PLAY}" >> "$GITHUB_OUTPUT"
+          echo "play_track=${PLAY_TRACK}" >> "$GITHUB_OUTPUT"
+          echo "push_to_mirror=${PUSH_TO_MIRROR}" >> "$GITHUB_OUTPUT"
+          echo "mirror_target_dir=${MIRROR_TARGET}" >> "$GITHUB_OUTPUT"
+
+  build-android:
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      CHANNEL: ${{ needs.prepare.outputs.channel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.16.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Apply fork branding overrides
+        env:
+          FORK_BRAND_NAME: ${{ vars.BRAND_NAME }}
+          FORK_REPO_URL: https://github.com/${{ github.repository }}
+          FORK_ANDROID_APPLICATION_ID: ${{ vars.ANDROID_APPLICATION_ID }}
+          FORK_ANDROID_NAMESPACE: ${{ vars.ANDROID_NAMESPACE }}
+          FORK_ANDROID_TEST_NAMESPACE: ${{ vars.ANDROID_TEST_NAMESPACE }}
+          FORK_URI_SCHEME: ${{ vars.URI_SCHEME }}
+          FORK_WINDOWS_IDENTITY_NAME: ${{ vars.WINDOWS_IDENTITY_NAME }}
+          FORK_WINDOWS_PUBLISHER_NAME: ${{ vars.WINDOWS_PUBLISHER_NAME }}
+          FORK_WINDOWS_INSTALL_DIR: ${{ vars.WINDOWS_INSTALL_DIR }}
+          FORK_WINDOWS_EXE_STEM: ${{ vars.WINDOWS_EXE_STEM }}
+          FORK_COPYRIGHT: ${{ vars.BRAND_COPYRIGHT }}
+        run: python .github/scripts/apply_fork_branding.py
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: zulu
+          java-version: "17"
+
+      - name: Setup NDK
+        uses: nttld/setup-ndk@v1
+        with:
+          ndk-version: ${{ env.NDK_VERSION }}
+          add-to-path: true
+          link-to-sdk: true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: "7.5"
+
+      - name: Install dependencies
+        run: make android-apk-install-dependencies
+
+      - name: Setup Android signing
+        if: ${{ secrets.ANDROID_SIGNING_KEY != '' && secrets.ANDROID_SIGNING_STORE_PASSWORD != '' && secrets.ANDROID_SIGNING_KEY_PASSWORD != '' && secrets.ANDROID_SIGNING_KEY_ALIAS != '' }}
+        shell: bash
+        run: |
+          echo "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 --decode > android/key.jks
+          cat > android/key.properties <<EOF
+          storeFile=$(pwd)/android/key.jks
+          storePassword=${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+          EOF
+
+      - name: Prepare Android
+        run: make android-apk-prepare
+
+      - name: Build Android APK
+        run: make android-apk-release
+
+      - name: Build Android AAB
+        run: make android-aab-release
+
+      - name: Collect Android artifacts
+        shell: bash
+        run: |
+          mkdir -p out
+          cp ./build/app/outputs/flutter-apk/*arm64-v8a*.apk "out/${APP_SLUG}-android-arm64.apk" || true
+          cp ./build/app/outputs/flutter-apk/*armeabi-v7a*.apk "out/${APP_SLUG}-android-armv7.apk" || true
+          cp ./build/app/outputs/flutter-apk/*x86_64*.apk "out/${APP_SLUG}-android-x64.apk" || true
+          cp ./build/app/outputs/flutter-apk/app-release.apk "out/${APP_SLUG}-android-universal.apk" || true
+          cp ./build/app/outputs/bundle/release/app-release.aab "out/${APP_SLUG}-android-market.aab" || true
+          (cd out && sha256sum * > SHA256SUMS-android.txt)
+          ls -la out
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-release
+          path: out/*
+          retention-days: 7
+
+      - name: Upload AAB to Google Play
+        if: ${{ needs.prepare.outputs.upload_to_play == 'true' && secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        shell: bash
+        run: |
+          cat > service_account.json <<'EOF'
+          ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          EOF
+
+      - name: Publish to Google Play
+        if: ${{ needs.prepare.outputs.upload_to_play == 'true' && secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: ${{ env.APP_ANDROID_PACKAGE }}
+          releaseName: ${{ needs.prepare.outputs.tag }}
+          releaseFiles: out/${{ env.APP_SLUG }}-android-market.aab
+          track: ${{ needs.prepare.outputs.play_track }}
+
+  build-windows:
+    needs: prepare
+    runs-on: windows-2022
+    env:
+      CHANNEL: ${{ needs.prepare.outputs.channel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.16.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Apply fork branding overrides
+        shell: pwsh
+        env:
+          FORK_BRAND_NAME: ${{ vars.BRAND_NAME }}
+          FORK_REPO_URL: https://github.com/${{ github.repository }}
+          FORK_ANDROID_APPLICATION_ID: ${{ vars.ANDROID_APPLICATION_ID }}
+          FORK_ANDROID_NAMESPACE: ${{ vars.ANDROID_NAMESPACE }}
+          FORK_ANDROID_TEST_NAMESPACE: ${{ vars.ANDROID_TEST_NAMESPACE }}
+          FORK_URI_SCHEME: ${{ vars.URI_SCHEME }}
+          FORK_WINDOWS_IDENTITY_NAME: ${{ vars.WINDOWS_IDENTITY_NAME }}
+          FORK_WINDOWS_PUBLISHER_NAME: ${{ vars.WINDOWS_PUBLISHER_NAME }}
+          FORK_WINDOWS_INSTALL_DIR: ${{ vars.WINDOWS_INSTALL_DIR }}
+          FORK_WINDOWS_EXE_STEM: ${{ vars.WINDOWS_EXE_STEM }}
+          FORK_COPYRIGHT: ${{ vars.BRAND_COPYRIGHT }}
+        run: python .github/scripts/apply_fork_branding.py
+
+      - name: Install dependencies
+        shell: pwsh
+        run: make windows-install-dependencies
+
+      - name: Setup Windows signing
+        if: ${{ secrets.WINDOWS_SIGNING_KEY != '' && secrets.WINDOWS_SIGNING_PASSWORD != '' }}
+        shell: pwsh
+        run: |
+          [IO.File]::WriteAllBytes("windows\sign.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_SIGNING_KEY }}"))
+          (Get-Content "windows\packaging\msix\make_config.yaml") `
+            -replace '^certificate_password:.*$', 'certificate_password: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}' `
+            | Set-Content "windows\packaging\msix\make_config.yaml"
+
+      - name: Prepare Windows
+        shell: pwsh
+        run: make windows-prepare
+
+      - name: Build Windows
+        shell: pwsh
+        run: make windows-release
+
+      - name: Package Windows outputs
+        shell: pwsh
+        run: .\scripts\package_windows.ps1
+
+      - name: Normalize artifact names
+        shell: pwsh
+        run: |
+          $slug = "${{ env.APP_SLUG }}"
+          if (Test-Path "out\Hiddify-Windows-Setup-x64.exe") {
+            Rename-Item -Path "out\Hiddify-Windows-Setup-x64.exe" -NewName "$slug-windows-setup-x64.exe" -Force
+          }
+          if (Test-Path "out\Hiddify-Windows-Setup-x64.msix") {
+            Rename-Item -Path "out\Hiddify-Windows-Setup-x64.msix" -NewName "$slug-windows-setup-x64.msix" -Force
+          }
+          if (Test-Path "out\Hiddify-Windows-Portable-x64.zip") {
+            Rename-Item -Path "out\Hiddify-Windows-Portable-x64.zip" -NewName "$slug-windows-portable-x64.zip" -Force
+          }
+          $files = Get-ChildItem -Path out -File
+          foreach ($file in $files) {
+            $hash = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash  $($file.Name)" | Out-File -FilePath "out\SHA256SUMS-windows.txt" -Append -Encoding utf8
+          }
+          Get-ChildItem -Path out -File
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: out/*
+          retention-days: 7
+
+  publish-release:
+    needs: [prepare, build-android, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+          path: release-out
+
+      - name: Build handoff env file
+        shell: bash
+        run: |
+          TAG="${{ needs.prepare.outputs.tag }}"
+          REPO="${{ github.repository }}"
+          mkdir -p release-meta
+          cat > release-meta/release-links.env <<EOF
+          APP_ANDROID_PLAY_URL=
+          APP_ANDROID_APK_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-android-universal.apk
+          APP_ANDROID_MIRROR_URL=
+          APP_WINDOWS_EXE_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-windows-setup-x64.exe
+          APP_WINDOWS_MIRROR_URL=
+          APP_DOCS_URL=
+          EOF
+          ls -la release-out
+          cat release-meta/release-links.env
+
+      - name: Upload handoff env
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-handoff
+          path: release-meta/release-links.env
+          retention-days: 7
+
+      - name: Create GitHub Release
+        if: ${{ needs.prepare.outputs.create_release == 'true' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          files: release-out/*
+          prerelease: ${{ needs.prepare.outputs.channel != 'prod' }}
+          generate_release_notes: true
+
+      - name: Upload to mirror host
+        if: ${{ needs.prepare.outputs.push_to_mirror == 'true' && secrets.MIRROR_SSH_HOST != '' && secrets.MIRROR_SSH_USER != '' && secrets.MIRROR_SSH_KEY != '' }}
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.MIRROR_SSH_HOST }}
+          username: ${{ secrets.MIRROR_SSH_USER }}
+          key: ${{ secrets.MIRROR_SSH_KEY }}
+          source: "release-out/*.apk,release-out/*.aab,release-out/*.exe,release-out/*.msix,release-out/*.zip,release-out/*.txt"
+          target: ${{ needs.prepare.outputs.mirror_target_dir }}

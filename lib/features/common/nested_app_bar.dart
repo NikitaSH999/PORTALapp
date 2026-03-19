@@ -8,9 +8,8 @@ import 'package:hiddify/utils/utils.dart';
 bool showDrawerButton(BuildContext context) {
   if (!useMobileRouter) return true;
   final String location = GoRouterState.of(context).uri.path;
-  if (location == const HomeRoute().location || location == const ProfilesOverviewRoute().location) return true;
-  if (location.startsWith(const ProxiesRoute().location)) return true;
-  return false;
+  if (location == const ProfilesOverviewRoute().location) return true;
+  return tabLocations.any((tab) => location == tab || location.startsWith(tab));
 }
 
 class NestedAppBar extends StatelessWidget {

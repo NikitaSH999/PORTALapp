@@ -1,5 +1,5 @@
 name: hiddify
-description: Cross Platform Multi Protocol Proxy Frontend.
+description: PORTAL VPN for Windows and Android.
 publish_to: "none"
 version: 2.5.7+20507
 
@@ -123,7 +123,7 @@ flutter:
   assets:
     # - assets/core/geoip.db
     # - assets/core/geosite.db
-    - assets/images/logo.svg
+    - assets/images/logo.png
     - assets/images/tray_icon.ico
     - assets/images/tray_icon.png
     - assets/images/tray_icon_dark.ico
@@ -152,11 +152,11 @@ flutter_gen:
     flutter_svg: true
 
 flutter_native_splash:
-  color: "#ffffff"
+  color: "#090D18"
   image: assets/images/source/ic_launcher_splash.png
   android_gravity: center
   android_12:
-    color: "#ffffff"
+    color: "#090D18"
     image: assets/images/source/ic_launcher_foreground.png
 
 ffigen:

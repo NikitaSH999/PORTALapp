@@ -54,7 +54,6 @@ final tabLocations = [
   const HomeRoute().location,
   const ProxiesRoute().location,
   const ConfigOptionsRoute().location,
-  const SettingsRoute().location,
   const LogsOverviewRoute().location,
   const AboutRoute().location,
 ];
@@ -62,6 +61,7 @@ final tabLocations = [
 int getCurrentIndex(BuildContext context) {
   final String location = GoRouterState.of(context).uri.path;
   if (location == const HomeRoute().location) return 0;
+  if (location.startsWith(const SettingsRoute().location)) return 4;
   var index = 0;
   for (final tab in tabLocations.sublist(1)) {
     index++;

@@ -1,0 +1,492 @@
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hiddify/features/portal/config/portal_public_config.dart';
+import 'package:hiddify/features/portal/data/portal_api_client.dart';
+import 'package:hiddify/features/portal/data/portal_repository.dart';
+import 'package:hiddify/features/portal/data/portal_session_store.dart';
+import 'package:hiddify/features/portal/model/portal_models.dart';
+
+class _FakePortalApiClient implements PortalApiClient {
+  _FakePortalApiClient(
+    this.responses, {
+    this.onPost,
+  });
+
+  final Map<String, Map<String, dynamic>> responses;
+  final Future<Map<String, dynamic>> Function(
+    String path,
+    Map<String, dynamic> body,
+  )? onPost;
+
+  @override
+  Future<Map<String, dynamic>> getJson(String path) async {
+    final response = responses[path];
+    if (response == null) {
+      throw StateError('No fake response registered for $path');
+    }
+    return response;
+  }
+
+  @override
+  Future<Map<String, dynamic>> postJson(
+    String path,
+    Map<String, dynamic> body,
+  ) async {
+    if (onPost != null) {
+      return onPost!(path, body);
+    }
+    return getJson(path);
+  }
+}
+
+class _ThrowingPortalApiClient implements PortalApiClient {
+  @override
+  Future<Map<String, dynamic>> getJson(String path) async {
+    throw StateError('network unavailable');
+  }
+
+  @override
+  Future<Map<String, dynamic>> postJson(
+    String path,
+    Map<String, dynamic> body,
+  ) async {
+    throw StateError('network unavailable');
+  }
+}
+
+class _MemoryPortalSessionStore implements PortalSessionStore {
+  _MemoryPortalSessionStore({
+    this.installId = 'install-123',
+    this.sessionToken = '',
+  });
+
+  final String installId;
+  String sessionToken;
+
+  @override
+  Future<void> clearSession() async {
+    sessionToken = '';
+  }
+
+  @override
+  Future<String> ensureInstallId() async => installId;
+
+  @override
+  bool get hasSessionAuth => sessionToken.isNotEmpty;
+
+  @override
+  String readInstallIdSync() => installId;
+
+  @override
+  String readSessionTokenSync() => sessionToken;
+
+  @override
+  Future<void> saveSessionToken(String value) async {
+    sessionToken = value;
+  }
+}
+
+void main() {
+  group('PortalRepositoryImpl.getExperience', () {
+    test('builds a service-first overview from portal payloads', () async {
+      final repository = PortalRepositoryImpl(
+        apiClient: _FakePortalApiClient({
+          '/api/auth/session': {
+            'ok': true,
+            'user': {'id': 1001, 'username': 'alice'}
+          },
+          '/api/dashboard': {
+            'tg_id': 1001,
+            'sub_type': 'PAID',
+            'current_plan_code': '1_month',
+            'is_active': true,
+            'expiry_at': '2026-04-01T00:00:00Z',
+            'used_gb': 18,
+            'total_gb': 100,
+            'remaining_gb': 82,
+            'active_sessions': 2,
+            'device_limit': 5,
+            'subscription_url': 'https://portal.example.test/sub/abc',
+            'features': {'haptic': true, 'lottie': false}
+          },
+          '/api/user/1001': {
+            'tg_id': 1001,
+            'username': 'alice',
+            'subscription_url': 'https://portal.example.test/sub/abc',
+            'is_active': true,
+            'is_admin': false,
+            'sub_type': 'PAID',
+            'expiry_at': '2026-04-01T00:00:00Z',
+            'nodes': [
+              {
+                'code': 'nl',
+                'name': 'Netherlands',
+                'host': 'nl.example.test',
+                'port': 443,
+                'enabled': true,
+              },
+              {
+                'code': 'pl',
+                'name': 'Poland',
+                'host': 'pl.example.test',
+                'port': 443,
+                'enabled': false,
+              }
+            ],
+            'limits': {'device_limit': 5, 'total_gb': 100},
+            'traffic': {'used_gb': 18, 'total_gb': 100, 'remaining_gb': 82},
+            'support': {
+              'username': 'portal_helpdesk',
+              'link': 'https://t.me/portal_helpdesk',
+              'new_ticket_link': 'https://t.me/portal_helpdesk?start=ticket'
+            },
+            'actions': {
+              'open_helpbot': 'https://t.me/portal_helpdesk',
+              'open_channel': 'https://t.me/portal_privacy',
+              'pay_via_bot': 'https://t.me/portal_service_bot?start=pay'
+            },
+            'features': {'haptic': true, 'lottie': false}
+          },
+          '/api/public/plans': {
+            'widget_enabled': true,
+            'plans': [
+              {
+                'code': '1_month',
+                'label': '1 Month',
+                'amount_rub': 249,
+                'amount_stars': 249,
+                'days': 30,
+                'device_limit': 5,
+                'node_policy': 'paid_pool',
+                'badge': 'Popular',
+                'is_active': true,
+                'sort_order': 1,
+              }
+            ]
+          },
+          '/api/tickets?limit=6': {
+            'tickets': [
+              {
+                'id': 91,
+                'user_tg_id': 1001,
+                'status': 'open',
+                'status_title': 'Open',
+                'subject': 'Need help',
+                'messages': [
+                  {
+                    'id': 900,
+                    'ticket_id': 91,
+                    'sender_tg_id': 1001,
+                    'sender_role': 'user',
+                    'body': 'Hello',
+                    'created_at': '2026-03-18T10:00:00Z',
+                  }
+                ]
+              }
+            ]
+          },
+          '/api/client/apps': {
+            'android': {
+              'play_url': 'https://play.google.com/store/apps/details?id=portal',
+              'apk_url': 'https://cdn.example.test/portal.apk',
+              'mirror_url': 'https://mirror.example.test/portal.apk',
+            },
+            'windows': {
+              'exe_url': 'https://cdn.example.test/portal.exe',
+              'mirror_url': 'https://mirror.example.test/portal.exe',
+            },
+            'docs_url': 'https://docs.example.test/install',
+            'updated_at': '2026-03-18T00:00:00Z',
+          },
+          '/api/nodes/status': {
+            'nodes': [
+              {
+                'code': 'nl',
+                'country': 'Netherlands',
+                'host': 'nl.example.test',
+                'port_open': true,
+                'dns_sni_status': 'ok',
+                'is_healthy': true,
+              },
+              {
+                'code': 'pl',
+                'country': 'Poland',
+                'host': 'pl.example.test',
+                'port_open': false,
+                'dns_sni_status': 'degraded',
+                'is_healthy': false,
+              }
+            ]
+          },
+        }),
+        config: PortalPublicConfig.fromMap(const {
+          'PORTAL_WEB_SESSION_TOKEN': 'test-token',
+        }),
+        sessionStore: _MemoryPortalSessionStore(),
+      );
+
+      final experience = await repository.getExperience();
+
+      expect(experience.isDemo, isFalse);
+      expect(experience.session.username, equals('alice'));
+      expect(experience.dashboard.connectionPointsLabel, equals('1/2'));
+      expect(experience.subscription.plans, hasLength(1));
+      expect(experience.devices, hasLength(2));
+      expect(experience.supportThreads.single.messages, hasLength(1));
+      expect(experience.downloads.map((item) => item.platformLabel), containsAll(<String>['Android', 'Windows']));
+      expect(experience.importPayload.smartUrl, contains('format=smart'));
+      expect(experience.subscription.payViaBotUrl, contains('portal_service_bot'));
+    });
+
+    test('falls back to demo experience when portal is unavailable', () async {
+      final repository = PortalRepositoryImpl(
+        apiClient: _ThrowingPortalApiClient(),
+        config: PortalPublicConfig.fromMap(const {}),
+        sessionStore: _MemoryPortalSessionStore(),
+      );
+
+      final experience = await repository.getExperience();
+
+      expect(experience.isDemo, isTrue);
+      expect(experience.session.isAuthorized, isFalse);
+      expect(experience.subscription.plans, isNotEmpty);
+      expect(experience.downloads, isNotEmpty);
+      expect(experience.supportThreads.single.subject, contains('Welcome'));
+    });
+
+    test('startTrial persists runtime session token and returns a live experience', () async {
+      final sessionStore = _MemoryPortalSessionStore();
+      Map<String, dynamic>? capturedBody;
+      final repository = PortalRepositoryImpl(
+        apiClient: _FakePortalApiClient({
+          '/api/client/session/start-trial': {
+            'session_token': 'runtime-session-123',
+            'experience': {
+              'session': {
+                'account_id': 'acc_1001',
+                'device_name': 'Android device',
+                'username': 'guest-acc_1001',
+                'is_authorized': true,
+              },
+              'dashboard': {
+                'sub_type': 'TRIAL',
+                'current_plan_code': 'trial_5_days',
+                'is_active': true,
+                'expiry_at': '2026-03-24T00:00:00Z',
+                'used_gb': 0,
+                'total_gb': 15,
+                'remaining_gb': 15,
+                'active_sessions': 0,
+                'device_limit': 1,
+                'subscription_url': 'https://portal.example.test/sub/trial',
+              },
+              'user': {
+                'account_id': 'acc_1001',
+                'username': 'guest-acc_1001',
+                'subscription_url': 'https://portal.example.test/sub/trial',
+                'is_active': true,
+                'sub_type': 'TRIAL',
+                'expiry_at': '2026-03-24T00:00:00Z',
+                'devices': [
+                  {
+                    'id': 'device_1',
+                    'name': 'Android device',
+                    'platform': 'Android',
+                    'is_active': true,
+                    'last_seen_at': '2026-03-19T08:00:00Z',
+                  }
+                ],
+              },
+              'plans': {
+                'widget_enabled': true,
+                'plans': [
+                  {
+                    'code': '1_month',
+                    'label': '1 Month',
+                    'amount_rub': 249,
+                    'amount_stars': 249,
+                    'days': 30,
+                    'device_limit': 5,
+                    'node_policy': 'paid_pool',
+                    'badge': 'Popular',
+                    'is_active': true,
+                    'sort_order': 1,
+                  }
+                ],
+              },
+              'tickets': {
+                'tickets': [],
+              },
+              'apps': {
+                'android': {
+                  'apk_url': 'https://cdn.example.test/portal.apk',
+                },
+              },
+              'node_status': {
+                'nodes': [
+                  {
+                    'code': 'nl',
+                    'country': 'Netherlands',
+                    'is_healthy': true,
+                  }
+                ],
+              },
+            },
+          },
+        }, onPost: (path, body) async {
+            capturedBody = body;
+            return {
+              'session_token': 'runtime-session-123',
+              'experience': {
+                'session': {
+                  'account_id': 'acc_1001',
+                  'device_name': 'Android device',
+                  'username': 'guest-acc_1001',
+                  'is_authorized': true,
+                },
+                'dashboard': {
+                  'sub_type': 'TRIAL',
+                  'current_plan_code': 'trial_5_days',
+                  'is_active': true,
+                  'expiry_at': '2026-03-24T00:00:00Z',
+                  'used_gb': 0,
+                  'total_gb': 15,
+                  'remaining_gb': 15,
+                  'active_sessions': 0,
+                  'device_limit': 1,
+                  'subscription_url': 'https://portal.example.test/sub/trial',
+                },
+                'user': {
+                  'account_id': 'acc_1001',
+                  'username': 'guest-acc_1001',
+                  'subscription_url': 'https://portal.example.test/sub/trial',
+                  'is_active': true,
+                  'sub_type': 'TRIAL',
+                  'expiry_at': '2026-03-24T00:00:00Z',
+                  'devices': [
+                    {
+                      'id': 'device_1',
+                      'name': 'Android device',
+                      'platform': 'Android',
+                      'is_active': true,
+                      'last_seen_at': '2026-03-19T08:00:00Z',
+                    }
+                  ],
+                },
+                'plans': {
+                  'widget_enabled': true,
+                  'plans': [
+                    {
+                      'code': '1_month',
+                      'label': '1 Month',
+                      'amount_rub': 249,
+                      'amount_stars': 249,
+                      'days': 30,
+                      'device_limit': 5,
+                      'node_policy': 'paid_pool',
+                      'badge': 'Popular',
+                      'is_active': true,
+                      'sort_order': 1,
+                    }
+                  ],
+                },
+                'tickets': {
+                  'tickets': [],
+                },
+                'apps': {
+                  'android': {
+                    'apk_url': 'https://cdn.example.test/portal.apk',
+                  },
+                },
+                'node_status': {
+                  'nodes': [
+                    {
+                      'code': 'nl',
+                      'country': 'Netherlands',
+                      'is_healthy': true,
+                    }
+                  ],
+                },
+              },
+            };
+          }),
+        config: PortalPublicConfig.fromMap(const {}),
+        sessionStore: sessionStore,
+      );
+
+      final experience = await repository.startTrial(
+        const PortalStartTrialRequest(
+          installId: 'install-123',
+          deviceName: 'Android device',
+          platform: 'android',
+          operatingSystemVersion: '14',
+          appVersion: '1.0.0',
+          localeTag: 'ru',
+          timeZone: 'MSK',
+          trialDays: 5,
+        ),
+      );
+
+      expect(sessionStore.readSessionTokenSync(), equals('runtime-session-123'));
+      expect(experience.isDemo, isFalse);
+      expect(experience.session.isAuthorized, isTrue);
+      expect(experience.importPayload.subscriptionUrl, contains('/sub/trial'));
+      expect(experience.devices.single.title, equals('Android device'));
+      expect(capturedBody, isNotNull);
+      expect(capturedBody!['install_id'], equals('install-123'));
+      expect(capturedBody!['trial_days'], equals(5));
+      expect(capturedBody!['locale'], equals('ru'));
+    });
+
+    test('requestTelegramLink returns deep link payload for app-first account', () async {
+      final repository = PortalRepositoryImpl(
+        apiClient: _FakePortalApiClient(
+          const {
+            '/api/client/telegram/link': {
+              'ok': true,
+              'linked': false,
+              'linked_telegram_id': null,
+              'linked_telegram_username': null,
+              'start_code': 'appabc123',
+              'bot_url': 'https://t.me/portal_service_bot?start=appabc123',
+              'channel_url': 'https://t.me/portal_privacy',
+            },
+          },
+        ),
+        config: PortalPublicConfig.fromMap(const {}),
+        sessionStore: _MemoryPortalSessionStore(sessionToken: 'runtime-session-123'),
+      );
+
+      final link = await repository.requestTelegramLink();
+
+      expect(link.linked, isFalse);
+      expect(link.startCode, equals('appabc123'));
+      expect(link.botUrl, contains('portal_service_bot'));
+      expect(link.channelUrl, contains('portal_privacy'));
+    });
+
+    test('claimTelegramBonus returns successful bonus grant payload', () async {
+      final repository = PortalRepositoryImpl(
+        apiClient: _FakePortalApiClient(
+          const {
+            '/api/bonuses/channel/claim': {
+              'ok': true,
+              'already_claimed': false,
+              'premium_days': 10,
+              'linked_telegram_id': 777001,
+              'linked_telegram_username': 'portal_user',
+            },
+          },
+        ),
+        config: PortalPublicConfig.fromMap(const {}),
+        sessionStore: _MemoryPortalSessionStore(sessionToken: 'runtime-session-123'),
+      );
+
+      final bonus = await repository.claimTelegramBonus();
+
+      expect(bonus.ok, isTrue);
+      expect(bonus.alreadyClaimed, isFalse);
+      expect(bonus.premiumDays, equals(10));
+      expect(bonus.linkedTelegramUsername, equals('portal_user'));
+    });
+  });
+}
