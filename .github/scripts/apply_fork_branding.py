@@ -48,21 +48,51 @@ def _set_rc_value(text: str, key: str, value: str) -> str:
     return out
 
 
+def _rewrite_constants(text: str, *, brand_name: str) -> str:
+    return _replace(
+        text,
+        r'static const appName = ".*?";',
+        f'static const appName = "{brand_name}";',
+    )
+
+
+def _rewrite_windows_exe_config(
+    text: str,
+    *,
+    publisher_name: str,
+    publisher_url: str,
+    display_name: str,
+    exe_name: str,
+    output_base_file_name: str,
+    install_dir_name: str,
+) -> str:
+    out = _set_yaml_scalar(text, "publisher", publisher_name)
+    out = _set_yaml_scalar(out, "publisher_url", publisher_url)
+    out = _set_yaml_scalar(out, "display_name", display_name)
+    out = _set_yaml_scalar(out, "executable_name", exe_name)
+    out = _set_yaml_scalar(out, "output_base_file_name", output_base_file_name)
+    out = _set_yaml_scalar(out, "install_dir_name", install_dir_name)
+    return out
+
+
 def _repo_urls(repo_url: str) -> tuple[str, str, str]:
     parsed = urlparse(repo_url)
     host = parsed.netloc.lower()
     path = parsed.path.strip("/")
     if host != "github.com" or "/" not in path:
+        base = repo_url.rstrip("/")
         return (
             repo_url,
-            "https://api.github.com/repos/hiddify/hiddify-next/releases",
-            "https://raw.githubusercontent.com/hiddify/hiddify-next/main/appcast.xml",
+            f"{base}/releases",
+            f"{base}/releases/latest/download/appcast.xml",
         )
     owner, repo = path.split("/", 1)
     owner = owner.strip()
     repo = repo.strip()
     api = f"https://api.github.com/repos/{owner}/{repo}/releases"
-    appcast = f"https://raw.githubusercontent.com/{owner}/{repo}/main/appcast.xml"
+    appcast = (
+        f"https://github.com/{owner}/{repo}/releases/latest/download/appcast.xml"
+    )
     return repo_url, api, appcast
 
 
@@ -98,26 +128,34 @@ def _rewrite_android_manifest(text: str, brand_name: str, uri_scheme: str) -> st
 def main() -> int:
     app_root = Path(__file__).resolve().parents[2]
 
-    brand_name = _read_env("FORK_BRAND_NAME", "PORTALapp")
+    brand_name = _read_env("FORK_BRAND_NAME", "POKROV VPN")
     repo_url = _read_env("FORK_REPO_URL", "")
     if not repo_url:
         gh_repo = _read_env("GITHUB_REPOSITORY", "")
-        repo_url = f"https://github.com/{gh_repo}" if gh_repo else "https://github.com/NikitaSH999/PORTALapp"
+        if not gh_repo:
+            raise RuntimeError(
+                "FORK_REPO_URL or GITHUB_REPOSITORY must be set for release branding."
+            )
+        repo_url = f"https://github.com/{gh_repo}"
 
-    android_app_id = _read_env("FORK_ANDROID_APPLICATION_ID", "com.kiwunaka.portalapp")
+    android_app_id = _read_env("FORK_ANDROID_APPLICATION_ID", "space.pokrov.vpn")
+    # Keep the Android namespace aligned with the existing Kotlin package tree
+    # unless the fork intentionally migrates source packages as well.
     android_namespace = _read_env("FORK_ANDROID_NAMESPACE", "com.hiddify.hiddify")
     android_test_namespace = _read_env(
         "FORK_ANDROID_TEST_NAMESPACE",
-        f"test.{android_namespace}",
+        "test.com.hiddify.hiddify",
     )
-    uri_scheme = _read_env("FORK_URI_SCHEME", "")
+    uri_scheme = _read_env("FORK_URI_SCHEME", "pokrovvpn")
 
-    windows_identity_name = _read_env("FORK_WINDOWS_IDENTITY_NAME", "Kiwunaka.PortalApp")
+    windows_identity_name = _read_env("FORK_WINDOWS_IDENTITY_NAME", "Pokrov.Vpn")
     windows_publisher_name = _read_env("FORK_WINDOWS_PUBLISHER_NAME", brand_name)
-    windows_install_dir = _read_env("FORK_WINDOWS_INSTALL_DIR", _slugify(brand_name))
-    exe_stem = _read_env("FORK_WINDOWS_EXE_STEM", _slugify(brand_name))
-    if not uri_scheme:
-        uri_scheme = _slugify(exe_stem).lower()
+    windows_publisher_url = _read_env(
+        "FORK_WINDOWS_PUBLISHER_URL",
+        "https://pokrov.space/",
+    )
+    windows_install_dir = _read_env("FORK_WINDOWS_INSTALL_DIR", brand_name)
+    exe_stem = _read_env("FORK_WINDOWS_EXE_STEM", "POKROVVPN")
     exe_name = f"{exe_stem}.exe"
     copyright_line = _read_env(
         "FORK_COPYRIGHT",
@@ -135,28 +173,13 @@ def main() -> int:
     print(f"  android_app_id={android_app_id}")
     print(f"  android_namespace={android_namespace}")
     print(f"  windows_identity_name={windows_identity_name}")
+    print(f"  windows_publisher_url={windows_publisher_url}")
     print(f"  windows_exe={exe_name}")
     print(f"  uri_scheme={uri_scheme}")
 
     _patch_file(
         app_root / "lib/core/model/constants.dart",
-        lambda t: _replace(
-            _replace(
-                _replace(
-                    _replace(
-                        _replace(t, r'static const appName = ".*?";', f'static const appName = "{brand_name}";'),
-                        r'static const githubUrl = ".*?";',
-                        f'static const githubUrl = "{repo_url}";',
-                    ),
-                    r'static const githubReleasesApiUrl =\s*"[^"]+";',
-                    f'static const githubReleasesApiUrl =\n      "{releases_api_url}";',
-                ),
-                r'static const githubLatestReleaseUrl =\s*"[^"]+";',
-                f'static const githubLatestReleaseUrl =\n      "{latest_release_url}";',
-            ),
-            r'static const appCastUrl =\s*"[^"]+";',
-            f'static const appCastUrl =\n      "{appcast_url}";',
-        ),
+        lambda t: _rewrite_constants(t, brand_name=brand_name),
     )
 
     _patch_file(
@@ -205,13 +228,13 @@ def main() -> int:
                         f'CreateMutex(NULL, TRUE, L"{mutex_name}")',
                     ),
                     r'FindWindowA\(NULL,\s*"[^"]+"\)',
-                    f'FindWindowA(NULL, "{exe_stem}")',
+                    f'FindWindowA(NULL, "{brand_name}")',
                 ),
                 r'window\.SendAppLinkToInstance\(L"[^"]+"\)',
-                f'window.SendAppLinkToInstance(L"{exe_stem}")',
+                f'window.SendAppLinkToInstance(L"{brand_name}")',
             ),
             r'window\.Create\(L"[^"]+",\s*origin,\s*size\)',
-            f'window.Create(L"{exe_stem}", origin, size)',
+            f'window.Create(L"{brand_name}", origin, size)',
         ),
     )
 
@@ -242,30 +265,14 @@ def main() -> int:
 
     _patch_file(
         app_root / "windows/packaging/exe/make_config.yaml",
-        lambda t: _set_yaml_scalar(
-            _set_yaml_scalar(
-                _set_yaml_scalar(
-                    _set_yaml_scalar(
-                        _set_yaml_scalar(
-                            _set_yaml_scalar(
-                                t,
-                                "publisher",
-                                windows_publisher_name,
-                            ),
-                            "publisher_url",
-                            repo_url,
-                        ),
-                        "display_name",
-                        brand_name,
-                    ),
-                    "executable_name",
-                    exe_name,
-                ),
-                "output_base_file_name",
-                exe_name,
-            ),
-            "install_dir_name",
-            f'"{{autopf64}}\\\\{windows_install_dir}"',
+        lambda t: _rewrite_windows_exe_config(
+            t,
+            publisher_name=windows_publisher_name,
+            publisher_url=windows_publisher_url,
+            display_name=brand_name,
+            exe_name=exe_name,
+            output_base_file_name=f"{exe_stem}-setup",
+            install_dir_name=f'"{{autopf64}}\\\\{windows_install_dir}"',
         ),
     )
 
@@ -294,7 +301,7 @@ def main() -> int:
                 exe_name,
             ),
             "ProductName",
-            internal_name,
+            brand_name,
         ),
     )
 
@@ -303,7 +310,7 @@ def main() -> int:
         lambda t: _replace(
             t,
             r"Exec\('taskkill', '/F /IM [^']+'",
-            f"Exec('taskkill', '/F /IM {internal_name}.exe'",
+            f"Exec('taskkill', '/F /IM {exe_name}'",
         ),
     )
 

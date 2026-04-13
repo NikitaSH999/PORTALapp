@@ -9,21 +9,31 @@
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
-  HANDLE hMutexInstance = CreateMutex(NULL, TRUE, L"PORTALVPNMutex");
-  HWND handle = FindWindowA(NULL, "PORTAL VPN");
+  HANDLE hMutexInstance = CreateMutex(NULL, TRUE, L"POKROVVPNMutex");
+  const bool already_running = GetLastError() == ERROR_ALREADY_EXISTS;
+  HWND handle = FindWindowA(NULL, "POKROV VPN");
 
-  if (GetLastError() == ERROR_ALREADY_EXISTS) {
+  if (already_running) {
     flutter::DartProject project(L"data");
     std::vector<std::string> command_line_arguments = GetCommandLineArguments();
     project.set_dart_entrypoint_arguments(std::move(command_line_arguments));
     FlutterWindow window(project);
-    if (window.SendAppLinkToInstance(L"PORTAL VPN")) {
+    if (window.SendAppLinkToInstance(L"POKROV VPN")) {
+      if (hMutexInstance != NULL) {
+        CloseHandle(hMutexInstance);
+      }
       return false;
     }
 
-    WINDOWPLACEMENT place = {sizeof(WINDOWPLACEMENT)};
-    GetWindowPlacement(handle, &place);
-    ShowWindow(handle, SW_NORMAL);
+    if (handle != NULL) {
+      WINDOWPLACEMENT place = {sizeof(WINDOWPLACEMENT)};
+      GetWindowPlacement(handle, &place);
+      ShowWindow(handle, SW_NORMAL);
+      SetForegroundWindow(handle);
+    }
+    if (hMutexInstance != NULL) {
+      CloseHandle(hMutexInstance);
+    }
     return 0;
   }
 
@@ -47,7 +57,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
-  if (!window.Create(L"PORTAL VPN", origin, size)) {
+  if (!window.Create(L"POKROV VPN", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);
@@ -59,6 +69,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   }
 
   ::CoUninitialize();
-  ReleaseMutex(hMutexInstance);
+  if (hMutexInstance != NULL) {
+    ReleaseMutex(hMutexInstance);
+    CloseHandle(hMutexInstance);
+  }
   return EXIT_SUCCESS;
 }

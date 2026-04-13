@@ -43,7 +43,7 @@ on:
       mirror_target_dir:
         description: "Target directory on mirror host"
         required: false
-        default: "/var/www/downloads/portalapp"
+        default: "/var/www/downloads/pokrov-vpn"
         type: string
   push:
     tags:
@@ -52,12 +52,16 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: fork-android-windows-release-${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
 env:
   IS_GITHUB_ACTIONS: 1
   FLUTTER_VERSION: "3.24.0"
   NDK_VERSION: "r26d"
-  APP_SLUG: "portalapp"
-  APP_ANDROID_PACKAGE: ${{ vars.ANDROID_PACKAGE_NAME || 'app.hiddify.com' }}
+  APP_SLUG: "pokrov-vpn"
+  APP_ANDROID_PACKAGE: ${{ vars.ANDROID_PACKAGE_NAME || 'space.pokrov.vpn' }}
 
 jobs:
   prepare:
@@ -101,11 +105,65 @@ jobs:
           echo "push_to_mirror=${PUSH_TO_MIRROR}" >> "$GITHUB_OUTPUT"
           echo "mirror_target_dir=${MIRROR_TARGET}" >> "$GITHUB_OUTPUT"
 
-  build-android:
+  validate-release-inputs:
     needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate signing and publishing inputs
+        shell: bash
+        env:
+          CREATE_RELEASE: ${{ needs.prepare.outputs.create_release }}
+          UPLOAD_TO_PLAY: ${{ needs.prepare.outputs.upload_to_play }}
+          ANDROID_SIGNING_KEY: ${{ secrets.ANDROID_SIGNING_KEY }}
+          ANDROID_SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+          ANDROID_SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+          ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+          WINDOWS_SIGNING_KEY: ${{ secrets.WINDOWS_SIGNING_KEY }}
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+
+          missing=()
+
+          for key in \
+            ANDROID_SIGNING_KEY \
+            ANDROID_SIGNING_STORE_PASSWORD \
+            ANDROID_SIGNING_KEY_PASSWORD \
+            ANDROID_SIGNING_KEY_ALIAS \
+            WINDOWS_SIGNING_KEY \
+            WINDOWS_SIGNING_PASSWORD
+          do
+            if [[ -z "${!key:-}" ]]; then
+              missing+=("$key")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required release signing inputs:"
+            printf ' - %s\n' "${missing[@]}"
+            exit 1
+          fi
+
+          if [[ "${UPLOAD_TO_PLAY}" == "true" && -z "${GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:-}" ]]; then
+            echo "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is required when upload_to_play=true"
+            exit 1
+          fi
+
+          if [[ "${CREATE_RELEASE}" != "true" ]]; then
+            echo "create_release=false: signing inputs still validated because this workflow is release-only."
+          fi
+
+  build-android:
+    needs: [prepare, validate-release-inputs]
     runs-on: ubuntu-latest
     env:
       CHANNEL: ${{ needs.prepare.outputs.channel }}
+      PORTAL_RELEASE_REPOSITORY_URL: https://github.com/${{ github.repository }}
+      PORTAL_RELEASES_API_URL: https://api.github.com/repos/${{ github.repository }}/releases
+      PORTAL_RELEASES_LATEST_URL: https://github.com/${{ github.repository }}/releases/latest
+      PORTAL_RELEASES_APPCAST_URL: https://github.com/${{ github.repository }}/releases/latest/download/appcast.xml
+      PORTAL_WARP_DEFAULTS_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.event.repository.default_branch || 'main' }}/external/client-fork/app/test.configs/warp
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -127,6 +185,7 @@ jobs:
           FORK_URI_SCHEME: ${{ vars.URI_SCHEME }}
           FORK_WINDOWS_IDENTITY_NAME: ${{ vars.WINDOWS_IDENTITY_NAME }}
           FORK_WINDOWS_PUBLISHER_NAME: ${{ vars.WINDOWS_PUBLISHER_NAME }}
+          FORK_WINDOWS_PUBLISHER_URL: ${{ vars.WINDOWS_PUBLISHER_URL }}
           FORK_WINDOWS_INSTALL_DIR: ${{ vars.WINDOWS_INSTALL_DIR }}
           FORK_WINDOWS_EXE_STEM: ${{ vars.WINDOWS_EXE_STEM }}
           FORK_COPYRIGHT: ${{ vars.BRAND_COPYRIGHT }}
@@ -154,7 +213,6 @@ jobs:
         run: make android-apk-install-dependencies
 
       - name: Setup Android signing
-        if: ${{ secrets.ANDROID_SIGNING_KEY != '' && secrets.ANDROID_SIGNING_STORE_PASSWORD != '' && secrets.ANDROID_SIGNING_KEY_PASSWORD != '' && secrets.ANDROID_SIGNING_KEY_ALIAS != '' }}
         shell: bash
         run: |
           echo "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 --decode > android/key.jks
@@ -194,7 +252,7 @@ jobs:
           retention-days: 7
 
       - name: Upload AAB to Google Play
-        if: ${{ needs.prepare.outputs.upload_to_play == 'true' && secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        if: ${{ needs.prepare.outputs.upload_to_play == 'true' }}
         shell: bash
         run: |
           cat > service_account.json <<'EOF'
@@ -202,7 +260,7 @@ jobs:
           EOF
 
       - name: Publish to Google Play
-        if: ${{ needs.prepare.outputs.upload_to_play == 'true' && secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON != '' }}
+        if: ${{ needs.prepare.outputs.upload_to_play == 'true' }}
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: service_account.json
@@ -212,10 +270,15 @@ jobs:
           track: ${{ needs.prepare.outputs.play_track }}
 
   build-windows:
-    needs: prepare
+    needs: [prepare, validate-release-inputs]
     runs-on: windows-2022
     env:
       CHANNEL: ${{ needs.prepare.outputs.channel }}
+      PORTAL_RELEASE_REPOSITORY_URL: https://github.com/${{ github.repository }}
+      PORTAL_RELEASES_API_URL: https://api.github.com/repos/${{ github.repository }}/releases
+      PORTAL_RELEASES_LATEST_URL: https://github.com/${{ github.repository }}/releases/latest
+      PORTAL_RELEASES_APPCAST_URL: https://github.com/${{ github.repository }}/releases/latest/download/appcast.xml
+      PORTAL_WARP_DEFAULTS_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.event.repository.default_branch || 'main' }}/external/client-fork/app/test.configs/warp
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -238,6 +301,7 @@ jobs:
           FORK_URI_SCHEME: ${{ vars.URI_SCHEME }}
           FORK_WINDOWS_IDENTITY_NAME: ${{ vars.WINDOWS_IDENTITY_NAME }}
           FORK_WINDOWS_PUBLISHER_NAME: ${{ vars.WINDOWS_PUBLISHER_NAME }}
+          FORK_WINDOWS_PUBLISHER_URL: ${{ vars.WINDOWS_PUBLISHER_URL }}
           FORK_WINDOWS_INSTALL_DIR: ${{ vars.WINDOWS_INSTALL_DIR }}
           FORK_WINDOWS_EXE_STEM: ${{ vars.WINDOWS_EXE_STEM }}
           FORK_COPYRIGHT: ${{ vars.BRAND_COPYRIGHT }}
@@ -248,7 +312,6 @@ jobs:
         run: make windows-install-dependencies
 
       - name: Setup Windows signing
-        if: ${{ secrets.WINDOWS_SIGNING_KEY != '' && secrets.WINDOWS_SIGNING_PASSWORD != '' }}
         shell: pwsh
         run: |
           [IO.File]::WriteAllBytes("windows\sign.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_SIGNING_KEY }}"))
@@ -271,16 +334,6 @@ jobs:
       - name: Normalize artifact names
         shell: pwsh
         run: |
-          $slug = "${{ env.APP_SLUG }}"
-          if (Test-Path "out\Hiddify-Windows-Setup-x64.exe") {
-            Rename-Item -Path "out\Hiddify-Windows-Setup-x64.exe" -NewName "$slug-windows-setup-x64.exe" -Force
-          }
-          if (Test-Path "out\Hiddify-Windows-Setup-x64.msix") {
-            Rename-Item -Path "out\Hiddify-Windows-Setup-x64.msix" -NewName "$slug-windows-setup-x64.msix" -Force
-          }
-          if (Test-Path "out\Hiddify-Windows-Portable-x64.zip") {
-            Rename-Item -Path "out\Hiddify-Windows-Portable-x64.zip" -NewName "$slug-windows-portable-x64.zip" -Force
-          }
           $files = Get-ChildItem -Path out -File
           foreach ($file in $files) {
             $hash = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash.ToLower()
@@ -296,7 +349,7 @@ jobs:
           retention-days: 7
 
   publish-release:
-    needs: [prepare, build-android, build-windows]
+    needs: [prepare, validate-release-inputs, build-android, build-windows]
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
@@ -315,12 +368,31 @@ jobs:
           APP_ANDROID_PLAY_URL=
           APP_ANDROID_APK_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-android-universal.apk
           APP_ANDROID_MIRROR_URL=
+          APP_ANDROID_AAB_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-android-market.aab
           APP_WINDOWS_EXE_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-windows-setup-x64.exe
           APP_WINDOWS_MIRROR_URL=
+          APP_WINDOWS_MSIX_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-windows-setup-x64.msix
+          APP_WINDOWS_PORTABLE_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-windows-portable-x64.zip
           APP_DOCS_URL=
           EOF
           ls -la release-out
           cat release-meta/release-links.env
+
+      - name: Generate updater feed
+        shell: bash
+        run: |
+          TAG="${{ needs.prepare.outputs.tag }}"
+          VERSION="${TAG#v}"
+          REPO="${{ github.repository }}"
+          PUB_DATE="$(date -u '+%a, %d %b %Y %H:%M:%S +0000')"
+          mkdir -p release-meta
+          sed \
+            -e "s|RELEASE_REPOSITORY|${REPO}|g" \
+            -e "s|RELEASE_TAG|${TAG}|g" \
+            -e "s|RELEASE_VERSION|${VERSION}|g" \
+            -e "s|RELEASE_PUB_DATE|${PUB_DATE}|g" \
+            appcast.xml > release-meta/appcast.xml
+          cat release-meta/appcast.xml
 
       - name: Upload handoff env
         uses: actions/upload-artifact@v4
@@ -329,12 +401,21 @@ jobs:
           path: release-meta/release-links.env
           retention-days: 7
 
+      - name: Upload updater feed
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-appcast
+          path: release-meta/appcast.xml
+          retention-days: 7
+
       - name: Create GitHub Release
         if: ${{ needs.prepare.outputs.create_release == 'true' }}
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.prepare.outputs.tag }}
-          files: release-out/*
+          files: |
+            release-out/*
+            release-meta/appcast.xml
           prerelease: ${{ needs.prepare.outputs.channel != 'prod' }}
           generate_release_notes: true
 

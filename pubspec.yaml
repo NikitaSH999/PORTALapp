@@ -1,5 +1,5 @@
 name: hiddify
-description: PORTAL VPN for Windows and Android.
+description: POKROV VPN for Windows and Android.
 publish_to: "none"
 version: 2.5.7+20507
 
@@ -124,6 +124,8 @@ flutter:
     # - assets/core/geoip.db
     # - assets/core/geosite.db
     - assets/images/logo.png
+    - assets/images/logo.svg
+    - assets/images/logo_with_text.svg
     - assets/images/tray_icon.ico
     - assets/images/tray_icon.png
     - assets/images/tray_icon_dark.ico

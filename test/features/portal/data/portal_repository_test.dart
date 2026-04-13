@@ -116,6 +116,15 @@ void main() {
             'is_admin': false,
             'sub_type': 'PAID',
             'expiry_at': '2026-04-01T00:00:00Z',
+            'devices': [
+              {
+                'id': 'device_1',
+                'name': 'Android device',
+                'platform': 'Android',
+                'is_active': true,
+                'last_seen_at': '2026-03-19T08:00:00Z',
+              }
+            ],
             'nodes': [
               {
                 'code': 'nl',
@@ -186,7 +195,8 @@ void main() {
           },
           '/api/client/apps': {
             'android': {
-              'play_url': 'https://play.google.com/store/apps/details?id=portal',
+              'play_url':
+                  'https://play.google.com/store/apps/details?id=portal',
               'apk_url': 'https://cdn.example.test/portal.apk',
               'mirror_url': 'https://mirror.example.test/portal.apk',
             },
@@ -230,11 +240,19 @@ void main() {
       expect(experience.session.username, equals('alice'));
       expect(experience.dashboard.connectionPointsLabel, equals('1/2'));
       expect(experience.subscription.plans, hasLength(1));
-      expect(experience.devices, hasLength(2));
+      expect(experience.devices, hasLength(1));
+      expect(experience.devices.single.platform, equals('Android'));
+      expect(experience.locations, hasLength(2));
+      expect(experience.locations.map((item) => item.title),
+          containsAll(<String>['Netherlands', 'Poland']));
+      expect(experience.locations.every((item) => item.regionLabel == 'Region'),
+          isTrue);
       expect(experience.supportThreads.single.messages, hasLength(1));
-      expect(experience.downloads.map((item) => item.platformLabel), containsAll(<String>['Android', 'Windows']));
+      expect(experience.downloads.map((item) => item.platformLabel),
+          containsAll(<String>['Android', 'Windows']));
       expect(experience.importPayload.smartUrl, contains('format=smart'));
-      expect(experience.subscription.payViaBotUrl, contains('portal_service_bot'));
+      expect(
+          experience.subscription.payViaBotUrl, contains('portal_service_bot'));
     });
 
     test('falls back to demo experience when portal is unavailable', () async {
@@ -249,11 +267,14 @@ void main() {
       expect(experience.isDemo, isTrue);
       expect(experience.session.isAuthorized, isFalse);
       expect(experience.subscription.plans, isNotEmpty);
+      expect(experience.locations, isEmpty);
       expect(experience.downloads, isNotEmpty);
       expect(experience.supportThreads.single.subject, contains('Welcome'));
     });
 
-    test('startTrial persists runtime session token and returns a live experience', () async {
+    test(
+        'startTrial persists runtime session token and returns a live experience',
+        () async {
       final sessionStore = _MemoryPortalSessionStore();
       Map<String, dynamic>? capturedBody;
       final repository = PortalRepositoryImpl(
@@ -333,82 +354,82 @@ void main() {
             },
           },
         }, onPost: (path, body) async {
-            capturedBody = body;
-            return {
-              'session_token': 'runtime-session-123',
-              'experience': {
-                'session': {
-                  'account_id': 'acc_1001',
-                  'device_name': 'Android device',
-                  'username': 'guest-acc_1001',
-                  'is_authorized': true,
-                },
-                'dashboard': {
-                  'sub_type': 'TRIAL',
-                  'current_plan_code': 'trial_5_days',
-                  'is_active': true,
-                  'expiry_at': '2026-03-24T00:00:00Z',
-                  'used_gb': 0,
-                  'total_gb': 15,
-                  'remaining_gb': 15,
-                  'active_sessions': 0,
-                  'device_limit': 1,
-                  'subscription_url': 'https://portal.example.test/sub/trial',
-                },
-                'user': {
-                  'account_id': 'acc_1001',
-                  'username': 'guest-acc_1001',
-                  'subscription_url': 'https://portal.example.test/sub/trial',
-                  'is_active': true,
-                  'sub_type': 'TRIAL',
-                  'expiry_at': '2026-03-24T00:00:00Z',
-                  'devices': [
-                    {
-                      'id': 'device_1',
-                      'name': 'Android device',
-                      'platform': 'Android',
-                      'is_active': true,
-                      'last_seen_at': '2026-03-19T08:00:00Z',
-                    }
-                  ],
-                },
-                'plans': {
-                  'widget_enabled': true,
-                  'plans': [
-                    {
-                      'code': '1_month',
-                      'label': '1 Month',
-                      'amount_rub': 249,
-                      'amount_stars': 249,
-                      'days': 30,
-                      'device_limit': 5,
-                      'node_policy': 'paid_pool',
-                      'badge': 'Popular',
-                      'is_active': true,
-                      'sort_order': 1,
-                    }
-                  ],
-                },
-                'tickets': {
-                  'tickets': [],
-                },
-                'apps': {
-                  'android': {
-                    'apk_url': 'https://cdn.example.test/portal.apk',
-                  },
-                },
-                'node_status': {
-                  'nodes': [
-                    {
-                      'code': 'nl',
-                      'country': 'Netherlands',
-                      'is_healthy': true,
-                    }
-                  ],
+          capturedBody = body;
+          return {
+            'session_token': 'runtime-session-123',
+            'experience': {
+              'session': {
+                'account_id': 'acc_1001',
+                'device_name': 'Android device',
+                'username': 'guest-acc_1001',
+                'is_authorized': true,
+              },
+              'dashboard': {
+                'sub_type': 'TRIAL',
+                'current_plan_code': 'trial_5_days',
+                'is_active': true,
+                'expiry_at': '2026-03-24T00:00:00Z',
+                'used_gb': 0,
+                'total_gb': 15,
+                'remaining_gb': 15,
+                'active_sessions': 0,
+                'device_limit': 1,
+                'subscription_url': 'https://portal.example.test/sub/trial',
+              },
+              'user': {
+                'account_id': 'acc_1001',
+                'username': 'guest-acc_1001',
+                'subscription_url': 'https://portal.example.test/sub/trial',
+                'is_active': true,
+                'sub_type': 'TRIAL',
+                'expiry_at': '2026-03-24T00:00:00Z',
+                'devices': [
+                  {
+                    'id': 'device_1',
+                    'name': 'Android device',
+                    'platform': 'Android',
+                    'is_active': true,
+                    'last_seen_at': '2026-03-19T08:00:00Z',
+                  }
+                ],
+              },
+              'plans': {
+                'widget_enabled': true,
+                'plans': [
+                  {
+                    'code': '1_month',
+                    'label': '1 Month',
+                    'amount_rub': 249,
+                    'amount_stars': 249,
+                    'days': 30,
+                    'device_limit': 5,
+                    'node_policy': 'paid_pool',
+                    'badge': 'Popular',
+                    'is_active': true,
+                    'sort_order': 1,
+                  }
+                ],
+              },
+              'tickets': {
+                'tickets': [],
+              },
+              'apps': {
+                'android': {
+                  'apk_url': 'https://cdn.example.test/portal.apk',
                 },
               },
-            };
-          }),
+              'node_status': {
+                'nodes': [
+                  {
+                    'code': 'nl',
+                    'country': 'Netherlands',
+                    'is_healthy': true,
+                  }
+                ],
+              },
+            },
+          };
+        }),
         config: PortalPublicConfig.fromMap(const {}),
         sessionStore: sessionStore,
       );
@@ -422,22 +443,24 @@ void main() {
           appVersion: '1.0.0',
           localeTag: 'ru',
           timeZone: 'MSK',
-          trialDays: 5,
         ),
       );
 
-      expect(sessionStore.readSessionTokenSync(), equals('runtime-session-123'));
+      expect(
+          sessionStore.readSessionTokenSync(), equals('runtime-session-123'));
       expect(experience.isDemo, isFalse);
       expect(experience.session.isAuthorized, isTrue);
       expect(experience.importPayload.subscriptionUrl, contains('/sub/trial'));
       expect(experience.devices.single.title, equals('Android device'));
+      expect(experience.locations.single.title, equals('Netherlands'));
       expect(capturedBody, isNotNull);
       expect(capturedBody!['install_id'], equals('install-123'));
-      expect(capturedBody!['trial_days'], equals(5));
+      expect(capturedBody!.containsKey('trial_days'), isFalse);
       expect(capturedBody!['locale'], equals('ru'));
     });
 
-    test('requestTelegramLink returns deep link payload for app-first account', () async {
+    test('requestTelegramLink returns deep link payload for app-first account',
+        () async {
       final repository = PortalRepositoryImpl(
         apiClient: _FakePortalApiClient(
           const {
@@ -453,7 +476,8 @@ void main() {
           },
         ),
         config: PortalPublicConfig.fromMap(const {}),
-        sessionStore: _MemoryPortalSessionStore(sessionToken: 'runtime-session-123'),
+        sessionStore:
+            _MemoryPortalSessionStore(sessionToken: 'runtime-session-123'),
       );
 
       final link = await repository.requestTelegramLink();
@@ -478,7 +502,8 @@ void main() {
           },
         ),
         config: PortalPublicConfig.fromMap(const {}),
-        sessionStore: _MemoryPortalSessionStore(sessionToken: 'runtime-session-123'),
+        sessionStore:
+            _MemoryPortalSessionStore(sessionToken: 'runtime-session-123'),
       );
 
       final bonus = await repository.claimTelegramBonus();

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:hiddify/features/portal/config/portal_public_config.dart';
 import 'package:hiddify/features/portal/data/portal_repository.dart';
 import 'package:hiddify/features/portal/model/portal_models.dart';
 import 'package:hiddify/features/portal/widget/locations_page.dart';
@@ -25,8 +26,35 @@ void main() {
     expect(find.text('Locations'), findsOneWidget);
     expect(find.text('Auto-select'), findsOneWidget);
     expect(find.text('Best server right now'), findsOneWidget);
+    expect(find.text('Active route'), findsOneWidget);
+    expect(find.text('Use'), findsNothing);
     expect(find.text('Netherlands'), findsWidgets);
     expect(find.text('Germany'), findsOneWidget);
+  });
+
+  testWidgets('shows an activation gate before a real subscription exists',
+      (tester) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          portalExperienceProvider.overrideWith(
+            (ref) async => PortalExperience.demo(
+              PortalPublicConfig.fromMap(const {}),
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          home: LocationsPage(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Locations unlock after activation'), findsOneWidget);
+    expect(find.text('Return to VPN'), findsOneWidget);
+    expect(find.text('Netherlands'), findsNothing);
+    expect(find.text('Poland'), findsNothing);
   });
 }
 
@@ -65,19 +93,20 @@ PortalExperience _experience() {
       plans: [],
     ),
     checkout: null,
-    devices: [
-      DeviceRecord(
+    devices: [],
+    locations: [
+      LocationRecord(
         id: 'nl',
         title: 'Netherlands',
         subtitle: 'Amsterdam',
-        platform: 'Location',
+        regionLabel: 'Location',
         isActive: true,
       ),
-      DeviceRecord(
+      LocationRecord(
         id: 'de',
         title: 'Germany',
         subtitle: 'Frankfurt',
-        platform: 'Location',
+        regionLabel: 'Location',
         isActive: false,
       ),
     ],

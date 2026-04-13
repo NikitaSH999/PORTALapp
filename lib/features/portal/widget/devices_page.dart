@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hiddify/core/widget/premium_surfaces.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/portal/data/portal_repository.dart';
 import 'package:hiddify/features/portal/model/portal_models.dart';
+import 'package:hiddify/features/portal/widget/portal_copy.dart';
 import 'package:hiddify/features/portal/widget/portal_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -11,190 +13,199 @@ class DevicesPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final copy = PortalCopy.of(context);
     final experience = ref.watch(portalExperienceProvider);
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          const NestedAppBar(title: Text('Devices')),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            sliver: SliverToBoxAdapter(
-              child: PortalAsyncBody(
-                value: experience,
-                builder: (context, portal) {
-                  final freeSlots =
-                      (portal.usage.deviceLimit - portal.usage.activeSessions)
-                          .clamp(0, portal.usage.deviceLimit);
-                  final currentDevice = _currentDevice(portal);
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      PortalSectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Current device',
-                              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    fontWeight: FontWeight.w700,
+      backgroundColor: Colors.transparent,
+      body: PremiumPageBackground(
+        child: CustomScrollView(
+          slivers: [
+            NestedAppBar(title: Text(copy.devicesTitle)),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              sliver: SliverToBoxAdapter(
+                child: PortalAsyncBody(
+                  value: experience,
+                  builder: (context, portal) {
+                    final freeSlots =
+                        (portal.usage.deviceLimit - portal.usage.activeSessions)
+                            .clamp(0, portal.usage.deviceLimit);
+                    final currentDevice = _currentDevice(portal);
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PortalSectionCard(
+                          tone: PortalSectionTone.accent,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              PremiumSectionHeader(
+                                eyebrow: copy.deviceOverviewEyebrow,
+                                title: copy.currentDeviceTitle,
+                                subtitle: copy.currentDeviceSubtitle,
+                              ),
+                              const Gap(16),
+                              Text(
+                                currentDevice != null
+                                    ? copy.localizeServerText(
+                                        currentDevice.title,
+                                      )
+                                    : portal.session.deviceName,
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              const Gap(6),
+                              Text(
+                                currentDevice?.subtitle.isNotEmpty == true
+                                    ? copy.localizeServerText(
+                                        currentDevice!.subtitle,
+                                      )
+                                    : copy.currentDeviceFallback,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              const Gap(18),
+                              Wrap(
+                                spacing: 12,
+                                runSpacing: 12,
+                                children: [
+                                  SizedBox(
+                                    width: 220,
+                                    child: PortalMetricTile(
+                                      icon: Icons.link_rounded,
+                                      label: copy.activeSessions,
+                                      value: portal.usage.activeSessions
+                                          .toString(),
+                                    ),
                                   ),
-                            ),
-                            const Gap(8),
-                            Text(
-                              currentDevice?.title ?? portal.session.deviceName,
-                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                    fontWeight: FontWeight.w700,
+                                  SizedBox(
+                                    width: 220,
+                                    child: PortalMetricTile(
+                                      icon: Icons.devices_other_rounded,
+                                      label: copy.availableSlots,
+                                      value: freeSlots.toString(),
+                                    ),
                                   ),
-                            ),
-                            const Gap(4),
-                            Text(
-                              currentDevice?.subtitle.isNotEmpty == true
-                                  ? currentDevice!.subtitle
-                                  : 'This device is linked to your PORTAL VPN access.',
-                            ),
-                            const Gap(16),
-                            Wrap(
-                              spacing: 12,
-                              runSpacing: 12,
-                              children: [
-                                SizedBox(
-                                  width: 220,
-                                  child: PortalMetricTile(
-                                    icon: Icons.link_rounded,
-                                    label: 'Active sessions',
-                                    value: portal.usage.activeSessions.toString(),
+                                  SizedBox(
+                                    width: 220,
+                                    child: PortalMetricTile(
+                                      icon: Icons.cloud_done_outlined,
+                                      label: copy.healthyNodes,
+                                      value: portal
+                                          .dashboard.connectionPointsLabel,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(
-                                  width: 220,
-                                  child: PortalMetricTile(
-                                    icon: Icons.devices_other_rounded,
-                                    label: 'Available slots',
-                                    value: freeSlots.toString(),
-                                  ),
-                                ),
-                                SizedBox(
-                                  width: 220,
-                                  child: PortalMetricTile(
-                                    icon: Icons.cloud_done_outlined,
-                                    label: 'Healthy nodes',
-                                    value: portal.dashboard.connectionPointsLabel,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Gap(16),
-                      ...portal.devices.map(
-                        (device) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: PortalSectionCard(
-                            child: Row(
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: device.title == portal.session.deviceName
-                                      ? Theme.of(context).colorScheme.primaryContainer
-                                      : null,
-                                  child: Icon(
-                                    device.isActive
-                                        ? Icons.radio_button_checked_rounded
-                                        : Icons.radio_button_off_rounded,
-                                  ),
-                                ),
-                                const Gap(12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        device.title,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(fontWeight: FontWeight.w700),
-                                      ),
-                                      Text(device.subtitle),
-                                    ],
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(device.platform),
-                                    if (device.title == portal.session.deviceName)
-                                      Text(
-                                        'This device',
-                                        style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                              color: Theme.of(context).colorScheme.primary,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                      ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
+                            ],
                           ),
                         ),
-                      ),
-                      const Gap(8),
-                      PortalSectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'App downloads',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            const Gap(12),
-                            ...portal.downloads.map(
-                              (target) => ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                title: Text(target.platformLabel),
-                                subtitle: Text(
-                                  target.primaryUrl.isNotEmpty
-                                      ? target.primaryUrl
-                                      : 'No primary link configured yet',
+                        const Gap(16),
+                        ...portal.devices.map(
+                          (device) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: PortalSectionCard(
+                              tone: device.title == portal.session.deviceName
+                                  ? PortalSectionTone.accent
+                                  : PortalSectionTone.neutral,
+                              child: PortalListRow(
+                                title: copy.localizeServerText(device.title),
+                                subtitle: copy.localizeServerText(
+                                  device.subtitle,
                                 ),
-                                trailing: Wrap(
-                                  spacing: 8,
+                                leading: PremiumIconOrb(
+                                  icon: device.isActive
+                                      ? Icons.devices_rounded
+                                      : Icons.desktop_windows_outlined,
+                                  size: 46,
+                                ),
+                                trailing: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    if (target.primaryUrl.isNotEmpty)
-                                      OutlinedButton(
-                                        onPressed: () => launchPortalLink(
-                                          context,
-                                          target.primaryUrl,
+                                    Text(
+                                      device.platform,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelLarge,
+                                    ),
+                                    if (device.title ==
+                                        portal.session.deviceName)
+                                      Padding(
+                                        padding: EdgeInsets.only(top: 4),
+                                        child: PortalStatusBadge(
+                                          label: copy.thisDevice,
+                                          icon: Icons
+                                              .check_circle_outline_rounded,
                                         ),
-                                        child: const Text('Primary'),
-                                      ),
-                                    if (target.mirrorUrl.isNotEmpty)
-                                      OutlinedButton(
-                                        onPressed: () => launchPortalLink(
-                                          context,
-                                          target.mirrorUrl,
-                                        ),
-                                        child: const Text('Mirror'),
                                       ),
                                   ],
                                 ),
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ],
-                  );
-                },
+                        const Gap(8),
+                        PortalSectionCard(
+                          tone: PortalSectionTone.muted,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              PremiumSectionHeader(
+                                eyebrow: copy.appDownloadsEyebrow,
+                                title: copy.appDownloadsTitle,
+                                subtitle: copy.appDownloadsSubtitle,
+                              ),
+                              const Gap(14),
+                              ...portal.downloads.map(
+                                (target) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: PortalListRow(
+                                    title: copy.localizeServerText(
+                                      target.platformLabel,
+                                    ),
+                                    subtitle: target.primaryUrl.isNotEmpty
+                                        ? target.primaryUrl
+                                        : copy.noPrimaryLinkYet,
+                                    leading: const PremiumIconOrb(
+                                      icon: Icons.download_rounded,
+                                      size: 42,
+                                    ),
+                                    trailing: Wrap(
+                                      spacing: 8,
+                                      children: [
+                                        if (target.primaryUrl.isNotEmpty)
+                                          OutlinedButton(
+                                            onPressed: () => launchPortalLink(
+                                              context,
+                                              target.primaryUrl,
+                                            ),
+                                            child: Text(copy.primaryAction),
+                                          ),
+                                        if (target.mirrorUrl.isNotEmpty)
+                                          OutlinedButton(
+                                            onPressed: () => launchPortalLink(
+                                              context,
+                                              target.mirrorUrl,
+                                            ),
+                                            child: Text(copy.mirrorAction),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

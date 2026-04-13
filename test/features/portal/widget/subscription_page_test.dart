@@ -1,37 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hiddify/features/portal/config/portal_public_config.dart';
 import 'package:hiddify/features/portal/data/portal_repository.dart';
 import 'package:hiddify/features/portal/model/portal_models.dart';
-import 'package:hiddify/features/portal/widget/support_page.dart';
+import 'package:hiddify/features/portal/widget/subscription_page.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() {
-  testWidgets('shows in-app support composer and device context', (
+  testWidgets('shows browser checkout entry as the primary purchase action', (
     tester,
   ) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           portalExperienceProvider.overrideWith((ref) async => _experience()),
-          portalPublicConfigProvider.overrideWithValue(
-            PortalPublicConfig.fromMap(const {}),
-          ),
         ],
-        child: const MaterialApp(home: SupportPage()),
+        child: const MaterialApp(home: SubscriptionPage()),
       ),
     );
 
     await tester.pumpAndSettle();
 
-    expect(find.text('Support'), findsOneWidget);
-    expect(find.text('Get help fast'), findsOneWidget);
-    expect(find.text('Android device\nAccount acc_1'), findsOneWidget);
-    expect(find.text('Open Telegram support'), findsOneWidget);
-    expect(find.text('Email support'), findsOneWidget);
-    expect(find.text('Copy diagnostics'), findsOneWidget);
-    expect(find.byType(TextField), findsNothing);
-    expect(find.text('Billing issue'), findsOneWidget);
+    expect(find.text('Subscription'), findsOneWidget);
+    expect(find.text('Open secure checkout'), findsOneWidget);
+    expect(find.text('Continue in Telegram'), findsOneWidget);
+    expect(find.text('Choose 30 days'), findsOneWidget);
   });
 }
 
@@ -66,8 +58,19 @@ PortalExperience _experience() {
       isTrialLike: true,
       checkoutEnabled: true,
       checkoutUrl: 'https://portal.example.test/checkout',
-      payViaBotUrl: 'https://t.me/portal_service_bot',
-      plans: [],
+      payViaBotUrl: 'https://t.me/pokrov_vpnbot',
+      plans: [
+        PlanQuote(
+          code: 'pro_30',
+          label: '30 days',
+          amountRub: 299,
+          amountStars: 0,
+          days: 30,
+          deviceLimit: 5,
+          nodePolicy: 'global',
+          badge: 'Popular',
+        ),
+      ],
     ),
     checkout: null,
     devices: [],
@@ -80,21 +83,7 @@ PortalExperience _experience() {
       healthyNodes: 2,
       totalNodes: 2,
     ),
-    supportThreads: [
-      SupportThread(
-        id: 1,
-        subject: 'Billing issue',
-        status: 'open',
-        messages: [
-          SupportMessage(
-            id: 1,
-            body: 'Need help with my renewal.',
-            senderRole: 'user',
-            createdAt: null,
-          ),
-        ],
-      ),
-    ],
+    supportThreads: [],
     downloads: [],
     importPayload: ImportPayload(
       subscriptionUrl: 'https://portal.example.test/sub/trial',

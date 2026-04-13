@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:hiddify/core/widget/premium_surfaces.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/portal/data/portal_repository.dart';
+import 'package:hiddify/features/portal/widget/portal_copy.dart';
 import 'package:hiddify/features/portal/widget/portal_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -10,144 +12,171 @@ class SupportPage extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final copy = PortalCopy.of(context);
     final experience = ref.watch(portalExperienceProvider);
     final config = ref.watch(portalPublicConfigProvider);
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: [
-          const NestedAppBar(title: Text('Support')),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            sliver: SliverToBoxAdapter(
-              child: PortalAsyncBody(
-                value: experience,
-                builder: (context, portal) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      PortalSectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Write from the app',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headlineSmall
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            const Gap(8),
-                            const Text(
-                              'Describe the issue here, then continue in Telegram or email with device context already prepared.',
-                            ),
-                            const Gap(16),
-                            const TextField(
-                              minLines: 3,
-                              maxLines: 5,
-                              decoration: InputDecoration(
-                                hintText: 'What is going wrong?',
-                                border: OutlineInputBorder(),
+      backgroundColor: Colors.transparent,
+      body: PremiumPageBackground(
+        child: CustomScrollView(
+          slivers: [
+            NestedAppBar(title: Text(copy.supportTitle)),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              sliver: SliverToBoxAdapter(
+                child: PortalAsyncBody(
+                  value: experience,
+                  builder: (context, portal) {
+                    final diagnostics = buildPortalDiagnosticsText(
+                      accountId: portal.session.accountId,
+                      deviceName: portal.session.deviceName,
+                      planCode: portal.subscription.currentPlanCode,
+                    );
+                    final supportEmailUri = buildPortalSupportEmailUri(
+                      contactEmail: config.contactEmail,
+                      accountId: portal.session.accountId,
+                      deviceName: portal.session.deviceName,
+                      planCode: portal.subscription.currentPlanCode,
+                      appLabel: config.brandName,
+                    );
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PortalSectionCard(
+                          tone: PortalSectionTone.accent,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              PremiumSectionHeader(
+                                eyebrow: copy.needHelpEyebrow,
+                                title: copy.getHelpFast,
+                                subtitle: copy.supportSubtitle,
                               ),
-                            ),
-                            const Gap(16),
-                            Wrap(
-                              spacing: 12,
-                              runSpacing: 12,
-                              children: [
-                                FilledButton.icon(
-                                  onPressed: () => launchPortalLink(
-                                    context,
-                                    config.supportTelegramUrl,
-                                  ),
-                                  icon: const Icon(Icons.telegram),
-                                  label: const Text('Open Telegram'),
-                                ),
-                                OutlinedButton.icon(
-                                  onPressed: () => launchPortalLink(
-                                    context,
-                                    'mailto:${config.contactEmail}',
-                                  ),
-                                  icon: const Icon(Icons.mail_outline),
-                                  label: const Text('Email support'),
-                                ),
-                                OutlinedButton.icon(
-                                  onPressed: () => copyPortalText(
-                                    context,
-                                    'account=${portal.session.accountId};device=${portal.session.deviceName};plan=${portal.subscription.currentPlanCode}',
-                                    success: 'Diagnostics copied.',
-                                  ),
-                                  icon: const Icon(Icons.health_and_safety_outlined),
-                                  label: const Text('Send diagnostics'),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Gap(16),
-                      PortalSectionCard(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Device context',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge
-                                  ?.copyWith(fontWeight: FontWeight.w700),
-                            ),
-                            const Gap(10),
-                            ListTile(
-                              contentPadding: EdgeInsets.zero,
-                              leading: const Icon(Icons.smartphone_rounded),
-                              title: Text(portal.session.deviceName),
-                              subtitle: Text('Account ${portal.session.accountId}'),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Gap(16),
-                      ...portal.supportThreads.map(
-                        (thread) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: PortalSectionCard(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                              const Gap(16),
+                              PortalSectionCard(
+                                tone: PortalSectionTone.muted,
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(
-                                      child: Text(
-                                        thread.subject,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium
-                                            ?.copyWith(fontWeight: FontWeight.w700),
-                                      ),
+                                    Text(
+                                      copy.preparedContext,
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium,
                                     ),
-                                    Chip(label: Text(thread.status.toUpperCase())),
+                                    const Gap(8),
+                                    Text(diagnostics),
                                   ],
                                 ),
-                                const Gap(8),
-                                ...thread.messages.take(2).map(
-                                      (message) => Padding(
-                                        padding: const EdgeInsets.only(bottom: 8),
-                                        child: Text(message.body),
-                                      ),
+                              ),
+                              const Gap(16),
+                              Wrap(
+                                spacing: 12,
+                                runSpacing: 12,
+                                children: [
+                                  FilledButton.icon(
+                                    onPressed: () => launchPortalLink(
+                                      context,
+                                      config.supportTelegramUrl,
                                     ),
-                              ],
+                                    icon: const Icon(Icons.telegram),
+                                    label: Text(copy.openTelegramSupport),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: () => launchPortalLink(
+                                      context,
+                                      supportEmailUri.toString(),
+                                    ),
+                                    icon: const Icon(Icons.mail_outline),
+                                    label: Text(copy.emailSupport),
+                                  ),
+                                  OutlinedButton.icon(
+                                    onPressed: () => copyPortalText(
+                                      context,
+                                      diagnostics,
+                                      success: copy.diagnosticsCopied,
+                                    ),
+                                    icon: const Icon(
+                                      Icons.health_and_safety_outlined,
+                                    ),
+                                    label: Text(copy.copyDiagnostics),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Gap(16),
+                        PortalSectionCard(
+                          tone: PortalSectionTone.muted,
+                          child: PortalListRow(
+                            title: copy.deviceContext,
+                            subtitle: copy.deviceContextDetails(
+                              portal.session.deviceName,
+                              portal.session.accountId,
+                            ),
+                            leading: const PremiumIconOrb(
+                              icon: Icons.smartphone_rounded,
+                              size: 48,
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  );
-                },
+                        const Gap(16),
+                        if (portal.hasProvisionedAccess)
+                          ...portal.supportThreads.map(
+                            (thread) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: PortalSectionCard(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            copy.localizeServerText(
+                                              thread.subject,
+                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium,
+                                          ),
+                                        ),
+                                        PortalStatusBadge(
+                                          label: copy.supportStatus(
+                                            thread.status,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const Gap(10),
+                                    ...thread.messages.take(2).map(
+                                          (message) => Padding(
+                                            padding: const EdgeInsets.only(
+                                                bottom: 8),
+                                            child: Text(
+                                              copy.localizeServerText(
+                                                message.body,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

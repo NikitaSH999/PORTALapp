@@ -165,6 +165,18 @@ class PortalRepositoryImpl implements PortalRepository {
       healthyNodes: _healthyNodes(nodeStatusJson),
       totalNodes: _totalNodes(nodeStatusJson),
     );
+    final devices = _buildDevices(
+      userJson,
+      sessionDeviceName: _asString(
+        sessionUser['device_name'],
+        fallback:
+            _asString(userJson['device_name'], fallback: 'Current device'),
+      ),
+    );
+    final locations = _buildLocations(
+      userPayload: userJson,
+      nodeStatusPayload: nodeStatusJson,
+    );
     final plans = _buildPlans(publicPlansJson);
 
     return PortalExperience(
@@ -177,7 +189,8 @@ class PortalRepositoryImpl implements PortalRepository {
         ),
         deviceName: _asString(
           sessionUser['device_name'],
-          fallback: _asString(userJson['device_name'], fallback: 'Current device'),
+          fallback:
+              _asString(userJson['device_name'], fallback: 'Current device'),
         ),
         username: _asString(sessionUser['username'], fallback: 'user'),
         isAuthorized: _asBool(
@@ -198,7 +211,8 @@ class PortalRepositoryImpl implements PortalRepository {
         currentPlanLabel: dashboard.currentPlanLabel,
         isTrialLike: _isTrialLike(dashboardJson['sub_type']) ||
             _isTrialLike(dashboardJson['current_plan_code']),
-        checkoutEnabled: _asBool(publicPlansJson['widget_enabled'], fallback: true),
+        checkoutEnabled:
+            _asBool(publicPlansJson['widget_enabled'], fallback: true),
         checkoutUrl: config.checkoutUrl,
         payViaBotUrl: _asString(
           _map(userJson['actions'])['pay_via_bot'],
@@ -215,7 +229,8 @@ class PortalRepositoryImpl implements PortalRepository {
               provider: 'portal',
               status: 'ready',
             ),
-      devices: _buildDevices(userJson),
+      devices: devices,
+      locations: locations,
       usage: UsageStats(
         usedGb: dashboard.usedGb,
         totalGb: dashboard.totalGb,
@@ -248,7 +263,7 @@ class PortalRepositoryImpl implements PortalRepository {
       currentPlanLabel: planLabel,
       statusHeadline: isActive ? 'Connected and ready' : 'Action required',
       statusBody: isActive
-          ? 'Manage subscription, devices and support from one place.'
+          ? 'Manage subscription, locations, devices and support from one place.'
           : 'Import a profile or renew access to unlock the full service flow.',
       expiresAt: _asDateTime(json['expiry_at']),
       usedGb: _asDouble(json['used_gb']),
@@ -267,24 +282,26 @@ class PortalRepositoryImpl implements PortalRepository {
     final plans = rawPlans
         .where((row) => _asBool(_map(row)['is_active'], fallback: true))
         .map((row) {
-          final data = _map(row);
-          return PlanQuote(
-            code: _asString(data['code']),
-            label: _asString(data['label'], fallback: 'Plan'),
-            amountRub: _asInt(data['amount_rub']),
-            amountStars: _asInt(data['amount_stars']),
-            days: _asInt(data['days']),
-            deviceLimit: _asInt(data['device_limit'], fallback: 1),
-            nodePolicy: _asString(data['node_policy'], fallback: 'pool'),
-            badge: _asString(data['badge']),
-          );
-        })
-        .toList();
+      final data = _map(row);
+      return PlanQuote(
+        code: _asString(data['code']),
+        label: _asString(data['label'], fallback: 'Plan'),
+        amountRub: _asInt(data['amount_rub']),
+        amountStars: _asInt(data['amount_stars']),
+        days: _asInt(data['days']),
+        deviceLimit: _asInt(data['device_limit'], fallback: 1),
+        nodePolicy: _asString(data['node_policy'], fallback: 'pool'),
+        badge: _asString(data['badge']),
+      );
+    }).toList();
     if (plans.isNotEmpty) return plans;
     return PortalExperience.demo(config).subscription.plans;
   }
 
-  List<DeviceRecord> _buildDevices(Map<String, dynamic> payload) {
+  List<DeviceRecord> _buildDevices(
+    Map<String, dynamic> payload, {
+    required String sessionDeviceName,
+  }) {
     final devices = _list(payload['devices']);
     if (devices.isNotEmpty) {
       return devices.map((row) {
@@ -294,7 +311,8 @@ class PortalRepositoryImpl implements PortalRepository {
           title: _asString(data['name'], fallback: 'Current device'),
           subtitle: _asString(
             data['last_seen_at'],
-            fallback: _asString(data['last_seen_label'], fallback: 'Recently active'),
+            fallback:
+                _asString(data['last_seen_label'], fallback: 'Recently active'),
           ),
           platform: _asString(data['platform'], fallback: 'Device'),
           isActive: _asBool(data['is_active'], fallback: true),
@@ -302,19 +320,43 @@ class PortalRepositoryImpl implements PortalRepository {
       }).toList();
     }
 
-    final nodes = _list(payload['nodes']);
-    if (nodes.isEmpty) return PortalExperience.demo(config).devices;
+    if (sessionDeviceName.isNotEmpty) {
+      return [
+        DeviceRecord(
+          id: 'current-device',
+          title: sessionDeviceName,
+          subtitle: 'This device is ready for connection recovery and support.',
+          platform: 'Device',
+          isActive: true,
+        ),
+      ];
+    }
+
+    return PortalExperience.demo(config).devices;
+  }
+
+  List<LocationRecord> _buildLocations({
+    required Map<String, dynamic> userPayload,
+    required Map<String, dynamic> nodeStatusPayload,
+  }) {
+    final primaryNodes = _list(userPayload['nodes']);
+    final fallbackNodes = _list(nodeStatusPayload['nodes']);
+    final nodes = primaryNodes.isNotEmpty ? primaryNodes : fallbackNodes;
+    if (nodes.isEmpty) return const [];
     return nodes.map((row) {
       final data = _map(row);
-      return DeviceRecord(
+      return LocationRecord(
         id: _asString(data['code'], fallback: 'node'),
         title: _asString(
           data['name'],
-          fallback: _asString(data['code'], fallback: 'Access point'),
+          fallback: _asString(
+            data['country'],
+            fallback: _asString(data['code'], fallback: 'Access point'),
+          ),
         ),
         subtitle:
             '${_asString(data['host'])}:${_asInt(data['port'], fallback: 443)}',
-        platform: 'Region',
+        regionLabel: 'Region',
         isActive: _asBool(data['enabled'], fallback: true),
       );
     }).toList();
@@ -349,21 +391,24 @@ class PortalRepositoryImpl implements PortalRepository {
     final targets = <DownloadTarget>[
       DownloadTarget(
         platformLabel: 'Android',
-        primaryUrl: _asString(android['apk_url'], fallback: config.androidApkUrl),
+        primaryUrl:
+            _asString(android['apk_url'], fallback: config.androidApkUrl),
         mirrorUrl:
             _asString(android['mirror_url'], fallback: config.androidMirrorUrl),
         docsUrl: _asString(payload['docs_url'], fallback: config.docsUrl),
       ),
       DownloadTarget(
         platformLabel: 'Windows',
-        primaryUrl: _asString(windows['exe_url'], fallback: config.windowsExeUrl),
+        primaryUrl:
+            _asString(windows['exe_url'], fallback: config.windowsExeUrl),
         mirrorUrl:
             _asString(windows['mirror_url'], fallback: config.windowsMirrorUrl),
         docsUrl: _asString(payload['docs_url'], fallback: config.docsUrl),
       ),
     ]
         .where(
-          (target) => target.primaryUrl.isNotEmpty || target.mirrorUrl.isNotEmpty,
+          (target) =>
+              target.primaryUrl.isNotEmpty || target.mirrorUrl.isNotEmpty,
         )
         .toList();
     if (targets.isNotEmpty) return targets;
@@ -399,7 +444,8 @@ class PortalRepositoryImpl implements PortalRepository {
         .length;
   }
 
-  int _totalNodes(Map<String, dynamic> payload) => _list(payload['nodes']).length;
+  int _totalNodes(Map<String, dynamic> payload) =>
+      _list(payload['nodes']).length;
 
   Map<String, dynamic> _sessionUser(Map<String, dynamic> payload) {
     final nestedUser = _map(payload['user']);

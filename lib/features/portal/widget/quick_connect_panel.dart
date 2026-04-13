@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
+import 'package:hiddify/core/widget/premium_surfaces.dart';
 import 'package:hiddify/features/portal/model/portal_models.dart';
+import 'package:hiddify/features/portal/widget/portal_copy.dart';
 import 'package:hiddify/features/portal/widget/portal_widgets.dart';
 
 class PortalQuickConnectPanel extends StatelessWidget {
@@ -17,77 +20,80 @@ class PortalQuickConnectPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final copy = PortalCopy.of(context);
     final theme = Theme.of(context);
     final location = _primaryLocation(experience);
+    final heroTitle = copy.heroStatusTitle(
+      trialLike: experience.subscription.isTrialLike,
+    );
 
     return PortalSectionCard(
+      tone: PortalSectionTone.accent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Quick connect',
-            style: theme.textTheme.labelLarge?.copyWith(
-              color: theme.colorScheme.primary,
-              fontWeight: FontWeight.w700,
-            ),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              PortalStatusBadge(
+                label: copy.quickConnectBadge,
+                icon: Icons.flash_on_rounded,
+              ),
+              PortalStatusBadge(
+                label: copy.routeDeckBadge,
+                icon: Icons.auto_awesome_rounded,
+              ),
+              PortalStatusBadge(
+                label: copy.nodesReady(
+                  experience.dashboard.connectionPointsLabel,
+                ),
+                icon: Icons.hub_rounded,
+              ),
+            ],
           ),
+          const Gap(16),
+          Text(heroTitle, style: theme.textTheme.headlineSmall),
           const Gap(8),
           Text(
-            experience.subscription.isTrialLike ? 'Trial active' : 'Subscription active',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const Gap(8),
-          Text(
-            experience.dashboard.statusBody,
-            style: theme.textTheme.bodyMedium?.copyWith(
+            copy.localizeServerText(experience.dashboard.statusBody),
+            style: theme.textTheme.bodyLarge?.copyWith(
               color: theme.colorScheme.onSurfaceVariant,
             ),
           ),
-          const Gap(18),
-          Container(
-            width: double.infinity,
+          const Gap(20),
+          PortalSectionCard(
+            tone: PortalSectionTone.muted,
             padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-              color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.55),
-            ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: theme.colorScheme.primaryContainer,
-                  ),
-                  child: Icon(
-                    Icons.auto_awesome_rounded,
-                    color: theme.colorScheme.onPrimaryContainer,
-                  ),
+                const PremiumIconOrb(
+                  icon: Icons.travel_explore_rounded,
+                  size: 54,
                 ),
-                const Gap(12),
+                const Gap(14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Auto-select',
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
+                        copy.autoRouteTitle,
+                        style: theme.textTheme.titleLarge,
+                      ),
+                      const Gap(4),
+                      Text(
+                        location != null
+                            ? copy.localizeServerText(location.title)
+                            : copy.autoSelectTitle,
+                        style: theme.textTheme.titleMedium,
                       ),
                       const Gap(2),
                       Text(
-                        location?.title ?? 'Auto-select',
-                        style: theme.textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const Gap(2),
-                      Text(
-                        'Best server right now',
+                        location?.subtitle.isNotEmpty == true
+                            ? copy.localizeServerText(location!.subtitle)
+                            : copy.bestPathNow,
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -95,37 +101,65 @@ class PortalQuickConnectPanel extends StatelessWidget {
                     ],
                   ),
                 ),
-                FilledButton.tonal(
+                const Gap(12),
+                OutlinedButton(
                   onPressed: onOpenLocations,
-                  child: const Text('Locations'),
+                  child: Text(copy.chooseRouteAction),
                 ),
               ],
             ),
-          ),
+          ).animate().fadeIn(duration: 280.ms).slideY(begin: 0.06, end: 0),
           const Gap(16),
           Wrap(
             spacing: 12,
             runSpacing: 12,
             children: [
-              PortalMetricTile(
-                label: 'Remaining',
-                value: formatPortalTraffic(experience.usage.remainingGb),
-                caption: 'Available on this device',
-                icon: Icons.shield_outlined,
+              SizedBox(
+                width: 220,
+                child: PortalMetricTile(
+                  label: copy.protectedUntil,
+                  value: formatPortalDate(experience.dashboard.expiresAt),
+                  caption: copy.protectedUntilCaption,
+                  icon: Icons.event_available_rounded,
+                ),
               ),
-              PortalMetricTile(
-                label: 'Expires',
-                value: formatPortalDate(experience.dashboard.expiresAt),
-                caption: 'Trial or paid access window',
-                icon: Icons.event_available_rounded,
+              SizedBox(
+                width: 220,
+                child: PortalMetricTile(
+                  label: copy.remainingTraffic,
+                  value: formatPortalTraffic(experience.usage.remainingGb),
+                  caption: copy.remainingTrafficCaption,
+                  icon: Icons.shield_outlined,
+                ),
+              ),
+              SizedBox(
+                width: 220,
+                child: PortalMetricTile(
+                  label: copy.liveDevices,
+                  value:
+                      '${experience.usage.activeSessions}/${experience.usage.deviceLimit}',
+                  caption: copy.liveDevicesCaption,
+                  icon: Icons.devices_rounded,
+                ),
               ),
             ],
-          ),
+          ).animate().fadeIn(duration: 320.ms).slideY(begin: 0.08, end: 0),
           const Gap(16),
-          OutlinedButton.icon(
-            onPressed: onOpenTelegramReward,
-            icon: const Icon(Icons.card_giftcard_rounded),
-            label: const Text('+10 days for Telegram'),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              FilledButton.tonalIcon(
+                onPressed: onOpenTelegramReward,
+                icon: const Icon(Icons.card_giftcard_rounded),
+                label: Text(copy.bonusDaysAction),
+              ),
+              TextButton.icon(
+                onPressed: onOpenLocations,
+                icon: const Icon(Icons.public_rounded),
+                label: Text(copy.browseLocationsAction),
+              ),
+            ],
           ),
         ],
       ),
@@ -133,9 +167,9 @@ class PortalQuickConnectPanel extends StatelessWidget {
   }
 }
 
-DeviceRecord? _primaryLocation(PortalExperience experience) {
-  for (final device in experience.devices) {
-    if (device.isActive) return device;
+LocationRecord? _primaryLocation(PortalExperience experience) {
+  for (final location in experience.locations) {
+    if (location.isActive) return location;
   }
-  return experience.devices.isEmpty ? null : experience.devices.first;
+  return experience.locations.isEmpty ? null : experience.locations.first;
 }

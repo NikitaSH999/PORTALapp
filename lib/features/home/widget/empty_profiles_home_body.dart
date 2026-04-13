@@ -1,9 +1,13 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/router.dart';
+import 'package:hiddify/core/widget/pokrov_logo.dart';
+import 'package:hiddify/core/widget/premium_surfaces.dart';
 import 'package:hiddify/features/portal/data/portal_trial_activator.dart';
+import 'package:hiddify/features/portal/widget/portal_copy.dart';
 import 'package:hiddify/features/portal/widget/portal_widgets.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -14,7 +18,7 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
     final trialActivation = ref.watch(portalTrialActivationControllerProvider);
-    final isRussian = Localizations.localeOf(context).languageCode.toLowerCase().startsWith('ru');
+    final copy = PortalCopy.of(context);
 
     ref.listen<AsyncValue<void>>(
       portalTrialActivationControllerProvider,
@@ -26,99 +30,150 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
         next.whenOrNull(
           data: (_) => messenger.showSnackBar(
             SnackBar(
-              content: Text(
-                isRussian
-                    ? 'Триал активирован, подключение готово.'
-                    : 'Trial activated. Your connection is ready.',
-              ),
+              content: Text(copy.trialReadyToast),
             ),
           ),
           error: (error, _) => messenger.showSnackBar(
             SnackBar(
-              content: Text(
-                isRussian
-                    ? 'Не удалось активировать триал: $error'
-                    : 'Could not activate the trial: $error',
-              ),
+              content: Text(copy.trialError(error)),
             ),
           ),
         );
       },
     );
 
+    final title = copy.emptyStateTitle;
+    final body = copy.emptyStateBody;
+    final bonus = copy.emptyStateBonusTitle;
+    final cta = copy.emptyStatePrimaryAction;
+    final secondary = copy.emptyStateSecondaryAction;
+
     return SliverFillRemaining(
       hasScrollBody: false,
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 520),
+            constraints: const BoxConstraints(maxWidth: 640),
             child: PortalSectionCard(
+              tone: PortalSectionTone.accent,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    isRussian ? 'PORTAL VPN' : 'PORTAL VPN',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.w700,
-                        ),
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      const PortalStatusBadge(
+                        label: 'POKROV VPN',
+                        icon: FluentIcons.shield_24_regular,
+                      ),
+                      PortalStatusBadge(
+                        label: copy.trialPlatformsBadge,
+                        icon: FluentIcons.phone_desktop_24_regular,
+                      ),
+                    ],
                   ),
-                  const Gap(8),
-                  Text(
-                    isRussian
-                        ? 'Попробуйте VPN бесплатно 5 дней'
-                        : 'Try the VPN free for 5 days',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
+                  const Gap(18),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const PremiumIconOrb(
+                        icon: FluentIcons.sparkle_24_regular,
+                        size: 56,
+                      ),
+                      const Gap(14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              title,
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                            const Gap(10),
+                            Text(
+                              body,
+                              style: Theme.of(context).textTheme.bodyLarge,
+                            ),
+                          ],
                         ),
+                      ),
+                    ],
                   ),
-                  const Gap(12),
-                  Text(
-                    isRussian
-                        ? 'Нажмите одну кнопку, чтобы активировать рабочий триал на этом устройстве. Telegram не нужен для старта.'
-                        : 'Activate a real trial on this device with one tap. Telegram is optional.',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  const Gap(10),
-                  Text(
-                    isRussian
-                        ? '+10 дней можно получить позже за подписку на Telegram-канал.'
-                        : '+10 extra days are available later after joining the Telegram channel.',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  const Gap(18),
+                  PortalSectionCard(
+                    tone: PortalSectionTone.muted,
+                    padding: const EdgeInsets.all(18),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const PokrovLogo(width: 42, height: 42),
+                        const Gap(14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                bonus,
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                              const Gap(4),
+                              Text(
+                                copy.emptyStateBonusBody,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
+                                    ),
+                              ),
+                            ],
+                          ),
                         ),
+                      ],
+                    ),
                   ),
                   const Gap(20),
-                  FilledButton.icon(
-                    onPressed: trialActivation.isLoading
-                        ? null
-                        : () => ref
-                            .read(portalTrialActivationControllerProvider.notifier)
-                            .activateTrial(locale: Localizations.localeOf(context)),
-                    icon: trialActivation.isLoading
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2.2),
-                          )
-                        : const Icon(FluentIcons.flash_24_regular),
-                    label: Text(
-                      isRussian ? 'Попробовать бесплатно' : 'Try free',
-                    ),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: [
+                      FilledButton.icon(
+                        onPressed: trialActivation.isLoading
+                            ? null
+                            : () => ref
+                                .read(portalTrialActivationControllerProvider
+                                    .notifier)
+                                .activateTrial(
+                                  locale: Localizations.localeOf(context),
+                                ),
+                        icon: trialActivation.isLoading
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.2,
+                                ),
+                              )
+                            : const Icon(FluentIcons.flash_24_regular),
+                        label: Text(cta),
+                      ),
+                      OutlinedButton.icon(
+                        onPressed: () => const AddProfileRoute().push(context),
+                        icon: const Icon(FluentIcons.add_24_regular),
+                        label: Text(secondary),
+                      ),
+                    ],
                   ),
-                  const Gap(12),
-                  OutlinedButton.icon(
-                    onPressed: () => const AddProfileRoute().push(context),
-                    icon: const Icon(FluentIcons.add_24_regular),
-                    label: Text(
-                      isRussian
-                          ? 'Добавить ключ или подписку вручную'
-                          : t.profile.add.buttonText,
-                    ),
-                  ),
-                ],
+                ]
+                    .animate(interval: 70.ms)
+                    .fadeIn(duration: 260.ms)
+                    .slideY(begin: 0.06, end: 0),
               ),
             ),
           ),
@@ -134,19 +189,37 @@ class EmptyActiveProfileHomeBody extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = ref.watch(translationsProvider);
+    final copy = PortalCopy.of(context);
 
     return SliverFillRemaining(
       hasScrollBody: false,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(t.home.noActiveProfileMsg),
-          const Gap(16),
-          OutlinedButton(
-            onPressed: () => const ProfilesOverviewRoute().push(context),
-            child: Text(t.profile.overviewPageTitle),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 460),
+            child: PortalSectionCard(
+              tone: PortalSectionTone.muted,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  PremiumSectionHeader(
+                    eyebrow: copy.profilesEyebrow,
+                    title: copy.chooseActiveProfileTitle,
+                    subtitle: t.home.noActiveProfileMsg,
+                  ),
+                  const Gap(18),
+                  OutlinedButton(
+                    onPressed: () =>
+                        const ProfilesOverviewRoute().push(context),
+                    child: Text(t.profile.overviewPageTitle),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
+        ),
       ),
     );
   }

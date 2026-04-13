@@ -63,7 +63,6 @@ class PortalStartTrialRequest {
     required this.appVersion,
     required this.localeTag,
     required this.timeZone,
-    required this.trialDays,
   });
 
   final String installId;
@@ -73,7 +72,6 @@ class PortalStartTrialRequest {
   final String appVersion;
   final String localeTag;
   final String timeZone;
-  final int trialDays;
 
   Map<String, dynamic> toJson() {
     return {
@@ -84,7 +82,6 @@ class PortalStartTrialRequest {
       'app_version': appVersion,
       'locale': localeTag,
       'time_zone': timeZone,
-      'trial_days': trialDays,
     };
   }
 }
@@ -200,6 +197,22 @@ class DeviceRecord {
   final bool isActive;
 }
 
+class LocationRecord {
+  const LocationRecord({
+    required this.id,
+    required this.title,
+    required this.subtitle,
+    required this.regionLabel,
+    required this.isActive,
+  });
+
+  final String id;
+  final String title;
+  final String subtitle;
+  final String regionLabel;
+  final bool isActive;
+}
+
 class UsageStats {
   const UsageStats({
     required this.usedGb,
@@ -283,7 +296,8 @@ class PortalExperience {
     required this.dashboard,
     required this.subscription,
     required this.checkout,
-    required this.devices,
+    this.devices = const [],
+    this.locations = const [],
     required this.usage,
     required this.supportThreads,
     required this.downloads,
@@ -296,10 +310,14 @@ class PortalExperience {
   final SubscriptionState subscription;
   final CheckoutSession? checkout;
   final List<DeviceRecord> devices;
+  final List<LocationRecord> locations;
   final UsageStats usage;
   final List<SupportThread> supportThreads;
   final List<DownloadTarget> downloads;
   final ImportPayload importPayload;
+
+  bool get hasProvisionedAccess =>
+      session.isAuthorized || importPayload.subscriptionUrl.trim().isNotEmpty;
 
   factory PortalExperience.demo(PortalPublicConfig config) {
     const demoPlan = PlanQuote(
@@ -329,7 +347,7 @@ class PortalExperience {
         currentPlanLabel: 'Trial',
         statusHeadline: 'Your service hub is ready',
         statusBody:
-            'Connect a profile, then unlock subscription, support, devices and downloads without leaving the app.',
+            'Connect a profile, then unlock subscription, locations, devices, support and downloads without leaving the app.',
         expiresAt: null,
         usedGb: 0,
         totalGb: 30,
@@ -370,20 +388,14 @@ class PortalExperience {
       ),
       devices: const [
         DeviceRecord(
-          id: 'nl',
-          title: 'Netherlands',
-          subtitle: 'Primary access point',
-          platform: 'Region',
-          isActive: true,
-        ),
-        DeviceRecord(
-          id: 'pl',
-          title: 'Poland',
-          subtitle: 'Secondary access point',
-          platform: 'Region',
+          id: 'device-demo',
+          title: 'Current device',
+          subtitle: 'Available after activation',
+          platform: 'Device',
           isActive: true,
         ),
       ],
+      locations: const [],
       usage: const UsageStats(
         usedGb: 0,
         totalGb: 30,
@@ -396,7 +408,7 @@ class PortalExperience {
       supportThreads: const [
         SupportThread(
           id: 1,
-          subject: 'Welcome to PORTAL VPN',
+          subject: 'Welcome to POKROV VPN',
           status: 'demo',
           messages: [
             SupportMessage(

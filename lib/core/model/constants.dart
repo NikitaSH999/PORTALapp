@@ -1,15 +1,29 @@
 abstract class Constants {
-  static const appName = "PORTAL VPN";
-  static const githubUrl = "https://github.com/NikitaSH999/PORTALapp";
-  static const githubReleasesApiUrl =
-      "https://api.github.com/repos/NikitaSH999/PORTALapp/releases";
-  static const githubLatestReleaseUrl =
-      "https://github.com/NikitaSH999/PORTALapp/releases/latest";
-  static const appCastUrl =
-      "https://raw.githubusercontent.com/NikitaSH999/PORTALapp/main/appcast.xml";
-  static const telegramChannelUrl = "https://t.me/portalvpn";
-  static const privacyPolicyUrl = "https://portalvpn.app/privacy";
-  static const termsAndConditionsUrl = "https://portalvpn.app/terms";
+  static const appName = "POKROV VPN";
+  static const githubUrl = String.fromEnvironment(
+    "PORTAL_RELEASE_REPOSITORY_URL",
+    defaultValue: "",
+  );
+  static const githubReleasesApiUrl = String.fromEnvironment(
+    "PORTAL_RELEASES_API_URL",
+    defaultValue: "",
+  );
+  static const githubLatestReleaseUrl = String.fromEnvironment(
+    "PORTAL_RELEASES_LATEST_URL",
+    defaultValue: "",
+  );
+  static const appCastUrl = String.fromEnvironment(
+    "PORTAL_RELEASES_APPCAST_URL",
+    defaultValue: "",
+  );
+  static bool get hasReleaseRepositoryUrl => githubUrl.isNotEmpty;
+  static bool get hasReleaseApiUrl => githubReleasesApiUrl.isNotEmpty;
+  static bool get hasAppCastUrl => appCastUrl.isNotEmpty;
+  static bool get hasReleaseMetadata =>
+      hasReleaseRepositoryUrl && hasReleaseApiUrl && hasAppCastUrl;
+  static const telegramChannelUrl = "https://t.me/pokrov_vpn";
+  static const privacyPolicyUrl = "https://pokrov.space/privacy";
+  static const termsAndConditionsUrl = "https://pokrov.space/terms";
   static const cfWarpPrivacyPolicy =
       "https://www.cloudflare.com/application/privacypolicy/";
   static const cfWarpTermsOfService =

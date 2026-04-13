@@ -1,3 +1,5 @@
+import 'package:hiddify/features/portal/config/shared_surface_facts.dart';
+
 class PortalPublicConfig {
   const PortalPublicConfig({
     required this.brandName,
@@ -48,64 +50,125 @@ class PortalPublicConfig {
 
   static PortalPublicConfig environment() {
     return fromMap({
-      'PORTAL_BRAND_NAME': const String.fromEnvironment('PORTAL_BRAND_NAME'),
-      'PORTAL_API_BASE_URL': const String.fromEnvironment('PORTAL_API_BASE_URL'),
-      'PORTAL_WEBAPP_URL': const String.fromEnvironment('PORTAL_WEBAPP_URL'),
-      'PORTAL_CHECKOUT_URL': const String.fromEnvironment('PORTAL_CHECKOUT_URL'),
-      'PORTAL_BOT_URL': const String.fromEnvironment('PORTAL_BOT_URL'),
-      'PORTAL_HELPBOT_URL': const String.fromEnvironment('PORTAL_HELPBOT_URL'),
-      'PORTAL_SUPPORT_TG_URL': const String.fromEnvironment('PORTAL_SUPPORT_TG_URL'),
-      'PORTAL_CONTACT_EMAIL': const String.fromEnvironment('PORTAL_CONTACT_EMAIL'),
-      'PORTAL_ENTERPRISE_EMAIL': const String.fromEnvironment('PORTAL_ENTERPRISE_EMAIL'),
-      'PORTAL_CONTACT_FORM_URL': const String.fromEnvironment('PORTAL_CONTACT_FORM_URL'),
-      'PORTAL_NEWS_CHANNEL_URL': const String.fromEnvironment('PORTAL_NEWS_CHANNEL_URL'),
-      'PORTAL_ANDROID_PLAY_URL': const String.fromEnvironment('PORTAL_ANDROID_PLAY_URL'),
-      'PORTAL_ANDROID_APK_URL': const String.fromEnvironment('PORTAL_ANDROID_APK_URL'),
-      'PORTAL_ANDROID_MIRROR_URL': const String.fromEnvironment('PORTAL_ANDROID_MIRROR_URL'),
-      'PORTAL_WINDOWS_EXE_URL': const String.fromEnvironment('PORTAL_WINDOWS_EXE_URL'),
-      'PORTAL_WINDOWS_MIRROR_URL': const String.fromEnvironment('PORTAL_WINDOWS_MIRROR_URL'),
-      'PORTAL_DOCS_URL': const String.fromEnvironment('PORTAL_DOCS_URL'),
-      'PORTAL_WEB_SESSION_TOKEN': const String.fromEnvironment('PORTAL_WEB_SESSION_TOKEN'),
-      'PORTAL_TELEGRAM_INIT_DATA': const String.fromEnvironment('PORTAL_TELEGRAM_INIT_DATA'),
+      if (const String.fromEnvironment('PORTAL_BRAND_NAME').trim().isNotEmpty)
+        'PORTAL_BRAND_NAME': const String.fromEnvironment('PORTAL_BRAND_NAME'),
+      if (const String.fromEnvironment('PORTAL_API_BASE_URL').trim().isNotEmpty)
+        'PORTAL_API_BASE_URL':
+            const String.fromEnvironment('PORTAL_API_BASE_URL'),
+      if (const String.fromEnvironment('PORTAL_WEBAPP_URL').trim().isNotEmpty)
+        'PORTAL_WEBAPP_URL': const String.fromEnvironment('PORTAL_WEBAPP_URL'),
+      if (const String.fromEnvironment('PORTAL_CHECKOUT_URL').trim().isNotEmpty)
+        'PORTAL_CHECKOUT_URL':
+            const String.fromEnvironment('PORTAL_CHECKOUT_URL'),
+      if (const String.fromEnvironment('PORTAL_BOT_URL').trim().isNotEmpty)
+        'PORTAL_BOT_URL': const String.fromEnvironment('PORTAL_BOT_URL'),
+      if (const String.fromEnvironment('PORTAL_HELPBOT_URL').trim().isNotEmpty)
+        'PORTAL_HELPBOT_URL':
+            const String.fromEnvironment('PORTAL_HELPBOT_URL'),
+      if (const String.fromEnvironment('PORTAL_SUPPORT_TG_URL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_SUPPORT_TG_URL':
+            const String.fromEnvironment('PORTAL_SUPPORT_TG_URL'),
+      if (const String.fromEnvironment('PORTAL_CONTACT_EMAIL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_CONTACT_EMAIL':
+            const String.fromEnvironment('PORTAL_CONTACT_EMAIL'),
+      if (const String.fromEnvironment('PORTAL_ENTERPRISE_EMAIL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_ENTERPRISE_EMAIL':
+            const String.fromEnvironment('PORTAL_ENTERPRISE_EMAIL'),
+      if (const String.fromEnvironment('PORTAL_CONTACT_FORM_URL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_CONTACT_FORM_URL':
+            const String.fromEnvironment('PORTAL_CONTACT_FORM_URL'),
+      if (const String.fromEnvironment('PORTAL_NEWS_CHANNEL_URL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_NEWS_CHANNEL_URL':
+            const String.fromEnvironment('PORTAL_NEWS_CHANNEL_URL'),
+      if (const String.fromEnvironment('PORTAL_ANDROID_PLAY_URL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_ANDROID_PLAY_URL':
+            const String.fromEnvironment('PORTAL_ANDROID_PLAY_URL'),
+      if (const String.fromEnvironment('PORTAL_ANDROID_APK_URL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_ANDROID_APK_URL':
+            const String.fromEnvironment('PORTAL_ANDROID_APK_URL'),
+      if (const String.fromEnvironment('PORTAL_ANDROID_MIRROR_URL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_ANDROID_MIRROR_URL':
+            const String.fromEnvironment('PORTAL_ANDROID_MIRROR_URL'),
+      if (const String.fromEnvironment('PORTAL_WINDOWS_EXE_URL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_WINDOWS_EXE_URL':
+            const String.fromEnvironment('PORTAL_WINDOWS_EXE_URL'),
+      if (const String.fromEnvironment('PORTAL_WINDOWS_MIRROR_URL')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_WINDOWS_MIRROR_URL':
+            const String.fromEnvironment('PORTAL_WINDOWS_MIRROR_URL'),
+      if (const String.fromEnvironment('PORTAL_DOCS_URL').trim().isNotEmpty)
+        'PORTAL_DOCS_URL': const String.fromEnvironment('PORTAL_DOCS_URL'),
+      if (const String.fromEnvironment('PORTAL_WEB_SESSION_TOKEN')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_WEB_SESSION_TOKEN':
+            const String.fromEnvironment('PORTAL_WEB_SESSION_TOKEN'),
+      if (const String.fromEnvironment('PORTAL_TELEGRAM_INIT_DATA')
+          .trim()
+          .isNotEmpty)
+        'PORTAL_TELEGRAM_INIT_DATA':
+            const String.fromEnvironment('PORTAL_TELEGRAM_INIT_DATA'),
     });
   }
 
   static PortalPublicConfig fromMap(Map<String, String> raw) {
     final apiBaseUrl = _cleanUrl(
       raw['PORTAL_API_BASE_URL'],
-      fallback: 'https://kiwunaka.space',
+      fallback: PortalSharedPublicUrls.api,
     );
     final webBase = _cleanUrl(
       raw['PORTAL_WEBAPP_URL'],
-      fallback: 'https://portal-privacy.online/webapp',
+      fallback: PortalSharedPublicUrls.webapp,
     );
     final checkoutUrl = _normalizeCheckoutUrl(
       raw['PORTAL_CHECKOUT_URL'],
-      fallbackHost: 'https://portal-privacy.online',
+      fallbackHost: PortalSharedPublicUrls.checkout,
     );
     final helpbotUrl = _normalizeTelegramUrl(
       raw['PORTAL_HELPBOT_URL'] ?? raw['PORTAL_SUPPORT_TG_URL'],
-      fallback: 'https://t.me/portal_privacy_helpbot',
+      fallback: PortalSharedPublicUrls.supportBot,
     );
 
     return PortalPublicConfig(
-      brandName: _trim(raw['PORTAL_BRAND_NAME'], fallback: 'PORTAL VPN'),
+      brandName: _trim(
+        raw['PORTAL_BRAND_NAME'],
+        fallback: PortalSharedProductFacts.clientBrand,
+      ),
       apiBaseUrl: apiBaseUrl,
       webappUrl: webBase,
       checkoutUrl: checkoutUrl,
       botUrl: _normalizeTelegramUrl(
         raw['PORTAL_BOT_URL'],
-        fallback: 'https://t.me/portal_service_bot',
+        fallback: PortalSharedPublicUrls.bot,
       ),
       helpbotUrl: helpbotUrl,
       supportTelegramUrl: helpbotUrl,
       contactEmail: _trim(
         raw['PORTAL_CONTACT_EMAIL'],
-        fallback: 'support@portal-privacy.online',
+        fallback: PortalSharedPublicUrls.supportEmail,
       ),
       enterpriseEmail: _trim(
         raw['PORTAL_ENTERPRISE_EMAIL'],
-        fallback: 'enterprise@portal-privacy.online',
+        fallback: PortalSharedPublicUrls.enterpriseEmail,
       ),
       contactFormUrl: _normalizeTelegramUrl(
         raw['PORTAL_CONTACT_FORM_URL'],
@@ -113,7 +176,7 @@ class PortalPublicConfig {
       ),
       newsChannelUrl: _normalizeTelegramUrl(
         raw['PORTAL_NEWS_CHANNEL_URL'],
-        fallback: 'https://t.me/portal_privacy',
+        fallback: PortalSharedPublicUrls.newsChannel,
       ),
       androidPlayUrl: _trim(raw['PORTAL_ANDROID_PLAY_URL']),
       androidApkUrl: _trim(raw['PORTAL_ANDROID_APK_URL']),
@@ -128,7 +191,9 @@ class PortalPublicConfig {
 }
 
 String _trim(String? value, {String fallback = ''}) {
-  return (value ?? fallback).trim();
+  final normalized = value?.trim() ?? '';
+  if (normalized.isNotEmpty) return normalized;
+  return fallback.trim();
 }
 
 String _cleanUrl(String? value, {String fallback = ''}) {
@@ -149,5 +214,9 @@ String _normalizeTelegramUrl(String? raw, {required String fallback}) {
 String _normalizeCheckoutUrl(String? raw, {required String fallbackHost}) {
   final value = _cleanUrl(raw);
   if (value.isNotEmpty) return value;
+  final canonicalCheckout = _cleanUrl(PortalSharedPublicUrls.checkout);
+  if (_cleanUrl(fallbackHost) == canonicalCheckout) {
+    return canonicalCheckout;
+  }
   return '${_cleanUrl(fallbackHost)}/checkout';
 }
