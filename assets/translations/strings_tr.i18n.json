@@ -1,407 +1,407 @@
-﻿{
+{
     "general":  {
-                    "appTitle":  "POKROV VPN",
-                    "reset":  "Sıfırla",
+                    "appTitle":  "POKROV Network",
+                    "reset":  "S?f?rla",
                     "toggle":  {
                                    "enabled":  "Etkin",
-                                   "disabled":  "Devre dışı"
+                                   "disabled":  "Devre d?s?"
                                },
                     "state":  {
-                                  "disable":  "Devre dışı bırak"
+                                  "disable":  "Devre d?s? b?rak"
                               },
-                    "sort":  "Sırala",
-                    "sortBy":  "Sırala",
+                    "sort":  "S?rala",
+                    "sortBy":  "S?rala",
                     "addToClipboard":  "Panoya ekle",
-                    "notSet":  "Ayarlanmadı",
+                    "notSet":  "Ayarlanmad?",
                     "agree":  "Kabul etmek",
                     "decline":  "Reddetmek",
                     "unknown":  "Bilinmeyen",
-                    "hidden":  "Gizlenmiş",
-                    "timeout":  "Zaman aşımı",
+                    "hidden":  "Gizlenmis",
+                    "timeout":  "Zaman as?m?",
                     "clipboardExportSuccessMsg":  "Panoya Eklendi",
-                    "showMore":  "Daha fazla göster",
-                    "showLess":  "Daha az göster",
-                    "openAppSettings":  "Uygulama Ayarlarını Aç",
-                    "grantPermission":  "İzin Ver"
+                    "showMore":  "Daha fazla goster",
+                    "showLess":  "Daha az goster",
+                    "openAppSettings":  "Uygulama Ayarlar?n? Ac",
+                    "grantPermission":  "Izin Ver"
                 },
     "intro":  {
-                  "termsAndPolicyCaution(rich)":  "devam ederek ${tap(@:about.termsAndConditions)} kabul etmiş olursunuz",
-                  "start":  "Başla"
+                  "termsAndPolicyCaution(rich)":  "devam ederek ${tap(@:about.termsAndConditions)} kabul etmis olursunuz",
+                  "start":  "Basla"
               },
     "home":  {
                  "pageTitle":  "Ana Sayfa",
-                 "emptyProfilesMsg":  "Aboneliği profili ekleyerek başlayın",
-                 "noActiveProfileMsg":  "Profil seçin"
+                 "emptyProfilesMsg":  "Aboneligi profili ekleyerek baslay?n",
+                 "noActiveProfileMsg":  "Profil secin"
              },
     "stats":  {
                   "traffic":  "Trafik",
-                  "trafficLive":  "Canlı Trafik",
+                  "trafficLive":  "Canl? Trafik",
                   "trafficTotal":  "Toplam Trafik",
-                  "uplink":  "Çıkış Yolu",
-                  "downlink":  "Giriş Yolu",
-                  "connection":  "Bağlantı",
-                  "speed":  "Hız",
-                  "totalTransferred":  "Toplam Aktarılan"
+                  "uplink":  "C?k?s Yolu",
+                  "downlink":  "Giris Yolu",
+                  "connection":  "Baglant?",
+                  "speed":  "H?z",
+                  "totalTransferred":  "Toplam Aktar?lan"
               },
     "profile":  {
                     "overviewPageTitle":  "Profiller",
                     "detailsPageTitle":  "Profil",
-                    "activeProfileNameSemanticLabel":  "Aktif profil adı: \"${name}\".",
-                    "activeProfileBtnSemanticLabel":  "Tüm profilleri görüntüleyin",
-                    "nonActiveProfileBtnSemanticLabel":  "Aktif profil olarak \"${name}\" seçeneğini seçin.",
+                    "activeProfileNameSemanticLabel":  "Aktif profil ad?: \"${name}\".",
+                    "activeProfileBtnSemanticLabel":  "Tum profilleri goruntuleyin",
+                    "nonActiveProfileBtnSemanticLabel":  "Aktif profil olarak \"${name}\" secenegini secin.",
                     "subscription":  {
                                          "traffic":  "Trafik",
-                                         "updatedTimeAgo":  "${timeago} güncellendi",
-                                         "remainingDuration":  "${duration} Gün Kaldı",
-                                         "remainingTrafficSemanticLabel":  "${consumed}/${total} trafik tüketildi",
-                                         "expired":  "Süresi Doldu",
+                                         "updatedTimeAgo":  "${timeago} guncellendi",
+                                         "remainingDuration":  "${duration} Gun Kald?",
+                                         "remainingTrafficSemanticLabel":  "${consumed}/${total} trafik tuketildi",
+                                         "expired":  "Suresi Doldu",
                                          "noTraffic":  "Kotal Doldu",
-                                         "upload":  "Yüklemek",
-                                         "download":  "İndirmek",
+                                         "upload":  "Yuklemek",
+                                         "download":  "Indirmek",
                                          "total":  "Toplam Trafik",
                                          "expireDate":  "Son kullanma tarihi"
                                      },
                     "sortBy":  {
-                                   "lastUpdate":  "Yakın zamanda güncellendi",
+                                   "lastUpdate":  "Yak?n zamanda guncellendi",
                                    "name":  "Alfabetik"
                                },
                     "add":  {
                                 "buttonText":  "Yeni profil",
                                 "shortBtnTxt":  "Yeni profil",
                                 "fromClipboard":  "Panodan Ekle",
-                                "scanQr":  "QR kodunu tarayın",
+                                "scanQr":  "QR kodunu taray?n",
                                 "qrScanner":  {
-                                                  "permissionDeniedError":  "İzin reddedildi",
-                                                  "unexpectedError":  "Bir şeyler yanlış gitti",
+                                                  "permissionDeniedError":  "Izin reddedildi",
+                                                  "unexpectedError":  "Bir seyler yanl?s gitti",
                                                   "torchSemanticLabel":  "El feneri",
-                                                  "facingSemanticLabel":  "Kameraya önü",
-                                                  "permissionRequest":  "QR Kodunu taramak için kamera izni"
+                                                  "facingSemanticLabel":  "Kameraya onu",
+                                                  "permissionRequest":  "QR Kodunu taramak icin kamera izni"
                                               },
-                                "manually":  "Manuel giriş",
+                                "manually":  "Manuel giris",
                                 "addWarp":  "WARP ekle",
-                                "addingWarpMsg":  "WARP\u0027ı kaydederken lütfen bekleyin.",
+                                "addingWarpMsg":  "WARP\u0027? kaydederken lutfen bekleyin.",
                                 "addingProfileMsg":  "Profil Ekleniyor",
                                 "failureMsg":  "Profil eklenemedi"
                             },
                     "update":  {
-                                   "buttonTxt":  "Güncelle",
-                                   "tooltip":  "Profili Güncelle",
-                                   "updateSubscriptions":  "Abonelikleri Güncelle",
-                                   "failureMsg":  "Profil güncellenemedi",
-                                   "successMsg":  "Profil başarıyla güncellendi",
-                                   "namedFailureMsg":  "\"${name}\" güncellenemedi",
-                                   "namedSuccessMsg":  "\"${name}\" başarıyla güncellendi"
+                                   "buttonTxt":  "Guncelle",
+                                   "tooltip":  "Profili Guncelle",
+                                   "updateSubscriptions":  "Abonelikleri Guncelle",
+                                   "failureMsg":  "Profil guncellenemedi",
+                                   "successMsg":  "Profil basar?yla guncellendi",
+                                   "namedFailureMsg":  "\"${name}\" guncellenemedi",
+                                   "namedSuccessMsg":  "\"${name}\" basar?yla guncellendi"
                                },
                     "share":  {
-                                  "buttonText":  "Paylaş",
-                                  "exportToClipboardSuccess":  "Panoya aktarıldı",
-                                  "exportSubLinkToClipboard":  "Abonelik bağlantısını panoya aktar",
-                                  "subLinkQrCode":  "QR kodun abonelik bağlantısı ",
-                                  "exportConfigToClipboard":  "Yapılandırmayı panoya aktar",
-                                  "exportConfigToClipboardSuccess":  "Yapılandırma panoya kopyalandı"
+                                  "buttonText":  "Paylas",
+                                  "exportToClipboardSuccess":  "Panoya aktar?ld?",
+                                  "exportSubLinkToClipboard":  "Abonelik baglant?s?n? panoya aktar",
+                                  "subLinkQrCode":  "QR kodun abonelik baglant?s? ",
+                                  "exportConfigToClipboard":  "Yap?land?rmay? panoya aktar",
+                                  "exportConfigToClipboardSuccess":  "Yap?land?rma panoya kopyaland?"
                               },
                     "edit":  {
-                                 "buttonTxt":  "Düzenle",
-                                 "selectActiveTxt":  "Etkin profili seçin"
+                                 "buttonTxt":  "Duzenle",
+                                 "selectActiveTxt":  "Etkin profili secin"
                              },
                     "delete":  {
                                    "buttonTxt":  "Sil",
-                                   "confirmationMsg":  "Profil kalıcı olarak silinsin mi?",
-                                   "successMsg":  "Profil başarıyla silindi"
+                                   "confirmationMsg":  "Profil kal?c? olarak silinsin mi?",
+                                   "successMsg":  "Profil basar?yla silindi"
                                },
                     "save":  {
                                  "buttonText":  "Kaydet",
-                                 "successMsg":  "Profil başarıyla kaydedildi",
+                                 "successMsg":  "Profil basar?yla kaydedildi",
                                  "failureMsg":  "Profil kaydedilemedi"
                              },
                     "detailsForm":  {
-                                        "nameLabel":  "İsim",
+                                        "nameLabel":  "Isim",
                                         "nameHint":  "Profil ismi",
                                         "urlLabel":  "URL",
-                                        "urlHint":  "Tam yapılandırma URL\u0027i",
-                                        "emptyNameMsg":  "İsim gerekli",
-                                        "invalidUrlMsg":  "Geçersiz URL",
-                                        "lastUpdate":  "Son Güncelleme",
-                                        "updateInterval":  "Otomatik güncelleme",
-                                        "updateIntervalDialogTitle":  "Otomatik Güncelleme Aralığı (saat olarak)"
+                                        "urlHint":  "Tam yap?land?rma URL\u0027i",
+                                        "emptyNameMsg":  "Isim gerekli",
+                                        "invalidUrlMsg":  "Gecersiz URL",
+                                        "lastUpdate":  "Son Guncelleme",
+                                        "updateInterval":  "Otomatik guncelleme",
+                                        "updateIntervalDialogTitle":  "Otomatik Guncelleme Aral?g? (saat olarak)"
                                     }
                 },
     "proxies":  {
                     "pageTitle":  "Proxyler",
-                    "emptyProxiesMsg":  "Kullanılabilir proxy yok",
+                    "emptyProxiesMsg":  "Kullan?labilir proxy yok",
                     "delayTestTooltip":  "Test Gecikmesi",
-                    "sortTooltip":  "Proxy\u0027leri Sırala",
+                    "sortTooltip":  "Proxy\u0027leri S?rala",
                     "checkIp":  "IP\u0027yi kontrol edin",
                     "unknownIp":  "Bilinmeyen IP",
                     "sortOptions":  {
-                                        "unsorted":  "Varsayılan",
+                                        "unsorted":  "Varsay?lan",
                                         "name":  "Alfabetik olarak",
                                         "delay":  "Gecikmeyle"
                                     },
                     "activeProxySemanticLabel":  "Aktif Vekil",
                     "delaySemantics":  {
                                            "result":  "Gecikme: ${delay}ms",
-                                           "timeout":  "Gecikme Testi Zaman Aşımı",
+                                           "timeout":  "Gecikme Testi Zaman As?m?",
                                            "testing":  "Gecikme: Test ediliyor..."
                                        },
                     "ipInfoSemantics":  {
                                             "address":  "IP adresi",
-                                            "country":  "Ülke"
+                                            "country":  "Ulke"
                                         }
                 },
     "logs":  {
                  "pageTitle":  "Log",
                  "filterHint":  "Filtre",
-                 "allLevelsFilter":  "Tüm",
-                 "shareCoreLogs":  "Çekirdek Loglarını Paylaş",
-                 "shareAppLogs":  "Uygulama Loglarını paylaş",
+                 "allLevelsFilter":  "Tum",
+                 "shareCoreLogs":  "Cekirdek Loglar?n? Paylas",
+                 "shareAppLogs":  "Uygulama Loglar?n? paylas",
                  "pauseTooltip":  "Duraklat",
                  "resumeTooltip":  "Devam et",
                  "clearTooltip":  "Temizle"
              },
     "settings":  {
                      "pageTitle":  "Ayarlar",
-                     "requiresRestartMsg":  "Bunun etkili olması için uygulamayı yeniden başlatın",
+                     "requiresRestartMsg":  "Bunun etkili olmas? icin uygulamay? yeniden baslat?n",
                      "experimental":  "Deneysel",
-                     "experimentalMsg":  "Deneysel işaretli özellikler hâlâ geliştirilme aşamasındadır ve sorunlara neden olabilir.",
-                     "exportOptions":  "Anonim Seçenekleri Panoya Kopyala",
-                     "exportAllOptions":  "Tüm Seçenekleri Panoya Kopyala",
-                     "importOptions":  "Seçenekleri Panodan İçe Aktarma",
-                     "importOptionsMsg":  "Bu, tüm yapılandırma seçeneklerini sağlanan değerlerle yeniden yazacaktır. Emin misin?",
+                     "experimentalMsg":  "Deneysel isaretli ozellikler hala gelistirilme asamas?ndad?r ve sorunlara neden olabilir.",
+                     "exportOptions":  "Anonim Secenekleri Panoya Kopyala",
+                     "exportAllOptions":  "Tum Secenekleri Panoya Kopyala",
+                     "importOptions":  "Secenekleri Panodan Ice Aktarma",
+                     "importOptionsMsg":  "Bu, tum yap?land?rma seceneklerini saglanan degerlerle yeniden yazacakt?r. Emin misin?",
                      "general":  {
                                      "sectionTitle":  "Genel",
                                      "locale":  "Dil",
-                                     "region":  "Bölge",
-                                     "regionMsg":  "Yerel adresleri atlamak için varsayılan seçeneği seçebilirsin",
+                                     "region":  "Bolge",
+                                     "regionMsg":  "Yerel adresleri atlamak icin varsay?lan secenegi secebilirsin",
                                      "regions":  {
-                                                     "ir":  "İran (ir) 🇮🇷",
-                                                     "cn":  "Çin (cn) 🇨🇳",
-                                                     "ru":  "Rusya (ru) 🇷🇺",
-                                                     "af":  "Afghanistan (af) 🇦🇫",
-                                                     "id":  "Endonezya (id) 🇮🇩",
-                                                     "tr":  "Türk (tr) 🇹🇷",
-                                                     "br":  "Brezilya (br) 🇧🇷",
-                                                     "other":  "Diğer"
+                                                     "ir":  "Iran (ir) ????",
+                                                     "cn":  "Cin (cn) ????",
+                                                     "ru":  "Rusya (ru) ????",
+                                                     "af":  "Afghanistan (af) ????",
+                                                     "id":  "Endonezya (id) ????",
+                                                     "tr":  "Turk (tr) ????",
+                                                     "br":  "Brezilya (br) ????",
+                                                     "other":  "Diger"
                                                  },
                                      "themeMode":  "Tema Modu",
                                      "themeModes":  {
-                                                        "system":  "Sistem temasını takip et",
-                                                        "dark":  "Karanlık mod",
-                                                        "light":  "Işık modu",
+                                                        "system":  "Sistem temas?n? takip et",
+                                                        "dark":  "Karanl?k mod",
+                                                        "light":  "Is?k modu",
                                                         "black":  "Siyah mod"
                                                     },
-                                     "enableAnalytics":  "Analitikleri Etkinleştir",
-                                     "enableAnalyticsMsg":  "Uygulamayı iyileştirmek için analiz toplama ve kilitlenme raporları göndermeye izni verin",
-                                     "autoStart":  "Önyüklemede Başlat",
-                                     "silentStart":  "Sessiz Başlatma",
-                                     "openWorkingDir":  "Çalışma Dizinini Aç",
-                                     "ignoreBatteryOptimizations":  "Pil Optimizasyonunu Devre Dışı Bırak",
-                                     "ignoreBatteryOptimizationsMsg":  "Optimum VPN performansı için kısıtlamaları kaldırın",
-                                     "dynamicNotification":  "Bildirimde hızı göster",
+                                     "enableAnalytics":  "Analitikleri Etkinlestir",
+                                     "enableAnalyticsMsg":  "Uygulamay? iyilestirmek icin analiz toplama ve kilitlenme raporlar? gondermeye izni verin",
+                                     "autoStart":  "Onyuklemede Baslat",
+                                     "silentStart":  "Sessiz Baslatma",
+                                     "openWorkingDir":  "Cal?sma Dizinini Ac",
+                                     "ignoreBatteryOptimizations":  "Pil Optimizasyonunu Devre D?s? B?rak",
+                                     "ignoreBatteryOptimizationsMsg":  "Optimum VPN performans? icin k?s?tlamalar? kald?r?n",
+                                     "dynamicNotification":  "Bildirimde h?z? goster",
                                      "hapticFeedback":  "Dokunsal geribildirim",
-                                     "autoIpCheck":  "Bağlantı IP\u0027sini Otomatik Olarak Kontrol Et",
-                                     "actionAtClosing":  "Kapanışta eylem",
+                                     "autoIpCheck":  "Baglant? IP\u0027sini Otomatik Olarak Kontrol Et",
+                                     "actionAtClosing":  "Kapan?sta eylem",
                                      "actionsAtClosing":  {
                                                               "askEachTime":  "Her seferinde sor",
                                                               "hide":  "Saklamak",
-                                                              "exit":  "Çıkış"
+                                                              "exit":  "C?k?s"
                                                           }
                                  },
                      "advanced":  {
-                                      "sectionTitle":  "Gelişmiş",
-                                      "debugMode":  "Hata ayıklama modu",
-                                      "debugModeMsg":  "Bu değişikliği uygulamak için uygulamayı yeniden başlatın",
-                                      "memoryLimit":  "Bellek Sınırı",
-                                      "memoryLimitMsg":  "Yetersiz bellek hataları veya sık sık uygulama çökmesi yaşıyorsanız etkinleştirin",
-                                      "resetTunnel":  "VPN Profilini Sıfırla"
+                                      "sectionTitle":  "Gelismis",
+                                      "debugMode":  "Hata ay?klama modu",
+                                      "debugModeMsg":  "Bu degisikligi uygulamak icin uygulamay? yeniden baslat?n",
+                                      "memoryLimit":  "Bellek S?n?r?",
+                                      "memoryLimitMsg":  "Yetersiz bellek hatalar? veya s?k s?k uygulama cokmesi yas?yorsan?z etkinlestirin",
+                                      "resetTunnel":  "Network Profilini S?f?rla"
                                   },
                      "network":  {
-                                     "perAppProxyPageTitle":  "Uygulama başına Proxy",
+                                     "perAppProxyPageTitle":  "Uygulama bas?na Proxy",
                                      "perAppProxyModes":  {
-                                                              "off":  "Tümü",
-                                                              "offMsg":  "Proxy tüm uygulamalar",
+                                                              "off":  "Tumu",
+                                                              "offMsg":  "Proxy tum uygulamalar",
                                                               "include":  "Proxy",
-                                                              "includeMsg":  "Yalnızca proxy seçilen uygulamalar",
+                                                              "includeMsg":  "Yaln?zca proxy secilen uygulamalar",
                                                               "exclude":  "Atlatma",
-                                                              "excludeMsg":  "Seçilen uygulamalara proxy uygulama"
+                                                              "excludeMsg":  "Secilen uygulamalara proxy uygulama"
                                                           },
-                                     "showSystemApps":  "Sistem uygulamalarını göster",
-                                     "hideSystemApps":  "Sistem uygulamalarını gizle",
-                                     "clearSelection":  "Seçimi temizle"
+                                     "showSystemApps":  "Sistem uygulamalar?n? goster",
+                                     "hideSystemApps":  "Sistem uygulamalar?n? gizle",
+                                     "clearSelection":  "Secimi temizle"
                                  },
                      "geoAssets":  {
-                                       "pageTitle":  "Varlıkları Yönlendirme",
+                                       "pageTitle":  "Varl?klar? Yonlendirme",
                                        "geoip":  "GeoIP",
                                        "geosite":  "Geosite",
-                                       "version":  "Sürüm ${version}",
+                                       "version":  "Surum ${version}",
                                        "fileMissing":  "Eksik dosya",
-                                       "update":  "Güncelleme",
-                                       "download":  "İndirmek",
-                                       "failureMsg":  "Öğe güncellenemedi",
-                                       "successMsg":  "Öğe başarıyla güncellendi",
-                                       "addRecommended":  "Önerilen Varlıkları Ekle",
-                                       "missingGeoAssetsMsg":  "Seçilen yönlendirme varlıklarının dosyaları eksik. Bunları indirin veya mevcut olanları seçin."
+                                       "update":  "Guncelleme",
+                                       "download":  "Indirmek",
+                                       "failureMsg":  "Oge guncellenemedi",
+                                       "successMsg":  "Oge basar?yla guncellendi",
+                                       "addRecommended":  "Onerilen Varl?klar? Ekle",
+                                       "missingGeoAssetsMsg":  "Secilen yonlendirme varl?klar?n?n dosyalar? eksik. Bunlar? indirin veya mevcut olanlar? secin."
                                    }
                  },
     "about":  {
-                  "pageTitle":  "Hakkında",
-                  "version":  "Sürüm",
+                  "pageTitle":  "Hakk?nda",
+                  "version":  "Surum",
                   "sourceCode":  "Kaynak kodu",
-                  "telegramChannel":  "Telegram Kanalı",
-                  "checkForUpdate":  "Güncellemeleri kontrol et",
-                  "privacyPolicy":  "Gizlilik Politikası",
-                  "termsAndConditions":  "Şartlar ve koşullar"
+                  "telegramChannel":  "Telegram Kanal?",
+                  "checkForUpdate":  "Guncellemeleri kontrol et",
+                  "privacyPolicy":  "Gizlilik Politikas?",
+                  "termsAndConditions":  "Sartlar ve kosullar"
               },
     "appUpdate":  {
-                      "notAvailableMsg":  " En son sürümü kullanıyorsunuz",
-                      "dialogTitle":  "Yeni Güncell",
-                      "updateMsg":  "@:general.appTitle\u0027ın yeni bir sürümü mevcut. Şimdi güncellemek ister misiniz?",
-                      "currentVersionLbl":  "Şimdiki versiyon",
+                      "notAvailableMsg":  " En son surumu kullan?yorsunuz",
+                      "dialogTitle":  "Yeni Guncell",
+                      "updateMsg":  "@:general.appTitle\u0027?n yeni bir surumu mevcut. Simdi guncellemek ister misiniz?",
+                      "currentVersionLbl":  "Simdiki versiyon",
                       "newVersionLbl":  "Yeni versiyon",
-                      "updateNowBtnTxt":  "Şimdi güncelle",
+                      "updateNowBtnTxt":  "Simdi guncelle",
                       "laterBtnTxt":  "Daha sonra",
-                      "ignoreBtnTxt":  "Görmezden gel"
+                      "ignoreBtnTxt":  "Gormezden gel"
                   },
     "tray":  {
-                 "dashboard":  "Gösterge Paneli",
-                 "quit":  "Çıkış yap",
-                 "open":  "Açık",
+                 "dashboard":  "Gosterge Paneli",
+                 "quit":  "C?k?s yap",
+                 "open":  "Ac?k",
                  "status":  {
-                                "connect":  "Bağlan",
-                                "connecting":  "Bağlanıyor",
-                                "disconnect":  "Bağlantıyı kes",
-                                "disconnecting":  "Bağlantı kesiliyor"
+                                "connect":  "Baglan",
+                                "connecting":  "Baglan?yor",
+                                "disconnect":  "Baglant?y? kes",
+                                "disconnecting":  "Baglant? kesiliyor"
                             }
              },
     "failure":  {
                     "unexpected":  "Beklenmeyen hata",
                     "clash":  {
                                   "unexpected":  "Beklenmeyen hata",
-                                  "core":  "Çakışma Hatası ${reason}"
+                                  "core":  "Cak?sma Hatas? ${reason}"
                               },
                     "singbox":  {
-                                    "unexpected":  "Beklenmedik Hizmet Hatası",
-                                    "serviceNotRunning":  "Servis çalışmıyor",
-                                    "missingPrivilege":  "Eksik Ayrıcalık",
-                                    "missingPrivilegeMsg":  "VPN modu yönetici ayrıcalıkları gerektirir. Uygulamayı yönetici olarak yeniden başlatın veya hizmet modunu değiştirin.",
-                                    "missingGeoAssets":  "Eksik Coğrafi Varlıklar",
-                                    "missingGeoAssetsMsg":  "Coğrafi öğeler eksik. Aktif varlığı değiştirmeyi veya ayarlarda seçileni indirmeyi düşünün.",
-                                    "invalidConfigOptions":  "Geçersiz yapılandırma seçenekleri",
-                                    "invalidConfig":  "Geçersiz Yapılandırma",
-                                    "create":  "Servis oluşturma hatası",
-                                    "start":  "Servis başlatma hatası"
+                                    "unexpected":  "Beklenmedik Hizmet Hatas?",
+                                    "serviceNotRunning":  "Servis cal?sm?yor",
+                                    "missingPrivilege":  "Eksik Ayr?cal?k",
+                                    "missingPrivilegeMsg":  "VPN modu yonetici ayr?cal?klar? gerektirir. Uygulamay? yonetici olarak yeniden baslat?n veya hizmet modunu degistirin.",
+                                    "missingGeoAssets":  "Eksik Cografi Varl?klar",
+                                    "missingGeoAssetsMsg":  "Cografi ogeler eksik. Aktif varl?g? degistirmeyi veya ayarlarda secileni indirmeyi dusunun.",
+                                    "invalidConfigOptions":  "Gecersiz yap?land?rma secenekleri",
+                                    "invalidConfig":  "Gecersiz Yap?land?rma",
+                                    "create":  "Servis olusturma hatas?",
+                                    "start":  "Servis baslatma hatas?"
                                 },
                     "connectivity":  {
                                          "unexpected":  "Beklenmedik Hata",
-                                         "missingVpnPermission":  "Eksik VPN İzni",
-                                         "missingNotificationPermission":  "Eksik Bildirim İzni",
+                                         "missingVpnPermission":  "Eksik Network Izni",
+                                         "missingNotificationPermission":  "Eksik Bildirim Izni",
                                          "core":  "Temel Hata"
                                      },
                     "profiles":  {
                                      "unexpected":  "Beklenmedik hata",
-                                     "notFound":  "Profil bulunamadı",
-                                     "invalidConfig":  "Geçersiz Yapılandırmalar",
-                                     "invalidUrl":  "Geçersiz URL"
+                                     "notFound":  "Profil bulunamad?",
+                                     "invalidConfig":  "Gecersiz Yap?land?rmalar",
+                                     "invalidUrl":  "Gecersiz URL"
                                  },
                     "connection":  {
-                                       "unexpected":  "Beklenmeyen bağlantı hatası",
-                                       "timeout":  "Bağlantı zamanaşımına uğradı",
-                                       "badResponse":  "Kötü yanıt",
-                                       "connectionError":  "Bağlantı hatası",
-                                       "badCertificate":  "Kötü sertifika"
+                                       "unexpected":  "Beklenmeyen baglant? hatas?",
+                                       "timeout":  "Baglant? zamanas?m?na ugrad?",
+                                       "badResponse":  "Kotu yan?t",
+                                       "connectionError":  "Baglant? hatas?",
+                                       "badCertificate":  "Kotu sertifika"
                                    },
                     "geoAssets":  {
                                       "unexpected":  "Beklenmeyen hata",
-                                      "notUpdate":  "Güncelleme mevcut değil",
-                                      "activeNotFound":  "Etkin Coğrafi Varlık Bulunamadı"
+                                      "notUpdate":  "Guncelleme mevcut degil",
+                                      "activeNotFound":  "Etkin Cografi Varl?k Bulunamad?"
                                   }
                 },
     "play":  {
-                 "title":  "POKROV VPN",
+                 "title":  "POKROV Network",
                  "short_description":  "Otomatik, SSH, VLESS, Vmess, Trojan, Reality, Sing-Box, Clash, Xray, Shadowsocks",
-                 "full_description":  "POKROV VPN\u0027in temel hedefi güvenli, kullanıcı dostu ve verimli bir tünel istemcisi sağlamaktır. VPN Hizmeti iznini kullanarak tüm trafiği veya seçilen uygulama trafiğini seçtiğiniz uzak bir sunucuya yönlendirmenizi sağlar. Not: Herhangi bir sunucu sağlamıyoruz; kullanıcıların kendi barındırılan sunucularını veya güvenilir sunucularını kullanarak çevrimiçi etkinliklerinin gizli kalmasını sağlamaları gerekir. Sunucuları aşağıdakilerle destekliyoruz: - Normal V2ray/Xray Abonelik Bağlantısı - Clash Abonelik Bağlantısı - Sing-Box Abonelik Bağlantısı Benzersiz özelliklerimiz nelerdir? - Kullanıcı Dostu - Optimize Edilmiş ve Hızlı - En Düşük Ping\u0027i otomatik olarak seçin - Kullanıcı kullanım bilgilerini gösterin - Derin bağlantı kullanarak tek tıklamayla alt bağlantıyı kolayca içe aktarın - Ücretsiz ve ADS Yok - Kullanıcı alt bağlantılarını kolayca değiştirin - giderek daha fazla Destek: - Sing-Box tarafından desteklenen tüm Protokoller - VLESS + xtls gerçeklik, vizyon - VMESS - Trojan - ShoadowSocks - Reality - V2ray - Hystria2 - TUIC - SSH - ShadowTLS Uygulama cekirdegi acik kaynakli Sing-Box tabanlidir. İzin Açıklaması: - VPN Hizmeti: Bu uygulamanın amacı güvenli, kullanıcı dostu ve verimli bir tünel istemcisi sağlamak olduğundan, trafiği tünel aracılığıyla uzak sunucuya yönlendirebilmek için bu izne ihtiyacımız var. - TÜM PAKETLERİ SORGULAYIN: Bu izin, kullanıcıların tünelleme için belirli uygulamaları dahil etmesine veya hariç tutmasına izin vermek için kullanılır. - ALMA ÖNYÜKLEME TAMAMLANDI: Bu izin, cihaz önyüklemesi sırasında bu uygulamayı etkinleştirmek için uygulama ayarlarından etkinleştirilebilir veya devre dışı bırakılabilir. - BİLDİRİMLER SONRASI: VPN hizmetinin sürekli çalışmasını sağlamak için bir ön plan hizmeti kullandığımız için bu izin önemlidir. - Bu uygulama reklam içermez. Analitik ve kilitlenme verileri yalnızca uygulamanın ilk kullanımında kullanıcının açık rızası ile gerçekleşir."
+                 "full_description":  "POKROV Network\u0027in temel hedefi guvenli, kullan?c? dostu ve verimli bir tunel istemcisi saglamakt?r. Network Hizmeti iznini kullanarak tum trafigi veya secilen uygulama trafigini sectiginiz uzak bir sunucuya yonlendirmenizi saglar. Not: Herhangi bir sunucu saglam?yoruz; kullan?c?lar?n kendi bar?nd?r?lan sunucular?n? veya guvenilir sunucular?n? kullanarak cevrimici etkinliklerinin gizli kalmas?n? saglamalar? gerekir. Sunucular? asag?dakilerle destekliyoruz: - Normal V2ray/Xray Abonelik Baglant?s? - Clash Abonelik Baglant?s? - Sing-Box Abonelik Baglant?s? Benzersiz ozelliklerimiz nelerdir? - Kullan?c? Dostu - Optimize Edilmis ve H?zl? - En Dusuk Ping\u0027i otomatik olarak secin - Kullan?c? kullan?m bilgilerini gosterin - Derin baglant? kullanarak tek t?klamayla alt baglant?y? kolayca ice aktar?n - Ucretsiz ve ADS Yok - Kullan?c? alt baglant?lar?n? kolayca degistirin - giderek daha fazla Destek: - Sing-Box taraf?ndan desteklenen tum Protokoller - VLESS + xtls gerceklik, vizyon - VMESS - Trojan - ShoadowSocks - Reality - V2ray - Hystria2 - TUIC - SSH - ShadowTLS Uygulama cekirdegi acik kaynakli Sing-Box tabanlidir. Izin Ac?klamas?: - Network Hizmeti: Bu uygulaman?n amac? guvenli, kullan?c? dostu ve verimli bir tunel istemcisi saglamak oldugundan, trafigi tunel arac?l?g?yla uzak sunucuya yonlendirebilmek icin bu izne ihtiyac?m?z var. - TUM PAKETLERI SORGULAYIN: Bu izin, kullan?c?lar?n tunelleme icin belirli uygulamalar? dahil etmesine veya haric tutmas?na izin vermek icin kullan?l?r. - ALMA ONYUKLEME TAMAMLANDI: Bu izin, cihaz onyuklemesi s?ras?nda bu uygulamay? etkinlestirmek icin uygulama ayarlar?ndan etkinlestirilebilir veya devre d?s? b?rak?labilir. - BILDIRIMLER SONRASI: Network Hizmetinin surekli cal?smas?n? saglamak icin bir on plan hizmeti kulland?g?m?z icin bu izin onemlidir. - Bu uygulama reklam icermez. Analitik ve kilitlenme verileri yaln?zca uygulaman?n ilk kullan?m?nda kullan?c?n?n ac?k r?zas? ile gerceklesir."
              },
     "connection":  {
-                       "tapToConnect":  "Bağlanmak için dokunun",
-                       "connecting":  "Bağlanıyor",
-                       "disconnecting":  "Bağlantı kesiliyor",
-                       "connected":  "Bağlandı",
-                       "reconnect":  "Yeniden bağlan",
-                       "connectAnyWay":  "Bağlamak",
-                       "experimentalNotice":  "Kullanımdaki Deneysel Özellikler",
-                       "experimentalNoticeMsg":  "Bağlantı kalitesini etkileyebilecek ve beklenmeyen hatalara neden olabilecek bazı deneysel özellikleri etkinleştirdiniz. Bu seçenekleri istediğiniz zaman Yapılandırma seçenekleri sayfasından değiştirebilir veya sıfırlayabilirsiniz.",
-                       "disableExperimentalNotice":  "Bir daha gösterme",
-                       "reconnectMsg":  "Değişiklikleri dikkate almak için yeniden bağlanılıyor..."
+                       "tapToConnect":  "Baglanmak icin dokunun",
+                       "connecting":  "Baglan?yor",
+                       "disconnecting":  "Baglant? kesiliyor",
+                       "connected":  "Bagland?",
+                       "reconnect":  "Yeniden baglan",
+                       "connectAnyWay":  "Baglamak",
+                       "experimentalNotice":  "Kullan?mdaki Deneysel Ozellikler",
+                       "experimentalNoticeMsg":  "Baglant? kalitesini etkileyebilecek ve beklenmeyen hatalara neden olabilecek baz? deneysel ozellikleri etkinlestirdiniz. Bu secenekleri istediginiz zaman Yap?land?rma secenekleri sayfas?ndan degistirebilir veya s?f?rlayabilirsiniz.",
+                       "disableExperimentalNotice":  "Bir daha gosterme",
+                       "reconnectMsg":  "Degisiklikleri dikkate almak icin yeniden baglan?l?yor..."
                    },
     "config":  {
                    "useXrayCoreWhenPossible":  {
-                                                   "Label":  "Mümkün Olduğunda X-ray-çekirdeğini Kullanın",
-                                                   "Description":  "Alt bağlantıları ayrıştırırken Xray-core kullanın. Bu seçeneği etkinleştirmek için alt bağlantıyı yeniden içe aktarmanız gerekir."
+                                                   "Label":  "Mumkun Oldugunda X-ray-cekirdegini Kullan?n",
+                                                   "Description":  "Alt baglant?lar? ayr?st?r?rken Xray-core kullan?n. Bu secenegi etkinlestirmek icin alt baglant?y? yeniden ice aktarman?z gerekir."
                                                },
-                   "resetBtn":  "Ayarları sıfırla",
+                   "resetBtn":  "Ayarlar? s?f?rla",
                    "serviceMode":  "Servis modu",
-                   "quickSettings":  "Hızlı Ayarlar",
-                   "setupWarp":  "WARP\u0027ı Kur",
-                   "allOptions":  "Tüm Yapılandırma Seçenekleri",
+                   "quickSettings":  "H?zl? Ayarlar",
+                   "setupWarp":  "WARP\u0027? Kur",
+                   "allOptions":  "Tum Yap?land?rma Secenekleri",
                    "serviceModes":  {
                                         "proxy":  "Proxy",
                                         "systemProxy":  "Sistem Proxy",
-                                        "tun":  "VPN",
-                                        "tunService":  "VPN Hizmeti"
+                                        "tun":  "Network",
+                                        "tunService":  "Network Hizmeti"
                                     },
                    "shortServiceModes":  {
                                              "proxy":  "vekil",
                                              "systemProxy":  "Sistem Proxy\u0027si",
-                                             "tun":  "VPN",
-                                             "tunService":  "VPN Hizmeti"
+                                             "tun":  "Network",
+                                             "tunService":  "Network Hizmeti"
                                          },
                    "section":  {
-                                   "route":  "Rota Seçenekleri",
-                                   "dns":  "DNS Seçenekleri",
-                                   "inbound":  "Gelen Seçenekler",
+                                   "route":  "Rota Secenekleri",
+                                   "dns":  "DNS Secenekleri",
+                                   "inbound":  "Gelen Secenekler",
                                    "mux":  "Multiplexer",
                                    "outbound":  "Outbound Options",
                                    "tlsTricks":  "TLS Tricks",
                                    "warp":  "WARP Options",
-                                   "misc":  "Çeşitli Seçenekler"
+                                   "misc":  "Cesitli Secenekler"
                                },
                    "warpConsent":  {
-                                       "title":  "POKROV VPN",
-                                       "description(rich)":  "Cloudflare WARP ücretsiz bir WireGuard VPN sağlayıcısıdır. Bu seçeneği etkinleştirerek Cloudflare WARP\u0027ın ${tos(Hizmet Şartları)} ve ${privacy(Gizlilik Politikası)}\u0027nı kabul etmiş olursunuz."
+                                       "title":  "POKROV Network",
+                                       "description(rich)":  "Cloudflare WARP ucretsiz bir WireGuard Protocol saglay?c?s?d?r. Bu secenegi etkinlestirerek Cloudflare WARP\u0027?n ${tos(Hizmet Sartlar?)} ve ${privacy(Gizlilik Politikas?)}\u0027n? kabul etmis olursunuz."
                                    },
-                   "generateWarpConfig":  "WARP Yapılandırması Oluştur",
-                   "missingWarpConfig":  "WARP Yapılandırması Eksik",
-                   "warpConfigGenerated":  "WARP Yapılandırması Oluşturuldu",
-                   "pageTitle":  "Yapılandırma Seçenekleri",
+                   "generateWarpConfig":  "WARP Yap?land?rmas? Olustur",
+                   "missingWarpConfig":  "WARP Yap?land?rmas? Eksik",
+                   "warpConfigGenerated":  "WARP Yap?land?rmas? Olusturuldu",
+                   "pageTitle":  "Yap?land?rma Secenekleri",
                    "logLevel":  "Log Seviyesi",
-                   "blockAds":  "Reklamları Engelle",
-                   "resolveDestination":  "Hedefi Çöz",
-                   "ipv6Mode":  "IPv6 Rotası",
+                   "blockAds":  "Reklamlar? Engelle",
+                   "resolveDestination":  "Hedefi Coz",
+                   "ipv6Mode":  "IPv6 Rotas?",
                    "ipv6Modes":  {
-                                     "disable":  "Devre dışı bırak",
-                                     "enable":  "Etkinleştir",
+                                     "disable":  "Devre d?s? b?rak",
+                                     "enable":  "Etkinlestir",
                                      "prefer":  "Tercih edilen",
-                                     "only":  "Özel"
+                                     "only":  "Ozel"
                                  },
                    "remoteDnsAddress":  "Uzak DNS",
                    "remoteDnsDomainStrategy":  "Uzak DNS Domain Stratejisi",
-                   "directDnsAddress":  "Doğrudan DNS",
-                   "directDnsDomainStrategy":  "Doğrudan DNS Domain Stratejisi",
+                   "directDnsAddress":  "Dogrudan DNS",
+                   "directDnsDomainStrategy":  "Dogrudan DNS Domain Stratejisi",
                    "mixedPort":  "Mixed Port",
-                   "tproxyPort":  "Şeffaf Proxy Bağlantı Noktası",
-                   "localDnsPort":  "Yerel DNS Bağlantı Noktası",
+                   "tproxyPort":  "Seffaf Proxy Baglant? Noktas?",
+                   "localDnsPort":  "Yerel DNS Baglant? Noktas?",
                    "allowConnectionFromLan":  "Allow Connection from LAN",
-                   "tunImplementation":  "TUN İmplementasyonu",
+                   "tunImplementation":  "TUN Implementasyonu",
                    "mtu":  "Paket Boyutu (MTU)",
-                   "connectionTestUrl":  "Bağlantı Testi URL\u0027i",
-                   "urlTestInterval":  "URL Test Aralığı",
-                   "enableClashApi":  "Clash API\u0027yi etkinleştir",
-                   "clashApiPort":  "Clash API Bağlantı Noktası",
-                   "enableTun":  "TUN\u0027u etkinleştir",
+                   "connectionTestUrl":  "Baglant? Testi URL\u0027i",
+                   "urlTestInterval":  "URL Test Aral?g?",
+                   "enableClashApi":  "Clash API\u0027yi etkinlestir",
+                   "clashApiPort":  "Clash API Baglant? Noktas?",
+                   "enableTun":  "TUN\u0027u etkinlestir",
                    "setSystemProxy":  "Sistem Proxy\u0027sini Ayarla",
                    "enableDnsRouting":  "Enable DNS Routing",
-                   "enableFakeDns":  "Sahte DNS\u0027yi Etkinleştir",
-                   "bypassLan":  "Lan\u0027ı Atla",
+                   "enableFakeDns":  "Sahte DNS\u0027yi Etkinlestir",
+                   "bypassLan":  "Lan\u0027? Atla",
                    "strictRoute":  "Kesin Rota",
                    "enableTlsFragment":  "Enable TLS Fragment",
                    "tlsFragmentSize":  "TLS Fragment Size",
@@ -415,8 +415,8 @@
                    "enableWarp":  "Enable WARP",
                    "warpDetourMode":  "Detour Mode",
                    "warpDetourModes":  {
-                                           "proxyOverWarp":  "WARP Aracılığıyla Proxy\u0027lerin Yönünü Değiştirin",
-                                           "warpOverProxy":  "Proxy\u0027ler Aracılığıyla WARP\u0027tan Sapma",
+                                           "proxyOverWarp":  "WARP Arac?l?g?yla Proxy\u0027lerin Yonunu Degistirin",
+                                           "warpOverProxy":  "Proxy\u0027ler Arac?l?g?yla WARP\u0027tan Sapma",
                                            "inbound":  "Detour WARP through proxies",
                                            "outbound":  "Detour proxies through WARP"
                                        },
@@ -424,14 +424,15 @@
                    "warpCleanIp":  "Clean IP",
                    "warpPort":  "Port",
                    "warpNoise":  "Noise",
-                   "warpNoiseSize":  "Gürültü Boyutu",
-                   "warpNoiseMode":  "Gürültü Modu",
-                   "warpNoiseDelay":  "Gürültü Gecikmesi"
+                   "warpNoiseSize":  "Gurultu Boyutu",
+                   "warpNoiseMode":  "Gurultu Modu",
+                   "warpNoiseDelay":  "Gurultu Gecikmesi"
                },
     "window":  {
                    "hide":  "Saklamak",
-                   "close":  "Çıkış",
-                   "alertMessage":  "Uygulamayı gizle veya çık?",
-                   "remember":  "Seçimimi hatırla"
+                   "close":  "C?k?s",
+                   "alertMessage":  "Uygulamay? gizle veya c?k?",
+                   "remember":  "Secimimi hat?rla"
                }
 }
+

@@ -1,6 +1,6 @@
-﻿{
+{
     "general":  {
-                    "appTitle":  "POKROV VPN",
+                    "appTitle":  "POKROV Network",
                     "reset":  "Set Ulang",
                     "toggle":  {
                                    "enabled":  "Mengaktifkan",
@@ -174,12 +174,12 @@
                                      "region":  "Region",
                                      "regionMsg":  "Bantu tetapkan opsi standar untuk melewati alamat lokal",
                                      "regions":  {
-                                                     "ir":  "İran (ir)",
-                                                     "cn":  "Çin (cn)",
+                                                     "ir":  "Iran (ir)",
+                                                     "cn":  "Cin (cn)",
                                                      "ru":  "Russia (ru)",
                                                      "af":  "Afghanistan (af)",
                                                      "id":  "Indonesia (id)",
-                                                     "tr":  "Turki (tr) 🇹🇷",
+                                                     "tr":  "Turki (tr) ????",
                                                      "other":  "Lainnya"
                                                  },
                                      "themeMode":  "Jenis Tema",
@@ -310,9 +310,9 @@
                                   }
                 },
     "play":  {
-                 "title":  "POKROV VPN",
+                 "title":  "POKROV Network",
                  "short_description":  "Otomatik, SSH, VLESS, Vmess, Trojan, Reality, Sing-Box, Clash, Xray, Shadowsocks",
-                 "full_description":  "Tujuan utama POKROV VPN adalah memberikan keamanan, user-friendly dan client tunnel yg efisien. POKROV VPN mengizinkanmu untuk mengarahkan semua atau beberapa trafik data aplikasi terpilih ke server remot pilihanmu, memanfaatkan izin VPN-Service.\n\nNote: Kami tidak menyediakan server apapun; pengguna diwajibkan untuk memastikan aktivitas online mereka tetap private dengan menggunakan self-hosted server atau server yg dipercaya pilihan mereka sendiri. \n \nKami mendukung server dengan:\n- Normal V2ray/Xray Subscription Link\n- Clash Subscription Link\n- Sing-Box Subscription Link\n\nApa fitur unik kami?\n - User Friendly\n - Cepat dan teroptimasi\n - Otomatis pilihan PING terendah \n - Menampilkan informasi penggunaan user\n - Dengan mudah import sublink dengan satu klik menggunakan deeplinking \n - Bebas dan tanpa iklan\n - Dengan mudah berganti user sublink\n - dan sebagainya\n\nSupport:\n- Semua protokol di dukung oleh Sing-Box \n- VLESS + xtls reality, vision\n- VMESS\n- Trojan\n- ShadowSocks\n- Reality\n- V2ray\n- Hystria2\n- TUIC\n- SSH\n- ShadowTLS\n\n\nInti Aplikasi didasarkan pada Sing-Box Open Source.\n\nDeskripsi Izin:\n- VPN Servis: Tujuan aplikasi ini menyediakan keamanan, user-friendly dan tunneling client efisien, kami membutuhkan izin untuk bisa mengarahkan traffic data melalui kanal remot server. \n- QUERY ALL PACKAGES: izin ini digunakan untuk memperbolehkan pengguna masuk atau mengeluarkan aplikasi tertentu untuk tunneling.\n- RECEIVE BOOT COMPLETED: izin ini dapat diaktifkan atau dinonaktifkan dari setting aplikasi untuk mengaktikan aplikasi ini saat boot device.\n- POST NOTIFICATIONS: izin ini penting karena kami menggunakan foreground service untuk memastikan operasi berkelanjutan dari VPN Servis.\n- Aplikasi ini bebas dari iklan. Analitik dan data crash hanya terjadi dengan persetujuan eksplisit dari pengguna pada saat penggunaan pertama kali"
+                 "full_description":  "Tujuan utama POKROV Network adalah memberikan keamanan, user-friendly dan client tunnel yg efisien. POKROV Network mengizinkanmu untuk mengarahkan semua atau beberapa trafik data aplikasi terpilih ke server remot pilihanmu, memanfaatkan izin VPN-Service.\n\nNote: Kami tidak menyediakan server apapun; pengguna diwajibkan untuk memastikan aktivitas online mereka tetap private dengan menggunakan self-hosted server atau server yg dipercaya pilihan mereka sendiri. \n \nKami mendukung server dengan:\n- Normal V2ray/Xray Subscription Link\n- Clash Subscription Link\n- Sing-Box Subscription Link\n\nApa fitur unik kami?\n - User Friendly\n - Cepat dan teroptimasi\n - Otomatis pilihan PING terendah \n - Menampilkan informasi penggunaan user\n - Dengan mudah import sublink dengan satu klik menggunakan deeplinking \n - Bebas dan tanpa iklan\n - Dengan mudah berganti user sublink\n - dan sebagainya\n\nSupport:\n- Semua protokol di dukung oleh Sing-Box \n- VLESS + xtls reality, vision\n- VMESS\n- Trojan\n- ShadowSocks\n- Reality\n- V2ray\n- Hystria2\n- TUIC\n- SSH\n- ShadowTLS\n\n\nInti Aplikasi didasarkan pada Sing-Box Open Source.\n\nDeskripsi Izin:\n- VPN Servis: Tujuan aplikasi ini menyediakan keamanan, user-friendly dan tunneling client efisien, kami membutuhkan izin untuk bisa mengarahkan traffic data melalui kanal remot server. \n- QUERY ALL PACKAGES: izin ini digunakan untuk memperbolehkan pengguna masuk atau mengeluarkan aplikasi tertentu untuk tunneling.\n- RECEIVE BOOT COMPLETED: izin ini dapat diaktifkan atau dinonaktifkan dari setting aplikasi untuk mengaktikan aplikasi ini saat boot device.\n- POST NOTIFICATIONS: izin ini penting karena kami menggunakan foreground service untuk memastikan operasi berkelanjutan dari VPN Servis.\n- Aplikasi ini bebas dari iklan. Analitik dan data crash hanya terjadi dengan persetujuan eksplisit dari pengguna pada saat penggunaan pertama kali"
              },
     "connection":  {
                        "tapToConnect":  "Ketuk untuk Sambung",
@@ -335,13 +335,13 @@
                    "serviceModes":  {
                                         "proxy":  "Proxy",
                                         "systemProxy":  "Sistem Proxy",
-                                        "tun":  "VPN",
+                                        "tun":  "Network",
                                         "tunService":  "Layanan VPN"
                                     },
                    "shortServiceModes":  {
                                              "proxy":  "Proksi",
                                              "systemProxy":  "Proksi Sistem",
-                                             "tun":  "VPN",
+                                             "tun":  "Network",
                                              "tunService":  "Layanan VPN"
                                          },
                    "section":  {
@@ -355,8 +355,8 @@
                                    "misc":  "Opsi Misc"
                                },
                    "warpConsent":  {
-                                       "title":  "POKROV VPN",
-                                       "description(rich)":  "Cloudflare WARP adalah WireGuard VPN Provider gratis. Dengan mengaktifkan opsi/pilihan ini berarti kamu setuju pada Cloudflare WARP\u0027s ${tos(Terms of Service)} dan ${privacy(Privacy Policy)}."
+                                       "title":  "POKROV Network",
+                                       "description(rich)":  "Cloudflare WARP adalah WireGuard Network Provider gratis. Dengan mengaktifkan opsi/pilihan ini berarti kamu setuju pada Cloudflare WARP\u0027s ${tos(Terms of Service)} dan ${privacy(Privacy Policy)}."
                                    },
                    "generateWarpConfig":  "Hasilkan Konfigurasi WARP",
                    "missingWarpConfig":  "Konfigurasi WARP tidak ada",
@@ -418,3 +418,4 @@
                    "warpNoiseDelay":  "Penundaan Kebisingan"
                }
 }
+

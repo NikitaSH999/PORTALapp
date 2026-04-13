@@ -18,41 +18,41 @@ class PortalCopy {
   static final RegExp _monthsPattern =
       RegExp(r'^(\d+)\s+months?$', caseSensitive: false);
 
-  String get shellVpn => 'VPN';
+  String get shellVpn => 'Network';
   String get shellLocations => isRussian ? 'Локации' : 'Locations';
   String get shellDevices => isRussian ? 'Устройства' : 'Devices';
   String get shellProfile => isRussian ? 'Профиль' : 'Profile';
   String get shellSupport => isRussian ? 'Поддержка' : 'Support';
   String get shellTagline =>
-      isRussian ? 'Спокойная защита на каждый день' : 'Calm privacy every day';
+      isRussian ? 'Умная оптимизация интернета' : 'Smart internet optimization';
   String get shellBadge => 'Pearl glass';
 
   String get loadingServiceData =>
-      isRussian ? 'Загружаем данные сервиса...' : 'Loading service data...';
+      isRussian ? 'Загружаем настройки сети...' : 'Loading network settings...';
   String get loadingAccessDeck => isRussian
       ? 'Загружаем доступ, устройства и маршруты...'
       : 'Loading access, devices and routes...';
   String get serviceUnavailable => isRussian
-      ? 'Сейчас не получается загрузить данные POKROV VPN.'
-      : 'POKROV VPN data is not available right now.';
+      ? 'Сейчас не получается загрузить данные POKROV Network.'
+      : 'POKROV Network data is not available right now.';
   String get copied =>
       isRussian ? 'Скопировано в буфер обмена.' : 'Copied to clipboard.';
   String get linkOpenFailed =>
       isRussian ? 'Не удалось открыть ссылку.' : 'Could not open the link.';
 
-  String get homeConsoleBadge => isRussian ? 'Домашний центр' : 'Home console';
+  String get homeConsoleBadge => isRussian ? 'Центр управления' : 'Control center';
   String get secureOnTapEyebrow =>
-      isRussian ? 'Защита в одно касание' : 'Secure in one tap';
+      isRussian ? 'Разгон в одно касание' : 'Boost in one tap';
   String homeStageTitle({required bool isActive}) => isRussian
-      ? (isActive ? 'Подключение готово' : 'Защита ждёт запуска')
-      : (isActive ? 'Connection is ready' : 'Protection is standing by');
+      ? (isActive ? 'Разгон активен' : 'Сеть ждёт запуска')
+      : (isActive ? 'Optimization is live' : 'Network is standing by');
   String homeStageBody({required bool isActive}) => isRussian
       ? (isActive
-          ? 'Подключайтесь, переключайте локации и управляйте доступом, не выходя из приложения.'
-          : 'Сначала активируйте доступ или подключите профиль, чтобы открыть полный сценарий POKROV VPN.')
+          ? 'Пользуйтесь быстрой почтой, видео и приложениями без лишних пауз.'
+          : 'Запустите тест-драйв или подключите профиль, чтобы открыть полный потенциал POKROV Network.')
       : (isActive
-          ? 'Connect, switch locations, and manage access without leaving the app.'
-          : 'Activate access or connect a profile first to unlock the full POKROV VPN flow.');
+          ? 'Enjoy fast email, video, and apps without unnecessary pauses.'
+          : 'Start the test-drive or connect a profile first to unlock the full POKROV Network potential.');
   String get activeProfileLabel =>
       isRussian ? 'Активный профиль' : 'Active profile';
   String get switchAction => isRussian ? 'Сменить' : 'Switch';
@@ -63,7 +63,7 @@ class PortalCopy {
   String get localProfileReady =>
       isRussian ? 'Локальный профиль готов' : 'Local profile ready';
   String get unlimitedTraffic =>
-      isRussian ? 'Безлимитный трафик' : 'Unlimited traffic';
+      isRussian ? 'Полный разгон' : 'Full boost';
   String trafficLeft(String value) =>
       isRussian ? 'Осталось $value' : '$value left';
   String daysRemaining(int value) =>
@@ -80,8 +80,8 @@ class PortalCopy {
       : 'Subscription link copied.';
 
   String get quickConnectBadge =>
-      isRussian ? 'Быстрое подключение' : 'Quick connect';
-  String get routeDeckBadge => isRussian ? 'Маршрут и защита' : 'Route deck';
+      isRussian ? 'Быстрый старт' : 'Quick start';
+  String get routeDeckBadge => isRussian ? 'Маршрут и ускорение' : 'Route & Speed';
   String nodesReady(String value) {
     if (value == '--') {
       return isRussian ? 'Узлы просыпаются' : 'Nodes waking up';
@@ -90,17 +90,17 @@ class PortalCopy {
   }
 
   String heroStatusTitle({required bool trialLike}) => trialLike
-      ? (isRussian ? 'Триал уже активен' : 'Trial is live')
-      : (isRussian ? 'Подписка уже активна' : 'Subscription is live');
+      ? (isRussian ? 'Тест-драйв уже активен' : 'Test-drive is live')
+      : (isRussian ? 'Премиум-доступ активен' : 'Premium access is live');
   String get autoRouteTitle =>
       isRussian ? 'Автомаршрут готов' : 'Auto route ready';
   String get bestPathNow =>
       isRussian ? 'Лучший маршрут сейчас' : 'Best path right now';
   String get chooseRouteAction =>
-      isRussian ? 'Выбрать маршрут' : 'Choose route';
-  String get protectedUntil => isRussian ? 'Защита до' : 'Protected until';
+      isRussian ? 'Выбрать сервер' : 'Choose server';
+  String get protectedUntil => isRussian ? 'Активно до' : 'Active until';
   String get protectedUntilCaption =>
-      isRussian ? 'Триал или платный доступ' : 'Trial or paid access window';
+      isRussian ? 'Тест-драйв или премиум' : 'Test-drive or premium window';
   String get remainingTraffic => isRussian ? 'Осталось трафика' : 'Remaining';
   String get remainingTrafficCaption =>
       isRussian ? 'Доступно на этом устройстве' : 'Available on this device';
@@ -125,12 +125,12 @@ class PortalCopy {
   String get bestAvailable =>
       isRussian ? 'Лучший доступный узел' : 'Best available';
   String get locationsGateTitle => isRussian
-      ? 'Локации откроются после активации'
-      : 'Locations unlock after activation';
+      ? 'Локации откроются после запуска'
+      : 'Locations unlock after start';
   String get locationsGateBody => isRussian
-      ? 'Сначала запустите 5-дневный триал на этом устройстве. После активации приложение получит реальный ключ и покажет живые точки доступа.'
-      : 'Start the 5-day trial on this device first. After activation the app receives a real connection key and shows live access points.';
-  String get openVpnAction => isRussian ? 'Вернуться в VPN' : 'Return to VPN';
+      ? 'Сначала запустите 5-дневный тест-драйв на этом устройстве. После этого приложение получит настройки и покажет доступные узлы разгона.'
+      : 'Start the 5-day test-drive on this device first. After that the app receives settings and shows available optimization nodes.';
+  String get openVpnAction => isRussian ? 'Вернуться в приложение' : 'Return to app';
   String get locationsSyncTitle =>
       isRussian ? 'Локации синхронизируются' : 'Locations are syncing';
   String get locationsSyncBody => isRussian
@@ -146,8 +146,8 @@ class PortalCopy {
       ? 'Живая сессия и лимит вашего плана.'
       : 'Your live device session and plan capacity.';
   String get currentDeviceFallback => isRussian
-      ? 'Это устройство уже связано с доступом POKROV VPN.'
-      : 'This device is linked to your POKROV VPN access.';
+      ? 'Это устройство уже связано с POKROV Network.'
+      : 'This device is linked to POKROV Network.';
   String get activeSessions =>
       isRussian ? 'Активные сессии' : 'Active sessions';
   String get availableSlots =>
@@ -169,15 +169,15 @@ class PortalCopy {
   String get profileTitle => shellProfile;
   String get accountEyebrow => isRussian ? 'Аккаунт' : 'Account';
   String get accountTitle =>
-      isRussian ? 'Аккаунт POKROV VPN' : 'POKROV VPN account';
+      isRussian ? 'Аккаунт POKROV Network' : 'POKROV Network account';
   String get accountSubtitle => isRussian
       ? 'Доступ, трафик и продление для этого устройства.'
       : 'Your device-linked access, traffic and renewal context.';
   String get remainingTrafficMetric =>
       isRussian ? 'Остаток трафика' : 'Remaining traffic';
   String get planMetric => isRussian ? 'План' : 'Plan';
-  String get appAccount => isRussian ? 'Аккаунт приложения' : 'App account';
-  String get deviceTrial => isRussian ? 'Триал устройства' : 'Device trial';
+  String get appAccount => isRussian ? 'Личный профиль' : 'User profile';
+  String get deviceTrial => isRussian ? 'Тест-драйв устройства' : 'Device test-drive';
   String accountDetails(String accountId, String deviceName) => isRussian
       ? 'ID аккаунта: $accountId\nУстройство: $deviceName'
       : 'Account ID: $accountId\nDevice: $deviceName';
@@ -211,17 +211,17 @@ class PortalCopy {
   String get bonusAlreadyActive => isRussian
       ? 'Бонус Telegram уже активирован для этого аккаунта.'
       : 'The Telegram bonus is already active for this account.';
-  String get recoveryEyebrow => isRussian ? 'Восстановление' : 'Recovery';
+  String get recoveryEyebrow => isRussian ? 'Настройки' : 'Settings';
   String get recoveryTitle =>
-      isRussian ? 'Восстановление подключения' : 'Connection recovery';
+      isRussian ? 'Восстановление настроек' : 'Settings recovery';
   String get recoverySubtitle => isRussian
       ? 'Держите главную ссылку подключения под рукой. Ручные инструменты остаются в расширенных настройках.'
       : 'Keep your primary connection link handy. Manual recovery stays in Advanced settings.';
   String get primaryConnectionLink =>
-      isRussian ? 'Главная ссылка подключения' : 'Primary connection link';
+      isRussian ? 'Главная ссылка доступа' : 'Primary access link';
   String get noConnectionLinkYet => isRussian
-      ? 'Пока нет активной ссылки подписки'
-      : 'No active subscription link yet';
+      ? 'Пока нет активной ссылки доступа'
+      : 'No active access link yet';
   String get manualRecovery =>
       isRussian ? 'Ручное восстановление' : 'Manual recovery';
   String get manualRecoverySubtitle => isRussian
@@ -236,8 +236,8 @@ class PortalCopy {
   String get advancedEyebrow => isRussian ? 'Расширенные' : 'Advanced';
   String get advancedTitle => isRussian ? 'Расширенные настройки' : 'Advanced';
   String get advancedSubtitle => isRussian
-      ? 'Сетевые тонкости остаются здесь и не мешают основному VPN-сценарию.'
-      : 'Advanced networking tools stay here, away from the main VPN flow.';
+      ? 'Сетевые тонкости остаются здесь и не мешают основному сценарию разгона.'
+      : 'Advanced networking tools stay here, away from the main optimization flow.';
   String get openAdvancedSettings =>
       isRussian ? 'Открыть расширенные настройки' : 'Open advanced settings';
 
@@ -265,8 +265,8 @@ class PortalCopy {
 
   String get subscriptionTitle => isRussian ? 'Подписка' : 'Subscription';
   String get subscriptionSubtitleTrial => isRussian
-      ? 'Продлите доступ из приложения, а оплату безопасно завершите в браузере.'
-      : 'Upgrade from the app and finish payment securely in your browser.';
+      ? 'Запустите тест-драйв из приложения, а оплату безопасно завершите в браузере.'
+      : 'Start the test-drive from the app and finish payment securely in your browser.';
   String get subscriptionSubtitlePaid => isRussian
       ? 'Управляйте продлением, оплатой и доступом из одного места.'
       : 'Manage renewal, payment and access from one place.';
@@ -291,25 +291,25 @@ class PortalCopy {
   }
 
   String get trialReadyToast => isRussian
-      ? 'Триал активирован, подключение готово.'
-      : 'Trial activated. Your connection is ready.';
+      ? 'Тест-драйв запущен, магия скорости началась.'
+      : 'Test-drive started. The magic is here.';
   String trialError(Object error) => isRussian
-      ? 'Не удалось активировать триал: $error'
-      : 'Could not activate the trial: $error';
+      ? 'Не удалось запустить тест-драйв: $error'
+      : 'Could not start the test-drive: $error';
   String get emptyStateTitle => isRussian
-      ? 'Пять дней защиты без настройки'
-      : 'Zero setup. Five days on us.';
+      ? 'Пять дней магии без настройки'
+      : 'Zero setup. Five days of speed.';
   String get emptyStateBody => isRussian
-      ? 'Один тап запускает рабочий триал прямо на этом устройстве. Telegram не нужен для старта.'
-      : 'One tap activates a real trial on this device. Telegram bonus can wait until later.';
+      ? 'Один тап запускает реальный тест-драйв прямо на этом устройстве. Попробуйте наш разгон в деле.'
+      : 'One tap starts a real test-drive on this device. Try our speed boost in action.';
   String get emptyStateBonusTitle => isRussian
-      ? 'Бонус Telegram можно подключить позже'
-      : 'Telegram bonus can wait';
+      ? 'Бонус Telegram даёт ещё +10 дней'
+      : 'Telegram bonus adds 10 more days';
   String get emptyStateBonusBody => isRussian
-      ? '+10 дней активируются после подписки на канал, когда вам это будет удобно.'
-      : '+10 extra days are available after joining the Telegram channel, whenever you are ready.';
+      ? 'Активируйте бонус после подписки на канал, когда вам будет удобно.'
+      : '+10 extra days are available after joining our Telegram channel.';
   String get emptyStatePrimaryAction =>
-      isRussian ? 'Запустить триал на 5 дней' : 'Start 5-day trial';
+      isRussian ? 'Запустить тест-драйв на 5 дней' : 'Start 5-day test-drive';
   String get emptyStateSecondaryAction => isRussian
       ? 'Добавить ключ или подписку вручную'
       : 'Add key or subscription manually';
@@ -355,7 +355,7 @@ class PortalCopy {
 
     switch (value.toLowerCase()) {
       case 'trial':
-        return 'Триал';
+        return 'Тест-драйв';
       case 'popular':
         return 'Популярно';
       case 'current device':
@@ -366,17 +366,17 @@ class PortalCopy {
         return 'Готово к подключению';
       case 'your trial is active.':
       case 'your trial is active':
-        return 'Триал уже активен.';
+        return 'Тест-драйв уже активен.';
       case 'your service hub is ready':
         return 'Центр сервиса готов';
       case 'connect a profile, then unlock subscription, locations, devices, support and downloads without leaving the app.':
-        return 'Подключите профиль, а затем откройте подписку, локации, устройства, поддержку и загрузки, не выходя из приложения.';
+        return 'Подключите профиль, чтобы открыть настройки, локации, устройства, поддержку и загрузки, не выходя из приложения.';
       case 'support and account data will appear here after trial activation.':
-        return 'Данные поддержки и аккаунта появятся здесь после активации триала.';
+        return 'Данные поддержки и аккаунта появятся здесь после запуска тест-драйва.';
       case 'welcome to pokrov vpn':
-        return 'Добро пожаловать в POKROV VPN';
+        return 'Добро пожаловать в POKROV Network';
       case 'available after activation':
-        return 'Доступно после активации';
+        return 'Доступно после запуска';
       case 'primary access point':
         return 'Основная точка доступа';
       case 'secondary access point':

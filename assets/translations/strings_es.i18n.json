@@ -1,6 +1,6 @@
-﻿{
+{
     "general":  {
-                    "appTitle":  "POKROV VPN",
+                    "appTitle":  "POKROV Network",
                     "reset":  "Renicio",
                     "toggle":  {
                                    "enabled":  "Activado",
@@ -11,17 +11,17 @@
                               },
                     "sort":  "Clasificar",
                     "sortBy":  "Ordenar por",
-                    "addToClipboard":  "Añadir al portapapeles",
+                    "addToClipboard":  "Anadir al portapapeles",
                     "notSet":  "No establecido",
                     "agree":  "Aceptar",
                     "decline":  "Rechazar",
                     "unknown":  "Desconocido",
                     "hidden":  "Oculto",
-                    "timeout":  "Se acabó el tiempo",
-                    "clipboardExportSuccessMsg":  "Añadido al portapapeles",
-                    "showMore":  "Mostrar más",
+                    "timeout":  "Se acabo el tiempo",
+                    "clipboardExportSuccessMsg":  "Anadido al portapapeles",
+                    "showMore":  "Mostrar mas",
                     "showLess":  "Muestra menos",
-                    "openAppSettings":  "Abrir la configuración de la aplicación",
+                    "openAppSettings":  "Abrir la configuracion de la aplicacion",
                     "grantPermission":  "Conceder permiso"
                 },
     "intro":  {
@@ -30,16 +30,16 @@
               },
     "home":  {
                  "pageTitle":  "Hogar",
-                 "emptyProfilesMsg":  "Comience agregando un perfil de suscripción",
+                 "emptyProfilesMsg":  "Comience agregando un perfil de suscripcion",
                  "noActiveProfileMsg":  "Elige un perfil"
              },
     "stats":  {
-                  "traffic":  "Tráfico",
-                  "trafficLive":  "Tráfico en tiempo real",
-                  "trafficTotal":  "Tráfico total",
+                  "traffic":  "Trafico",
+                  "trafficLive":  "Trafico en tiempo real",
+                  "trafficTotal":  "Trafico total",
                   "uplink":  "Enlace de subida",
                   "downlink":  "Enlace de bajada",
-                  "connection":  "Conexión",
+                  "connection":  "Conexion",
                   "speed":  "Velocidad",
                   "totalTransferred":  "Total transferido"
               },
@@ -50,55 +50,55 @@
                     "activeProfileBtnSemanticLabel":  "Ver todos los perfiles",
                     "nonActiveProfileBtnSemanticLabel":  "Seleccione \"${name}\" como perfil activo.",
                     "subscription":  {
-                                         "traffic":  "Tráfico",
+                                         "traffic":  "Trafico",
                                          "updatedTimeAgo":  "Actualizado ${timeago}",
-                                         "remainingDuration":  "${duration} días restantes",
-                                         "remainingTrafficSemanticLabel":  "${consumed} de ${total} Tráfico Consumido",
+                                         "remainingDuration":  "${duration} dias restantes",
+                                         "remainingTrafficSemanticLabel":  "${consumed} de ${total} Trafico Consumido",
                                          "expired":  "Caducado",
                                          "noTraffic":  "Fuera de cuota",
                                          "upload":  "Subir",
                                          "download":  "Descargar",
-                                         "total":  "Tráfico total",
-                                         "expireDate":  "Fecha de expiración"
+                                         "total":  "Trafico total",
+                                         "expireDate":  "Fecha de expiracion"
                                      },
                     "sortBy":  {
                                    "lastUpdate":  "Recientemente actualizado",
-                                   "name":  "Alfabéticamente"
+                                   "name":  "Alfabeticamente"
                                },
                     "add":  {
                                 "buttonText":  "Nuevo perfil",
                                 "shortBtnTxt":  "Nuevo perfil",
                                 "fromClipboard":  "Agregar desde el portapapeles",
-                                "scanQr":  "Escanear código QR",
+                                "scanQr":  "Escanear codigo QR",
                                 "qrScanner":  {
                                                   "permissionDeniedError":  "Permiso Denegado",
-                                                  "unexpectedError":  "Algo salió mal",
+                                                  "unexpectedError":  "Algo salio mal",
                                                   "torchSemanticLabel":  "Linterna",
-                                                  "facingSemanticLabel":  "Frente a la cámara",
-                                                  "permissionRequest":  "Permiso a la cámara para escanear el código QR"
+                                                  "facingSemanticLabel":  "Frente a la camara",
+                                                  "permissionRequest":  "Permiso a la camara para escanear el codigo QR"
                                               },
                                 "manually":  "Entrada manual",
-                                "addWarp":  "Añadir WARP",
+                                "addWarp":  "Anadir WARP",
                                 "addingWarpMsg":  "Por favor, espere mientras registramos WARP.",
                                 "addingProfileMsg":  "Agregar perfil",
                                 "failureMsg":  "No se pudo agregar el perfil"
                             },
                     "update":  {
                                    "buttonTxt":  "Actualizar",
-                                   "tooltip":  "Actualización del perfil",
+                                   "tooltip":  "Actualizacion del perfil",
                                    "updateSubscriptions":  "Actualizar suscripciones",
                                    "failureMsg":  "No se pudo actualizar el perfil",
-                                   "successMsg":  "Perfil actualizado con éxito",
+                                   "successMsg":  "Perfil actualizado con exito",
                                    "namedFailureMsg":  "No se pudo actualizar \"${name}\"",
                                    "namedSuccessMsg":  "\"${name}\" actualizado exitosamente"
                                },
                     "share":  {
                                   "buttonText":  "Compartir",
                                   "exportToClipboardSuccess":  "Exportado al portapapeles",
-                                  "exportSubLinkToClipboard":  "Exportar enlace de suscripción al portapapeles",
-                                  "subLinkQrCode":  "Código QR del enlace de suscripción",
-                                  "exportConfigToClipboard":  "Exportar configuración al portapapeles",
-                                  "exportConfigToClipboardSuccess":  "Configuración copiada al portapapeles"
+                                  "exportSubLinkToClipboard":  "Exportar enlace de suscripcion al portapapeles",
+                                  "subLinkQrCode":  "Codigo QR del enlace de suscripcion",
+                                  "exportConfigToClipboard":  "Exportar configuracion al portapapeles",
+                                  "exportConfigToClipboardSuccess":  "Configuracion copiada al portapapeles"
                               },
                     "edit":  {
                                  "buttonTxt":  "Editar",
@@ -106,7 +106,7 @@
                              },
                     "delete":  {
                                    "buttonTxt":  "Borrar",
-                                   "confirmationMsg":  "¿Eliminar perfil permanentemente?",
+                                   "confirmationMsg":  "?Eliminar perfil permanentemente?",
                                    "successMsg":  "Perfil eliminado exitosamente"
                                },
                     "save":  {
@@ -118,12 +118,12 @@
                                         "nameLabel":  "Nombre",
                                         "nameHint":  "Nombre de perfil",
                                         "urlLabel":  "URL",
-                                        "urlHint":  "URL de configuración completa",
+                                        "urlHint":  "URL de configuracion completa",
                                         "emptyNameMsg":  "Se requiere el nombre",
                                         "invalidUrlMsg":  "URL invalida",
-                                        "lastUpdate":  "Última actualización",
-                                        "updateInterval":  "Actualización automática",
-                                        "updateIntervalDialogTitle":  "Intervalo de actualización automática (en horas)"
+                                        "lastUpdate":  "Ultima actualizacion",
+                                        "updateInterval":  "Actualizacion automatica",
+                                        "updateIntervalDialogTitle":  "Intervalo de actualizacion automatica (en horas)"
                                     }
                 },
     "proxies":  {
@@ -135,7 +135,7 @@
                     "unknownIp":  "IP desconocida",
                     "sortOptions":  {
                                         "unsorted":  "Por Defecto",
-                                        "name":  "Alfabéticamente",
+                                        "name":  "Alfabeticamente",
                                         "delay":  "Por retraso"
                                     },
                     "activeProxySemanticLabel":  "Proxy activo",
@@ -145,8 +145,8 @@
                                            "testing":  "Retraso: Probando..."
                                        },
                     "ipInfoSemantics":  {
-                                            "address":  "Dirección IP",
-                                            "country":  "País"
+                                            "address":  "Direccion IP",
+                                            "country":  "Pais"
                                         }
                 },
     "logs":  {
@@ -161,55 +161,55 @@
              },
     "settings":  {
                      "pageTitle":  "Ajustes",
-                     "requiresRestartMsg":  "Para que esto surta efecto, reinicie la aplicación.",
+                     "requiresRestartMsg":  "Para que esto surta efecto, reinicie la aplicacion.",
                      "experimental":  "Experimental",
-                     "experimentalMsg":  "Las funciones con el indicador Experimental aún están en desarrollo y pueden causar problemas.",
-                     "exportOptions":  "Copiar opciones anónimas al portapapeles",
+                     "experimentalMsg":  "Las funciones con el indicador Experimental aun estan en desarrollo y pueden causar problemas.",
+                     "exportOptions":  "Copiar opciones anonimas al portapapeles",
                      "exportAllOptions":  "Copiar todas las opciones al portapapeles",
                      "importOptions":  "Importar opciones desde el portapapeles",
-                     "importOptionsMsg":  "Esto reescribirá todas las opciones de configuración con los valores proporcionados. ¿Está seguro?",
+                     "importOptionsMsg":  "Esto reescribira todas las opciones de configuracion con los valores proporcionados. ?Esta seguro?",
                      "general":  {
                                      "sectionTitle":  "General",
                                      "locale":  "Idioma",
-                                     "region":  "Región",
+                                     "region":  "Region",
                                      "regionMsg":  "Ayuda a configurar opciones predeterminadas para omitir direcciones nacionales",
                                      "regions":  {
-                                                     "ir":  "Irán (ir)",
+                                                     "ir":  "Iran (ir)",
                                                      "cn":  "China (CN)",
                                                      "ru":  "Rusia (ru)",
-                                                     "af":  "Afganistán (af)",
+                                                     "af":  "Afganistan (af)",
                                                      "id":  "Indonesia (id)",
-                                                     "tr":  "Turquía (tr) 🇹🇷",
+                                                     "tr":  "Turquia (tr) ????",
                                                      "other":  "Otro"
                                                  },
-                                     "themeMode":  "Modo temático",
+                                     "themeMode":  "Modo tematico",
                                      "themeModes":  {
                                                         "system":  "Seguir el tema del sistema",
                                                         "dark":  "Modo Oscuro",
                                                         "light":  "Modo Claro",
                                                         "black":  "Modo Negro"
                                                     },
-                                     "enableAnalytics":  "Habilitar análisis",
-                                     "enableAnalyticsMsg":  "Dar permiso para recopilar análisis y enviar informes de fallos para mejorar la aplicación.",
+                                     "enableAnalytics":  "Habilitar analisis",
+                                     "enableAnalyticsMsg":  "Dar permiso para recopilar analisis y enviar informes de fallos para mejorar la aplicacion.",
                                      "autoStart":  "Inicie en el arranque",
                                      "silentStart":  "Inicio Silencioso",
                                      "openWorkingDir":  "Abrir directorio de trabajo",
-                                     "ignoreBatteryOptimizations":  "Deshabilitar la optimización de la batería",
-                                     "ignoreBatteryOptimizationsMsg":  "Elimine las restricciones para un rendimiento VPN óptimo",
-                                     "dynamicNotification":  "Mostrar velocidad en la notificación",
-                                     "hapticFeedback":  "Respuesta háptica",
-                                     "autoIpCheck":  "Comprobación automática de la IP de conexión"
+                                     "ignoreBatteryOptimizations":  "Deshabilitar la optimizacion de la bateria",
+                                     "ignoreBatteryOptimizationsMsg":  "Elimine las restricciones para un rendimiento VPN optimo",
+                                     "dynamicNotification":  "Mostrar velocidad en la notificacion",
+                                     "hapticFeedback":  "Respuesta haptica",
+                                     "autoIpCheck":  "Comprobacion automatica de la IP de conexion"
                                  },
                      "advanced":  {
                                       "sectionTitle":  "Avanzado",
-                                      "debugMode":  "Modo de depuración",
-                                      "debugModeMsg":  "Reinicie la aplicación para aplicar este cambio.",
+                                      "debugMode":  "Modo de depuracion",
+                                      "debugModeMsg":  "Reinicie la aplicacion para aplicar este cambio.",
                                       "memoryLimit":  "Limite de memoria",
-                                      "memoryLimitMsg":  "Habilítelo si experimenta errores de falta de memoria o fallas frecuentes de la aplicación",
+                                      "memoryLimitMsg":  "Habilitelo si experimenta errores de falta de memoria o fallas frecuentes de la aplicacion",
                                       "resetTunnel":  "Restablecer perfil VPN"
                                   },
                      "network":  {
-                                     "perAppProxyPageTitle":  "Proxy por aplicación",
+                                     "perAppProxyPageTitle":  "Proxy por aplicacion",
                                      "perAppProxyModes":  {
                                                               "off":  "Todo",
                                                               "offMsg":  "Proxy en todas las aplicaciones",
@@ -220,39 +220,39 @@
                                                           },
                                      "showSystemApps":  "Mostrar aplicaciones del sistema",
                                      "hideSystemApps":  "Ocultar aplicaciones del sistema",
-                                     "clearSelection":  "Selección clara"
+                                     "clearSelection":  "Seleccion clara"
                                  },
                      "geoAssets":  {
                                        "pageTitle":  "Activos de enrutamiento",
                                        "geoip":  "GeoIP",
                                        "geosite":  "Geosite",
-                                       "version":  "Versión ${version}",
+                                       "version":  "Version ${version}",
                                        "fileMissing":  "Archivo faltante",
                                        "update":  "Actualizar",
                                        "download":  "Descargar",
                                        "failureMsg":  "No se pudo actualizar el activo",
                                        "successMsg":  "Activo actualizado correctamente",
                                        "addRecommended":  "Agregar activos recomendados",
-                                       "missingGeoAssetsMsg":  "Faltan los archivos de los recursos de enrutamiento seleccionados. Descárgalos o elige los existentes."
+                                       "missingGeoAssetsMsg":  "Faltan los archivos de los recursos de enrutamiento seleccionados. Descargalos o elige los existentes."
                                    }
                  },
     "about":  {
                   "pageTitle":  "Acerca de",
-                  "version":  "Versión",
-                  "sourceCode":  "Código fuente",
+                  "version":  "Version",
+                  "sourceCode":  "Codigo fuente",
                   "telegramChannel":  "Canal de Telegram",
                   "checkForUpdate":  "Buscar actualizaciones",
-                  "privacyPolicy":  "Política de privacidad",
-                  "termsAndConditions":  "Términos y condiciones"
+                  "privacyPolicy":  "Politica de privacidad",
+                  "termsAndConditions":  "Terminos y condiciones"
               },
     "appUpdate":  {
-                      "notAvailableMsg":  "Ya estas usando la última versión.",
-                      "dialogTitle":  "Actualización disponible",
-                      "updateMsg":  "Hay disponible una nueva versión de @:general.appTitle. ¿Te gustaría actualizar ahora?",
-                      "currentVersionLbl":  "Versión actual",
-                      "newVersionLbl":  "Nueva versión",
+                      "notAvailableMsg":  "Ya estas usando la ultima version.",
+                      "dialogTitle":  "Actualizacion disponible",
+                      "updateMsg":  "Hay disponible una nueva version de @:general.appTitle. ?Te gustaria actualizar ahora?",
+                      "currentVersionLbl":  "Version actual",
+                      "newVersionLbl":  "Nueva version",
                       "updateNowBtnTxt":  "Actualizar ahora",
-                      "laterBtnTxt":  "Más tarde",
+                      "laterBtnTxt":  "Mas tarde",
                       "ignoreBtnTxt":  "Ignorar"
                   },
     "tray":  {
@@ -274,20 +274,20 @@
                               },
                     "singbox":  {
                                     "unexpected":  "Error de servicio inesperado",
-                                    "serviceNotRunning":  "El servicio no está funcionando",
+                                    "serviceNotRunning":  "El servicio no esta funcionando",
                                     "missingPrivilege":  "Privilegio perdido",
-                                    "missingPrivilegeMsg":  "El modo VPN requiere privilegios de administrador. Reinicie la aplicación como administrador o cambie el modo de servicio.",
-                                    "missingGeoAssets":  "Recursos geográficos faltantes",
-                                    "missingGeoAssetsMsg":  "Faltan recursos geográficos. considere cambiar el activo activo o descargar uno seleccionado en la configuración.",
-                                    "invalidConfigOptions":  "Opciones de configuración no válidas",
-                                    "invalidConfig":  "Configuración no válida",
-                                    "create":  "Error de creación del servicio",
+                                    "missingPrivilegeMsg":  "El modo VPN requiere privilegios de administrador. Reinicie la aplicacion como administrador o cambie el modo de servicio.",
+                                    "missingGeoAssets":  "Recursos geograficos faltantes",
+                                    "missingGeoAssetsMsg":  "Faltan recursos geograficos. considere cambiar el activo activo o descargar uno seleccionado en la configuracion.",
+                                    "invalidConfigOptions":  "Opciones de configuracion no validas",
+                                    "invalidConfig":  "Configuracion no valida",
+                                    "create":  "Error de creacion del servicio",
                                     "start":  "Error de inicio del servicio"
                                 },
                     "connectivity":  {
                                          "unexpected":  "Falla inesperada",
                                          "missingVpnPermission":  "Permiso VPN faltante",
-                                         "missingNotificationPermission":  "Permiso de notificación faltante",
+                                         "missingNotificationPermission":  "Permiso de notificacion faltante",
                                          "core":  "Error central"
                                      },
                     "profiles":  {
@@ -297,22 +297,22 @@
                                      "invalidUrl":  "URL Invalido"
                                  },
                     "connection":  {
-                                       "unexpected":  "Error de conexión inesperado",
-                                       "timeout":  "El tiempo de conexión expiro",
+                                       "unexpected":  "Error de conexion inesperado",
+                                       "timeout":  "El tiempo de conexion expiro",
                                        "badResponse":  "Mala respuesta",
-                                       "connectionError":  "Error de conexión",
+                                       "connectionError":  "Error de conexion",
                                        "badCertificate":  "Certificado malo"
                                    },
                     "geoAssets":  {
                                       "unexpected":  "Error inesperado",
-                                      "notUpdate":  "Actualización no disponible",
-                                      "activeNotFound":  "Activo geográfico activo no encontrado"
+                                      "notUpdate":  "Actualizacion no disponible",
+                                      "activeNotFound":  "Activo geografico activo no encontrado"
                                   }
                 },
     "play":  {
-                 "title":  "POKROV VPN",
+                 "title":  "POKROV Network",
                  "short_description":  "Auto, SSH, VLESS, VMess, Trojan, Reality, Sing-Box, Clash, XRay, Shadowsocks",
-                 "full_description":  "El objetivo clave de POKROV VPN es proporcionar un cliente de túnel seguro, fácil de usar y eficiente. Le permite enrutar todo el tráfico o el tráfico de aplicaciones seleccionadas a un servidor remoto de su elección, utilizando el permiso del servicio VPN.Nota: No proporcionamos ningún servidor; Los usuarios deben garantizar que sus actividades en línea permanezcan privadas mediante el uso de su propio servidor autohospedado o servidores confiables. Soportamos servidores con:- Enlace de suscripción normal a V2ray/Xray- Enlace de suscripción a Choque- Enlace de suscripción a Sing-Box¿Cuáles son nuestras características únicas? - Fácil de usar - Optimizado y Rápido - Seleccionar automáticamente LowestPing - Mostrar información de uso del usuario. - Importe fácilmente un subvínculo con un solo clic mediante enlaces profundos - Gratis y sin anuncios - Cambie fácilmente los subvínculos de usuario - más y másApoyo:- Todos los protocolos soportados por Sing-Box- VLESS + xtls realidad, visión- VMESS- troyano- Calcetines Shoadow- Realidad-V2ray-Histria2-TUIC-SSH- SombraTLSEl núcleo de la aplicación se basa en sing-box de código abierto. Descripción del permiso:- Servicio VPN: como el objetivo de esta aplicación es proporcionar un cliente de túnel seguro, fácil de usar y eficiente, necesitamos este permiso para poder enrutar el tráfico a través del túnel al servidor remoto.- CONSULTAR TODOS LOS PAQUETES: este permiso se utiliza para permitir a los usuarios incluir o excluir aplicaciones específicas para la tunelización.- RECIBIR ARRANQUE COMPLETADO: este permiso se puede habilitar o deshabilitar desde la configuración de la aplicación para activar esta aplicación al iniciar el dispositivo.- PUBLICAR NOTIFICACIONES: este permiso es esencial ya que empleamos un servicio en primer plano para garantizar el funcionamiento continuo del servicio VPN.- Esta aplicación está libre de publicidad. Los datos analíticos y de fallos solo se producen con el consentimiento explícito del usuario en el primer uso de la aplicación."
+                 "full_description":  "El objetivo clave de POKROV Network es proporcionar un cliente de tunel seguro, facil de usar y eficiente. Le permite enrutar todo el trafico o el trafico de aplicaciones seleccionadas a un servidor remoto de su eleccion, utilizando el permiso del servicio VPN.Nota: No proporcionamos ningun servidor; Los usuarios deben garantizar que sus actividades en linea permanezcan privadas mediante el uso de su propio servidor autohospedado o servidores confiables. Soportamos servidores con:- Enlace de suscripcion normal a V2ray/Xray- Enlace de suscripcion a Choque- Enlace de suscripcion a Sing-Box?Cuales son nuestras caracteristicas unicas? - Facil de usar - Optimizado y Rapido - Seleccionar automaticamente LowestPing - Mostrar informacion de uso del usuario. - Importe facilmente un subvinculo con un solo clic mediante enlaces profundos - Gratis y sin anuncios - Cambie facilmente los subvinculos de usuario - mas y masApoyo:- Todos los protocolos soportados por Sing-Box- VLESS + xtls realidad, vision- VMESS- troyano- Calcetines Shoadow- Realidad-V2ray-Histria2-TUIC-SSH- SombraTLSEl nucleo de la aplicacion se basa en sing-box de codigo abierto. Descripcion del permiso:- Servicio VPN: como el objetivo de esta aplicacion es proporcionar un cliente de tunel seguro, facil de usar y eficiente, necesitamos este permiso para poder enrutar el trafico a traves del tunel al servidor remoto.- CONSULTAR TODOS LOS PAQUETES: este permiso se utiliza para permitir a los usuarios incluir o excluir aplicaciones especificas para la tunelizacion.- RECIBIR ARRANQUE COMPLETADO: este permiso se puede habilitar o deshabilitar desde la configuracion de la aplicacion para activar esta aplicacion al iniciar el dispositivo.- PUBLICAR NOTIFICACIONES: este permiso es esencial ya que empleamos un servicio en primer plano para garantizar el funcionamiento continuo del servicio VPN.- Esta aplicacion esta libre de publicidad. Los datos analiticos y de fallos solo se producen con el consentimiento explicito del usuario en el primer uso de la aplicacion."
              },
     "connection":  {
                        "tapToConnect":  "Toque para conectarse",
@@ -322,26 +322,26 @@
                        "reconnect":  "Reconectar",
                        "connectAnyWay":  "Conectar",
                        "experimentalNotice":  "Funciones experimentales en uso",
-                       "experimentalNoticeMsg":  "Ha habilitado algunas funciones experimentales que podrían afectar la calidad de la conexión y provocar errores inesperados. Siempre puede cambiar o restablecer estas opciones desde la página de opciones de configuración.",
+                       "experimentalNoticeMsg":  "Ha habilitado algunas funciones experimentales que podrian afectar la calidad de la conexion y provocar errores inesperados. Siempre puede cambiar o restablecer estas opciones desde la pagina de opciones de configuracion.",
                        "disableExperimentalNotice":  "No volver a mostrar",
                        "reconnectMsg":  "Reconectar para tener en cuenta los cambios..."
                    },
     "config":  {
                    "resetBtn":  "Restablecer opciones",
                    "serviceMode":  "Modo de servicio",
-                   "quickSettings":  "Ajustes rápidos",
+                   "quickSettings":  "Ajustes rapidos",
                    "setupWarp":  "Configurar WARP",
-                   "allOptions":  "Todas las opciones de configuración",
+                   "allOptions":  "Todas las opciones de configuracion",
                    "serviceModes":  {
                                         "proxy":  "Proxy",
                                         "systemProxy":  "Sistema Proxy",
-                                        "tun":  "VPN",
+                                        "tun":  "Network",
                                         "tunService":  "Servicio VPN"
                                     },
                    "shortServiceModes":  {
                                              "proxy":  "Proxy",
                                              "systemProxy":  "Proxy del sistema",
-                                             "tun":  "VPN",
+                                             "tun":  "Network",
                                              "tunService":  "Servicio VPN"
                                          },
                    "section":  {
@@ -355,13 +355,13 @@
                                    "misc":  "Opciones varias"
                                },
                    "warpConsent":  {
-                                       "title":  "POKROV VPN",
-                                       "description(rich)":  "Cloudflare WARP es un proveedor de VPN WireGuard gratuito. Al habilitar esta opción, acepta los ${tos(Términos de servicio)} y ${privacy(Política de privacidad)} de Cloudflare WARP."
+                                       "title":  "POKROV Network",
+                                       "description(rich)":  "Cloudflare WARP es un proveedor de VPN WireGuard gratuito. Al habilitar esta opcion, acepta los ${tos(Terminos de servicio)} y ${privacy(Politica de privacidad)} de Cloudflare WARP."
                                    },
-                   "generateWarpConfig":  "Generar configuración WARP",
-                   "missingWarpConfig":  "Falta la configuración WARP",
-                   "warpConfigGenerated":  "Se genera la configuración WARP",
-                   "pageTitle":  "Opciones de configuración",
+                   "generateWarpConfig":  "Generar configuracion WARP",
+                   "missingWarpConfig":  "Falta la configuracion WARP",
+                   "warpConfigGenerated":  "Se genera la configuracion WARP",
+                   "pageTitle":  "Opciones de configuracion",
                    "logLevel":  "Registro del Nivel",
                    "blockAds":  "Bloquear anuncios",
                    "resolveDestination":  "Resolver Destino",
@@ -379,22 +379,22 @@
                    "mixedPort":  "Puerto Mixto",
                    "tproxyPort":  "Puerto de proxy transparente",
                    "localDnsPort":  "Puerto DNS local",
-                   "allowConnectionFromLan":  "Permitir conexión desde LAN",
-                   "tunImplementation":  "Implementación de TUN",
-                   "mtu":  "Tamaño de paquete (MTU)",
-                   "connectionTestUrl":  "URL de prueba de conexión",
+                   "allowConnectionFromLan":  "Permitir conexion desde LAN",
+                   "tunImplementation":  "Implementacion de TUN",
+                   "mtu":  "Tamano de paquete (MTU)",
+                   "connectionTestUrl":  "URL de prueba de conexion",
                    "urlTestInterval":  "URL Prueba de Intervalo",
                    "enableClashApi":  "Habilitar API de choque",
                    "clashApiPort":  "Puerto API de choque",
-                   "enableTun":  "Habilitar sintonización",
+                   "enableTun":  "Habilitar sintonizacion",
                    "setSystemProxy":  "stablecer proxy del sistema",
                    "enableDnsRouting":  "Habilitar enrutamiento DNS",
                    "enableFakeDns":  "Habilitar DNS falso",
                    "bypassLan":  "Omitir LAN",
                    "strictRoute":  "Ruta estricta",
                    "enableTlsFragment":  "Habilitar fragmento TLS",
-                   "tlsFragmentSize":  "Tamaño del fragmento TLS",
-                   "tlsFragmentSleep":  "Sueño de fragmento TLS",
+                   "tlsFragmentSize":  "Tamano del fragmento TLS",
+                   "tlsFragmentSleep":  "Sueno de fragmento TLS",
                    "enableTlsMixedSniCase":  "Habilitar caso SNI mixto TLS",
                    "enableTlsPadding":  "Habilitar el relleno TLS",
                    "tlsPaddingSize":  "Relleno TLS",
@@ -404,8 +404,8 @@
                    "enableWarp":  "Enable WARP",
                    "warpDetourMode":  "Detour Mode",
                    "warpDetourModes":  {
-                                           "proxyOverWarp":  "Desvío de proxies a través de WARP",
-                                           "warpOverProxy":  "Desvío de WARP a través de proxies",
+                                           "proxyOverWarp":  "Desvio de proxies a traves de WARP",
+                                           "warpOverProxy":  "Desvio de WARP a traves de proxies",
                                            "inbound":  "Detour WARP through proxies",
                                            "outbound":  "Detour proxies through WARP"
                                        },
@@ -413,8 +413,9 @@
                    "warpCleanIp":  "Clean IP",
                    "warpPort":  "Port",
                    "warpNoise":  "Noise",
-                   "warpNoiseSize":  "Tamaño de ruido",
+                   "warpNoiseSize":  "Tamano de ruido",
                    "warpNoiseMode":  "Modo Ruido",
                    "warpNoiseDelay":  "Retraso por ruido"
                }
 }
+

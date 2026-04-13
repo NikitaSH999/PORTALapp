@@ -154,6 +154,7 @@ Client UX rule:
 - signed release builds inject updater/source-code metadata through `PORTAL_RELEASE_REPOSITORY_URL`, `PORTAL_RELEASES_API_URL`, `PORTAL_RELEASES_LATEST_URL`, `PORTAL_RELEASES_APPCAST_URL`, and `PORTAL_WARP_DEFAULTS_URL`
 - local non-release builds keep updater and source-code surfaces disabled instead of falling back to a personal repository URL
 - release verification must start from a clean `libcore` checkout pinned to the parent repo SHA; `python scripts/run_client_release_gate.py preflight` is the canonical root-level check before Flutter tests or artifact builds
+- test/build modes of `python scripts/run_client_release_gate.py` now auto-bootstrap missing generated Dart assets with `flutter pub get` and `flutter pub run build_runner build --delete-conflicting-outputs`, so clean checkouts can rebuild the ignored codegen surface before Flutter tests begin
 - `AAB`, `MSIX`, and portable `ZIP` remain release/store artifacts rather than first-layer client download targets today
 - when `release_gate_check.py` includes Android build gates, it must also include `python scripts/android_localhost_audit.py` against a release-installed build on a physical device via `ANDROID_AUDIT_SERIAL`
 
