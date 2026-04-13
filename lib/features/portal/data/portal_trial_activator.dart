@@ -63,7 +63,6 @@ class PortalTrialActivator {
       appVersion: appInfo.version,
       localeTag: locale?.languageCode ?? PlatformDispatcher.instance.locale.languageCode,
       timeZone: DateTime.now().timeZoneName,
-      trialDays: 5,
     );
 
     final experience = await portalRepository.startTrial(request);

@@ -8,11 +8,11 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/model/constants.dart';
 import 'package:hiddify/core/model/failures.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
+import 'package:hiddify/core/widget/pokrov_logo.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_notifier.dart';
 import 'package:hiddify/features/app_update/notifier/app_update_state.dart';
 import 'package:hiddify/features/app_update/widget/new_version_dialog.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
-import 'package:hiddify/gen/assets.gen.dart';
 import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -47,7 +47,8 @@ class AboutPage extends HookConsumerWidget {
     );
 
     final conditionalTiles = [
-      if (appInfo.release.allowCustomUpdateChecker)
+      if (appInfo.release.allowCustomUpdateChecker &&
+          Constants.hasReleaseMetadata)
         ListTile(
           title: Text(t.about.checkForUpdate),
           trailing: switch (appUpdate) {
@@ -103,10 +104,9 @@ class AboutPage extends HookConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Assets.images.logo.image(
+                  const PokrovLogo(
                     width: 64,
                     height: 64,
-                    filterQuality: FilterQuality.high,
                   ),
                   const Gap(16),
                   Column(
@@ -131,15 +131,16 @@ class AboutPage extends HookConsumerWidget {
               [
                 ...conditionalTiles,
                 if (conditionalTiles.isNotEmpty) const Divider(),
-                ListTile(
-                  title: Text(t.about.sourceCode),
-                  trailing: const Icon(FluentIcons.open_24_regular),
-                  onTap: () async {
-                    await UriUtils.tryLaunch(
-                      Uri.parse(Constants.githubUrl),
-                    );
-                  },
-                ),
+                if (Constants.hasReleaseRepositoryUrl)
+                  ListTile(
+                    title: Text(t.about.sourceCode),
+                    trailing: const Icon(FluentIcons.open_24_regular),
+                    onTap: () async {
+                      await UriUtils.tryLaunch(
+                        Uri.parse(Constants.githubUrl),
+                      );
+                    },
+                  ),
                 ListTile(
                   title: Text(t.about.telegramChannel),
                   trailing: const Icon(FluentIcons.open_24_regular),

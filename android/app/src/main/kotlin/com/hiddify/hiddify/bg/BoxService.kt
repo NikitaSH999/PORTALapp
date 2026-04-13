@@ -14,6 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
 import com.hiddify.hiddify.Application
+import com.hiddify.hiddify.BuildConfig
 import com.hiddify.hiddify.R
 import com.hiddify.hiddify.Settings
 import com.hiddify.hiddify.constant.Action
@@ -133,6 +134,10 @@ class BoxService(
     }
 
     private fun startCommandServer() {
+        if (!BuildConfig.DEBUG) {
+            Log.i(TAG, "Skipping command server in release build")
+            return
+        }
         val commandServer =
                 CommandServer(this, 300)
         commandServer.start()

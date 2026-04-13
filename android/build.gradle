@@ -13,6 +13,52 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
+def deleteWithRetries = { File target, int maxAttempts = 8, long sleepMillis = 400L ->
+    if (!target.exists()) {
+        return
+    }
+
+    Exception lastError = null
+    for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            delete target
+            if (!target.exists()) {
+                return
+            }
+        } catch (Exception error) {
+            lastError = error
+        }
+
+        if (attempt < maxAttempts) {
+            logger.lifecycle("Waiting for Windows file lock to clear before deleting ${target} (attempt ${attempt}/${maxAttempts})")
+            Thread.sleep(sleepMillis)
+        }
+    }
+
+    throw new GradleException("Unable to clean lock-prone release output ${target}", lastError)
+}
+
+tasks.register("prepareWindowsReleaseOutputs") {
+    onlyIf {
+        System.getProperty("os.name", "").toLowerCase().contains("windows")
+    }
+
+    doLast {
+        [
+            new File(rootProject.buildDir, "app/intermediates/merged_native_libs/release/out"),
+            new File(rootProject.buildDir, "mobile_scanner/kotlin/compileReleaseKotlin/cacheable"),
+        ].each { File target ->
+            deleteWithRetries(target)
+        }
+    }
+}
+
+gradle.projectsEvaluated {
+    project(":app").tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+        dependsOn(rootProject.tasks.named("prepareWindowsReleaseOutputs"))
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }

@@ -89,6 +89,31 @@ enum DomainStrategy {
       };
 }
 
+enum RoutingMode {
+  global,
+  allExceptRu,
+  blockedOnly,
+}
+
+extension RoutingModePresentation on RoutingMode {
+  List<RoutingMode> visibleChoices({RoutingMode? selected}) {
+    const publicPresets = <RoutingMode>[
+      RoutingMode.global,
+      RoutingMode.allExceptRu,
+    ];
+    if (selected == RoutingMode.blockedOnly) {
+      return [...publicPresets, RoutingMode.blockedOnly];
+    }
+    return publicPresets;
+  }
+
+  String present(TranslationsEn t) => switch (this) {
+        RoutingMode.global => 'Global',
+        RoutingMode.allExceptRu => 'All except RU',
+        RoutingMode.blockedOnly => 'Blocked only',
+      };
+}
+
 enum TunImplementation {
   mixed,
   system,

@@ -104,7 +104,9 @@ class _FakeProfileRepository implements ProfileRepository {
 }
 
 void main() {
-  test('activateTrial builds app-first request and silently imports subscription', () async {
+  test(
+      'activateTrial builds app-first request and silently imports subscription',
+      () async {
     final repository = _FakePortalRepository(
       PortalExperience(
         isDemo: false,
@@ -166,7 +168,7 @@ void main() {
       sessionStore: _MemoryPortalSessionStore(),
       loadProfileRepository: () async => profileRepository,
       appInfo: AppInfoEntity(
-        name: 'PORTAL VPN',
+        name: 'POKROV VPN',
         version: '1.0.0',
         buildNumber: '100',
         release: Release.general,
@@ -181,12 +183,12 @@ void main() {
     );
 
     expect(experience.importPayload.subscriptionUrl, contains('/sub/trial'));
-    expect(profileRepository.importedUrl, equals('https://portal.example.test/sub/trial'));
+    expect(profileRepository.importedUrl,
+        equals('https://portal.example.test/sub/trial'));
     expect(profileRepository.importedAsActive, isTrue);
     expect(repository.capturedRequest, isNotNull);
     expect(repository.capturedRequest!.installId, equals('install-123'));
     expect(repository.capturedRequest!.deviceName, equals('Android device'));
     expect(repository.capturedRequest!.localeTag, equals('ru'));
-    expect(repository.capturedRequest!.trialDays, equals(5));
   });
 }

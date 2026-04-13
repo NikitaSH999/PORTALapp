@@ -154,7 +154,7 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
                         val started = mainActivity.serviceStatus.value == Status.Started
                         if (!started) return@launch success(true)
                         val restart = Settings.rebuildServiceMode()
-                        if (restart) {
+                        if (restart || !BuildConfig.DEBUG) {
                             mainActivity.reconnect()
                             BoxService.stop()
                             delay(1000L)
@@ -174,6 +174,9 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Trigger.SelectOutbound.method -> {
                 scope.launch {
                     result.runCatching {
+                        if (!BuildConfig.DEBUG) {
+                            return@launch success(true)
+                        }
                         val args = call.arguments as Map<*, *>
                         Libbox.newStandaloneCommandClient()
                             .selectOutbound(
@@ -188,6 +191,9 @@ class MethodHandler(private val scope: CoroutineScope) : FlutterPlugin,
             Trigger.UrlTest.method -> {
                 scope.launch {
                     result.runCatching {
+                        if (!BuildConfig.DEBUG) {
+                            return@launch success(true)
+                        }
                         val args = call.arguments as Map<*, *>
                         Libbox.newStandaloneCommandClient()
                             .urlTest(

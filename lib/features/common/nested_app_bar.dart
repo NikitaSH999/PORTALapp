@@ -30,29 +30,83 @@ class NestedAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    RootScaffold.canShowDrawer(context);
+    final canUseDrawer =
+        (RootScaffold.stateKey.currentState?.hasDrawer ?? false) &&
+            showDrawerButton(context);
 
     return SliverAppBar(
-      leading: (RootScaffold.stateKey.currentState?.hasDrawer ?? false) && showDrawerButton(context)
-          ? DrawerButton(
-              onPressed: () {
-                RootScaffold.stateKey.currentState?.openDrawer();
-              },
+      leadingWidth: 72,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
+      scrolledUnderElevation: 0,
+      toolbarHeight: 72,
+      leading: canUseDrawer
+          ? Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: _AppBarIconButton(
+                icon: Icons.menu_rounded,
+                tooltip: MaterialLocalizations.of(context).openAppDrawerTooltip,
+                onPressed: () {
+                  RootScaffold.stateKey.currentState?.openDrawer();
+                },
+              ),
             )
           : (Navigator.of(context).canPop()
-              ? IconButton(
-                  icon: Icon(context.isRtl ? Icons.arrow_forward : Icons.arrow_back),
-                  padding: EdgeInsets.only(right: context.isRtl ? 50 : 0),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // Pops the current route off the navigator stack
-                  },
+              ? Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: _AppBarIconButton(
+                    icon: context.isRtl
+                        ? Icons.arrow_forward_rounded
+                        : Icons.arrow_back_rounded,
+                    tooltip:
+                        MaterialLocalizations.of(context).backButtonTooltip,
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
                 )
               : null),
       title: title,
-      actions: actions,
+      actions: [
+        if (actions != null)
+          ...actions!.map(
+            (action) => Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: action,
+            ),
+          ),
+        const SizedBox(width: 8),
+      ],
       pinned: pinned,
       forceElevated: forceElevated,
       bottom: bottom,
+    );
+  }
+}
+
+class _AppBarIconButton extends StatelessWidget {
+  const _AppBarIconButton({
+    required this.icon,
+    required this.tooltip,
+    required this.onPressed,
+  });
+
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Theme.of(context).colorScheme.surface.withOpacity(
+              Theme.of(context).brightness == Brightness.light ? 0.82 : 0.68,
+            ),
+        shape: const CircleBorder(),
+        child: IconButton(
+          onPressed: onPressed,
+          icon: Icon(icon),
+        ),
+      ),
     );
   }
 }

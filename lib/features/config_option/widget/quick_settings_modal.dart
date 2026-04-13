@@ -40,6 +40,12 @@ class QuickSettingsModal extends HookConsumerWidget {
               onSelectionChanged: (newSet) => ref.read(ConfigOptions.serviceMode.notifier).update(newSet.first),
             ),
           ),
+          ListTile(
+            title: const Text('Routing preset'),
+            subtitle: Text(ref.watch(ConfigOptions.routingMode).present(t)),
+            trailing: const Icon(FluentIcons.chevron_right_24_regular),
+            onTap: () => const ConfigOptionsRoute().go(context),
+          ),
           const Gap(8),
           if (warpPrefaceCompleted)
             GestureDetector(

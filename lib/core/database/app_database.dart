@@ -58,7 +58,10 @@ class AppDatabase extends _$AppDatabase with InfraLogger {
         },
       ),
       beforeOpen: (details) async {
-        if (kDebugMode) {
+        // Migration tests intentionally open intermediate schema versions.
+        // Only validate against the latest schema after the database reaches
+        // the current runtime version.
+        if (kDebugMode && details.versionNow == schemaVersion) {
           await validateDatabaseSchema();
         }
       },

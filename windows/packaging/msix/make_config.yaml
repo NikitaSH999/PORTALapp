@@ -1,15 +1,15 @@
-display_name: PORTAL VPN
-publisher_display_name: Kiwunaka
-identity_name: Kiwunaka.PortalVpn
+display_name: POKROV VPN
+publisher_display_name: POKROV VPN
+identity_name: Pokrov.Vpn
 msix_version: 2.5.7.0
 logo_path: windows\runner\resources\app_icon.ico
 capabilities: internetClient, internetClientServer, privateNetworkClientServer
 languages: en-us, zh-cn, zh-tw, tr-tr,fa-ir,ru-ru,pt-br,es-es
-protocol_activation: portalvpn
-execution_alias: portalvpn
+protocol_activation: pokrovvpn
+execution_alias: pokrovvpn
 certificate_path: windows\sign.pfx
-certificate_password: portalvpn-dev
-publisher: CN=8CB43675-F44B-4AA5-9372-E8727781BDC4
+certificate_password: ""
+publisher: CN=POKROV VPN
 install_certificate: "false"
 enable_at_startup: "true"
 startup_task:

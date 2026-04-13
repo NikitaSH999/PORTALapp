@@ -41,6 +41,22 @@ GoRouter router(RouterRef ref) {
     routes: [
       if (useMobileRouter) $mobileWrapperRoute else $desktopWrapperRoute,
       $introRoute,
+      GoRoute(
+        path: '/proxies',
+        redirect: (_, __) => const LocationsRoute().location,
+      ),
+      GoRoute(
+        path: '/config-options',
+        redirect: (_, __) => const DevicesRoute().location,
+      ),
+      GoRoute(
+        path: '/logs',
+        redirect: (_, __) => const SupportRoute().location,
+      ),
+      GoRoute(
+        path: '/about',
+        redirect: (_, __) => const ProfileRoute().location,
+      ),
     ],
     refreshListenable: notifier,
     redirect: notifier.redirect,
@@ -52,16 +68,16 @@ GoRouter router(RouterRef ref) {
 
 final tabLocations = [
   const HomeRoute().location,
-  const ProxiesRoute().location,
-  const ConfigOptionsRoute().location,
-  const LogsOverviewRoute().location,
-  const AboutRoute().location,
+  const LocationsRoute().location,
+  const DevicesRoute().location,
+  const ProfileRoute().location,
+  const SupportRoute().location,
 ];
 
 int getCurrentIndex(BuildContext context) {
   final String location = GoRouterState.of(context).uri.path;
   if (location == const HomeRoute().location) return 0;
-  if (location.startsWith(const SettingsRoute().location)) return 4;
+  if (location.startsWith(const SettingsRoute().location)) return 3;
   var index = 0;
   for (final tab in tabLocations.sublist(1)) {
     index++;

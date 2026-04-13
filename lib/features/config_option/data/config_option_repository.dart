@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:dartx/dartx.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/optional_range.dart';
@@ -17,6 +20,9 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const kBlockedOnlyRuleSetUrl =
+    'https://github.com/savely-krasovsky/antizapret-sing-box/releases/latest/download/antizapret.srs';
+
 abstract class ConfigOptions {
   static final serviceMode = PreferencesNotifier.create<ServiceMode, String>(
     "service-mode",
@@ -29,6 +35,12 @@ abstract class ConfigOptions {
     "region",
     Region.other,
     mapFrom: Region.values.byName,
+    mapTo: (value) => value.name,
+  );
+  static final routingMode = PreferencesNotifier.create<RoutingMode, String>(
+    "routing-mode",
+    RoutingMode.global,
+    mapFrom: RoutingMode.values.byName,
     mapTo: (value) => value.name,
   );
   static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>(
@@ -96,7 +108,13 @@ abstract class ConfigOptions {
       "4.4.2.2",
       "8.8.8.8",
     ]),
-    defaultValueFunction: (ref) => ref.read(region) == Region.cn ? "223.5.5.5" : "1.1.1.1",
+    defaultValueFunction: (ref) {
+      return switch (ref.read(routingMode)) {
+        RoutingMode.global => "udp://1.1.1.1",
+        RoutingMode.allExceptRu => "local",
+        RoutingMode.blockedOnly => "local",
+      };
+    },
     validator: (value) => value.isNotBlank,
   );
 
@@ -162,7 +180,7 @@ abstract class ConfigOptions {
 
   static final enableClashApi = PreferencesNotifier.create<bool, bool>(
     "enable-clash-api",
-    true,
+    false,
   );
 
   static final clashApiPort = PreferencesNotifier.create<int, int>(
@@ -363,6 +381,7 @@ abstract class ConfigOptions {
 
   static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>> preferences = {
     "region": region,
+    "routing-mode": routingMode,
     "block-ads": blockAds,
     "use-xray-core-when-possible": useXrayCoreWhenPossible,
     "service-mode": serviceMode,
@@ -421,52 +440,17 @@ abstract class ConfigOptions {
 
   static final singboxConfigOptions = FutureProvider<SingboxConfigOption>(
     (ref) async {
-      // final region = ref.watch(Preferences.region);
-      final rules = <SingboxRule>[];
-      // final rules = switch (region) {
-      //   Region.ir => [
-      //       const SingboxRule(
-      //         domains: "domain:.ir,geosite:ir",
-      //         ip: "geoip:ir",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.cn => [
-      //       const SingboxRule(
-      //         domains: "domain:.cn,geosite:cn",
-      //         ip: "geoip:cn",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.ru => [
-      //       const SingboxRule(
-      //         domains: "domain:.ru",
-      //         ip: "geoip:ru",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.af => [
-      //       const SingboxRule(
-      //         domains: "domain:.af,geosite:af",
-      //         ip: "geoip:af",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   Region.id => [
-      //       const SingboxRule(
-      //         domains: "domain:.id,geosite:id",
-      //         ip: "geoip:id",
-      //         outbound: RuleOutbound.bypass,
-      //       ),
-      //     ],
-      //   _ => <SingboxRule>[],
-      // };
+      final rules = buildRoutingRules(
+        routingMode: ref.watch(routingMode),
+        region: ref.watch(region),
+      );
 
       final mode = ref.watch(serviceMode);
       // final reg = ref.watch(Preferences.region.notifier).raw();
 
-      return SingboxConfigOption(
+      final config = SingboxConfigOption(
         region: ref.watch(region).name,
+        routingMode: ref.watch(routingMode),
         blockAds: ref.watch(blockAds),
         useXrayCoreWhenPossible: ref.watch(useXrayCoreWhenPossible),
         executeConfigAsIs: false,
@@ -547,8 +531,59 @@ abstract class ConfigOptions {
         //     ),
         rules: rules,
       );
+
+      return applyReleaseLocalSurfacePolicy(
+        config,
+        isAndroid: Platform.isAndroid,
+        isReleaseMode: kReleaseMode,
+      );
     },
   );
+}
+
+SingboxConfigOption applyReleaseLocalSurfacePolicy(
+  SingboxConfigOption config, {
+  required bool isAndroid,
+  required bool isReleaseMode,
+}) {
+  if (!isAndroid || !isReleaseMode) {
+    return config;
+  }
+
+  return config.copyWith(
+    enableClashApi: false,
+    allowConnectionFromLan: false,
+    mixedPort: 0,
+    tproxyPort: 0,
+    localDnsPort: 0,
+  );
+}
+
+List<SingboxRule> buildRoutingRules({
+  required RoutingMode routingMode,
+  required Region? region,
+}) {
+  final _ = region;
+  return switch (routingMode) {
+    RoutingMode.global => const <SingboxRule>[],
+    RoutingMode.allExceptRu => const <SingboxRule>[
+        SingboxRule(
+          ip: "geoip:private",
+          outbound: RuleOutbound.bypass,
+        ),
+        SingboxRule(
+          domains: "domain:.ru",
+          ip: "geoip:ru",
+          outbound: RuleOutbound.bypass,
+        ),
+      ],
+    RoutingMode.blockedOnly => const <SingboxRule>[
+        SingboxRule(
+          ruleSetUrl: kBlockedOnlyRuleSetUrl,
+          outbound: RuleOutbound.proxy,
+        ),
+      ],
+  };
 }
 
 class ConfigOptionRepository with ExceptionHandler, InfraLogger {

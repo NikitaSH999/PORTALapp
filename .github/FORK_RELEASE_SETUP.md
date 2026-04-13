@@ -14,21 +14,21 @@ Workflow: `.github/workflows/fork-android-windows-release.yml`
 
 ## Recommended repository variables (branding overrides)
 
-- `BRAND_NAME` (example: `PORTALapp`)
-- `ANDROID_APPLICATION_ID` (example: `com.kiwunaka.portalapp`)
-- `ANDROID_NAMESPACE` (example: `com.kiwunaka.portalapp`)
-- `ANDROID_TEST_NAMESPACE` (example: `test.com.kiwunaka.portalapp`)
-- `URI_SCHEME` (example: `portalapp`)
-- `WINDOWS_IDENTITY_NAME` (example: `Kiwunaka.PortalApp`)
-- `WINDOWS_PUBLISHER_NAME` (example: `Kiwunaka`)
-- `WINDOWS_INSTALL_DIR` (example: `PORTALapp`)
-- `WINDOWS_EXE_STEM` (example: `PORTALapp`)
+- `BRAND_NAME` (example: `POKROV VPN`)
+- `ANDROID_APPLICATION_ID` (example: `space.pokrov.vpn`)
+- `ANDROID_NAMESPACE` (example: `com.hiddify.hiddify`)
+- `ANDROID_TEST_NAMESPACE` (example: `test.com.hiddify.hiddify`)
+- `URI_SCHEME` (example: `pokrovvpn`)
+- `WINDOWS_IDENTITY_NAME` (example: `Pokrov.Vpn`)
+- `WINDOWS_PUBLISHER_NAME` (example: `POKROV VPN`)
+- `WINDOWS_INSTALL_DIR` (example: `POKROV VPN`)
+- `WINDOWS_EXE_STEM` (example: `POKROVVPN`)
 - `BRAND_COPYRIGHT` (optional custom copyright line)
 
 ## Required for Play upload (optional)
 
 - `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`
-- Repository variable `ANDROID_PACKAGE_NAME` (defaults to `app.hiddify.com` if missing)
+- Repository variable `ANDROID_PACKAGE_NAME` (defaults to `space.pokrov.vpn` if missing)
 
 ## Required for mirror upload (optional)
 
@@ -49,3 +49,7 @@ Workflow: `.github/workflows/fork-android-windows-release.yml`
 4. Download artifact `release-handoff` and apply links via:
    - `pwsh external/client-fork/scripts/release_handoff.ps1`
    - `python external/client-fork/scripts/check_release_urls.py --env-file external/client-fork/release-links.env`
+
+Default artifact slug in this repo is `pokrov-vpn`.
+Default mirror path in this repo is `/var/www/downloads/pokrov-vpn`.
+Keep the Android namespace on the legacy `com.hiddify.hiddify` package unless you also migrate the Kotlin source tree under `android/app/src/main/kotlin`.

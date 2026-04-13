@@ -17,6 +17,7 @@ class SingboxConfigOption with _$SingboxConfigOption {
   @JsonSerializable(fieldRename: FieldRename.kebab)
   const factory SingboxConfigOption({
     required String region,
+    required RoutingMode routingMode,
     required bool blockAds,
     required bool useXrayCoreWhenPossible,
     required bool executeConfigAsIs,

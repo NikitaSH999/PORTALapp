@@ -15,6 +15,7 @@ import 'package:hiddify/features/config_option/overview/warp_options_widgets.dar
 import 'package:hiddify/features/connection/notifier/connection_notifier.dart';
 import 'package:hiddify/features/profile/data/profile_data_providers.dart';
 import 'package:hiddify/features/profile/data/profile_repository.dart';
+import 'package:hiddify/features/profile/add/warp_profile_defaults.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/model/profile_failure.dart';
 import 'package:hiddify/features/profile/notifier/active_profile_notifier.dart';
@@ -54,7 +55,8 @@ class AddProfile extends _$AddProfile with AppLogger {
     return const AsyncData(null);
   }
 
-  ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
+  ProfileRepository get _profilesRepo =>
+      ref.read(profileRepositoryProvider).requireValue;
   CancelToken? _cancelToken;
 
   Future<void> add(String rawInput) async {
@@ -64,7 +66,8 @@ class AddProfile extends _$AddProfile with AppLogger {
     state = await AsyncValue.guard(
       () async {
         final activeProfile = await ref.read(activeProfileProvider.future);
-        final markAsActive = activeProfile == null || ref.read(Preferences.markNewProfileActive);
+        final markAsActive =
+            activeProfile == null || ref.read(Preferences.markNewProfileActive);
         final TaskEither<ProfileFailure, Unit> task;
         if (LinkParser.parse(rawInput) case (final link)?) {
           loggy.debug("adding profile, url: [${link.url}]");
@@ -77,7 +80,7 @@ class AddProfile extends _$AddProfile with AppLogger {
           loggy.debug("adding profile, content");
           var name = parsed.name;
           var oldItem = await _profilesRepo.getByName(name);
-          if (name == "Hiddify WARP" && oldItem != null) {
+          if (name == defaultWarpProfileName && oldItem != null) {
             _profilesRepo.deleteById(oldItem.id).run();
           }
           while (await _profilesRepo.getByName(name) != null) {
@@ -114,7 +117,8 @@ class AddProfile extends _$AddProfile with AppLogger {
         final _prefs = ref.read(sharedPreferencesProvider).requireValue;
         final _warp = ref.read(warpOptionNotifierProvider.notifier);
 
-        final consent = false && (_prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false);
+        final consent = false &&
+            (_prefs.getBool(WarpOptionNotifier.warpConsentGiven) ?? false);
 
         final t = ref.read(translationsProvider);
         final notification = ref.read(inAppNotificationControllerProvider);
@@ -127,7 +131,9 @@ class AddProfile extends _$AddProfile with AppLogger {
 
           if (agreed ?? false) {
             await _prefs.setBool(WarpOptionNotifier.warpConsentGiven, true);
-            final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
+            final toast = notification.showInfoToast(
+                t.profile.add.addingWarpMsg,
+                duration: const Duration(milliseconds: 100));
             toast?.pause();
             await _warp.generateWarpConfig();
             toast?.start();
@@ -141,7 +147,8 @@ class AddProfile extends _$AddProfile with AppLogger {
         final hasWarp2Config = accountId != null && accessToken != null;
 
         if (!hasWarp2Config || true) {
-          final toast = notification.showInfoToast(t.profile.add.addingWarpMsg, duration: const Duration(milliseconds: 100));
+          final toast = notification.showInfoToast(t.profile.add.addingWarpMsg,
+              duration: const Duration(milliseconds: 100));
           toast?.pause();
           await _warp.generateWarp2Config();
           toast?.start();
@@ -173,7 +180,8 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
     return const AsyncData(null);
   }
 
-  ProfileRepository get _profilesRepo => ref.read(profileRepositoryProvider).requireValue;
+  ProfileRepository get _profilesRepo =>
+      ref.read(profileRepositoryProvider).requireValue;
 
   Future<void> updateProfile(RemoteProfileEntity profile) async {
     if (state.isLoading) return;
@@ -193,7 +201,9 @@ class UpdateProfile extends _$UpdateProfile with AppLogger {
 
             await ref.read(activeProfileProvider.future).then((active) async {
               if (active != null && active.id == profile.id) {
-                await ref.read(connectionNotifierProvider.notifier).reconnect(profile);
+                await ref
+                    .read(connectionNotifierProvider.notifier)
+                    .reconnect(profile);
               }
             });
             return unit;

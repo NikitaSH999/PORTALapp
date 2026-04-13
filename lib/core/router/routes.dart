@@ -9,6 +9,7 @@ import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_page.dart'
 import 'package:hiddify/features/portal/widget/devices_page.dart';
 import 'package:hiddify/features/portal/widget/locations_page.dart';
 import 'package:hiddify/features/portal/widget/profile_page.dart';
+import 'package:hiddify/features/portal/widget/subscription_page.dart';
 import 'package:hiddify/features/portal/widget/support_page.dart';
 import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/details/profile_details_page.dart';
@@ -43,37 +44,41 @@ final GlobalKey<NavigatorState>? _dynamicRootKey =
           path: "profiles/:id",
           name: ProfileDetailsRoute.name,
         ),
-        TypedGoRoute<ConfigOptionsRoute>(
-          path: "config-options",
-          name: ConfigOptionsRoute.name,
+        TypedGoRoute<SubscriptionRoute>(
+          path: "subscription",
+          name: SubscriptionRoute.name,
         ),
         TypedGoRoute<QuickSettingsRoute>(
           path: "quick-settings",
           name: QuickSettingsRoute.name,
         ),
-        TypedGoRoute<SettingsRoute>(
-          path: "settings",
-          name: SettingsRoute.name,
-          routes: [
-            TypedGoRoute<PerAppProxyRoute>(
-              path: "per-app-proxy",
-              name: PerAppProxyRoute.name,
-            ),
-          ],
-        ),
-        TypedGoRoute<LogsOverviewRoute>(
-          path: "logs",
-          name: LogsOverviewRoute.name,
-        ),
-        TypedGoRoute<AboutRoute>(
-          path: "about",
-          name: AboutRoute.name,
+      ],
+    ),
+    TypedGoRoute<LocationsRoute>(
+      path: "/locations",
+      name: LocationsRoute.name,
+    ),
+    TypedGoRoute<DevicesRoute>(
+      path: "/devices",
+      name: DevicesRoute.name,
+    ),
+    TypedGoRoute<SettingsRoute>(
+      path: "/settings",
+      name: SettingsRoute.name,
+      routes: [
+        TypedGoRoute<PerAppProxyRoute>(
+          path: "per-app-proxy",
+          name: PerAppProxyRoute.name,
         ),
       ],
     ),
-    TypedGoRoute<ProxiesRoute>(
-      path: "/proxies",
-      name: ProxiesRoute.name,
+    TypedGoRoute<SupportRoute>(
+      path: "/support",
+      name: SupportRoute.name,
+    ),
+    TypedGoRoute<ProfileRoute>(
+      path: "/profile",
+      name: ProfileRoute.name,
     ),
   ],
 )
@@ -108,31 +113,35 @@ class MobileWrapperRoute extends ShellRouteData {
           path: "profiles/:id",
           name: ProfileDetailsRoute.name,
         ),
+        TypedGoRoute<SubscriptionRoute>(
+          path: "subscription",
+          name: SubscriptionRoute.name,
+        ),
         TypedGoRoute<QuickSettingsRoute>(
           path: "quick-settings",
           name: QuickSettingsRoute.name,
         ),
       ],
     ),
-    TypedGoRoute<ProxiesRoute>(
-      path: "/proxies",
-      name: ProxiesRoute.name,
+    TypedGoRoute<LocationsRoute>(
+      path: "/locations",
+      name: LocationsRoute.name,
     ),
-    TypedGoRoute<ConfigOptionsRoute>(
-      path: "/config-options",
-      name: ConfigOptionsRoute.name,
+    TypedGoRoute<DevicesRoute>(
+      path: "/devices",
+      name: DevicesRoute.name,
     ),
     TypedGoRoute<SettingsRoute>(
       path: "/settings",
       name: SettingsRoute.name,
     ),
-    TypedGoRoute<LogsOverviewRoute>(
-      path: "/logs",
-      name: LogsOverviewRoute.name,
+    TypedGoRoute<SupportRoute>(
+      path: "/support",
+      name: SupportRoute.name,
     ),
-    TypedGoRoute<AboutRoute>(
-      path: "/about",
-      name: AboutRoute.name,
+    TypedGoRoute<ProfileRoute>(
+      path: "/profile",
+      name: ProfileRoute.name,
     ),
   ],
 )
@@ -173,16 +182,31 @@ class HomeRoute extends GoRouteData {
   }
 }
 
-class ProxiesRoute extends GoRouteData {
-  const ProxiesRoute();
-  static const name = "Proxies";
+class SubscriptionRoute extends GoRouteData {
+  const SubscriptionRoute();
+  static const name = "Subscription";
+
+  static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
-    return const NoTransitionPage(
-      name: name,
-      child: LocationsPage(),
-    );
+    if (useMobileRouter) {
+      return const MaterialPage(
+        name: name,
+        child: SubscriptionPage(),
+      );
+    }
+    return const NoTransitionPage(name: name, child: SubscriptionPage());
+  }
+}
+
+class LocationsRoute extends GoRouteData {
+  const LocationsRoute();
+  static const name = "Locations";
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return const NoTransitionPage(name: name, child: LocationsPage());
   }
 }
 
@@ -218,7 +242,8 @@ class ProfilesOverviewRoute extends GoRouteData {
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return BottomSheetPage(
       name: name,
-      builder: (controller) => ProfilesOverviewModal(scrollController: controller),
+      builder: (controller) =>
+          ProfilesOverviewModal(scrollController: controller),
     );
   }
 }
@@ -256,9 +281,10 @@ class ProfileDetailsRoute extends GoRouteData {
   }
 }
 
-class LogsOverviewRoute extends GoRouteData {
-  const LogsOverviewRoute();
-  static const name = "Logs";
+class DevicesRoute extends GoRouteData {
+  const DevicesRoute({this.section});
+  final String? section;
+  static const name = "Devices";
 
   static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
@@ -267,10 +293,10 @@ class LogsOverviewRoute extends GoRouteData {
     if (useMobileRouter) {
       return const MaterialPage(
         name: name,
-        child: SupportPage(),
+        child: DevicesPage(),
       );
     }
-    return const NoTransitionPage(name: name, child: SupportPage());
+    return const NoTransitionPage(name: name, child: DevicesPage());
   }
 }
 
@@ -308,10 +334,9 @@ class SettingsRoute extends GoRouteData {
   }
 }
 
-class ConfigOptionsRoute extends GoRouteData {
-  const ConfigOptionsRoute({this.section});
-  final String? section;
-  static const name = "Config Options";
+class SupportRoute extends GoRouteData {
+  const SupportRoute();
+  static const name = "Support";
 
   static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
@@ -320,13 +345,10 @@ class ConfigOptionsRoute extends GoRouteData {
     if (useMobileRouter) {
       return const MaterialPage(
         name: name,
-        child: DevicesPage(),
+        child: SupportPage(),
       );
     }
-    return const NoTransitionPage(
-      name: name,
-      child: DevicesPage(),
-    );
+    return const NoTransitionPage(name: name, child: SupportPage());
   }
 }
 
@@ -346,9 +368,9 @@ class PerAppProxyRoute extends GoRouteData {
   }
 }
 
-class AboutRoute extends GoRouteData {
-  const AboutRoute();
-  static const name = "About";
+class ProfileRoute extends GoRouteData {
+  const ProfileRoute();
+  static const name = "Profile";
 
   static final GlobalKey<NavigatorState>? $parentNavigatorKey = _dynamicRootKey;
 
@@ -362,4 +384,82 @@ class AboutRoute extends GoRouteData {
     }
     return const NoTransitionPage(name: name, child: ProfilePage());
   }
+}
+
+@Deprecated('Use LocationsRoute instead.')
+class ProxiesRoute {
+  const ProxiesRoute();
+
+  static const name = LocationsRoute.name;
+
+  String get location => const LocationsRoute().location;
+
+  void go(BuildContext context) => const LocationsRoute().go(context);
+
+  Future<T?> push<T>(BuildContext context) =>
+      const LocationsRoute().push<T>(context);
+
+  void pushReplacement(BuildContext context) =>
+      const LocationsRoute().pushReplacement(context);
+
+  void replace(BuildContext context) => const LocationsRoute().replace(context);
+}
+
+@Deprecated('Use DevicesRoute instead.')
+class ConfigOptionsRoute {
+  const ConfigOptionsRoute({this.section});
+
+  final String? section;
+
+  static const name = DevicesRoute.name;
+
+  DevicesRoute get _route => DevicesRoute(section: section);
+
+  String get location => _route.location;
+
+  void go(BuildContext context) => _route.go(context);
+
+  Future<T?> push<T>(BuildContext context) => _route.push<T>(context);
+
+  void pushReplacement(BuildContext context) => _route.pushReplacement(context);
+
+  void replace(BuildContext context) => _route.replace(context);
+}
+
+@Deprecated('Use SupportRoute instead.')
+class LogsOverviewRoute {
+  const LogsOverviewRoute();
+
+  static const name = SupportRoute.name;
+
+  String get location => const SupportRoute().location;
+
+  void go(BuildContext context) => const SupportRoute().go(context);
+
+  Future<T?> push<T>(BuildContext context) =>
+      const SupportRoute().push<T>(context);
+
+  void pushReplacement(BuildContext context) =>
+      const SupportRoute().pushReplacement(context);
+
+  void replace(BuildContext context) => const SupportRoute().replace(context);
+}
+
+@Deprecated('Use ProfileRoute instead.')
+class AboutRoute {
+  const AboutRoute();
+
+  static const name = ProfileRoute.name;
+
+  String get location => const ProfileRoute().location;
+
+  void go(BuildContext context) => const ProfileRoute().go(context);
+
+  Future<T?> push<T>(BuildContext context) =>
+      const ProfileRoute().push<T>(context);
+
+  void pushReplacement(BuildContext context) =>
+      const ProfileRoute().pushReplacement(context);
+
+  void replace(BuildContext context) => const ProfileRoute().replace(context);
 }

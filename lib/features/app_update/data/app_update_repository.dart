@@ -29,7 +29,7 @@ class AppUpdateRepositoryImpl
   }) {
     return exceptionHandler(
       () async {
-        if (!release.allowCustomUpdateChecker) {
+        if (!release.allowCustomUpdateChecker || !Constants.hasReleaseApiUrl) {
           throw Exception("custom update checkers are not supported");
         }
         final response =

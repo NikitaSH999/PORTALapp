@@ -142,6 +142,19 @@ class ConfigOptionsPage extends HookConsumerWidget {
                   const SettingsDivider(),
                   SettingsSection(t.config.section.route),
                   ChoicePreferenceWidget(
+                    selected: ref.watch(ConfigOptions.routingMode),
+                    preferences: ref.watch(ConfigOptions.routingMode.notifier),
+                    choices: ref
+                        .watch(ConfigOptions.routingMode)
+                        .visibleChoices(
+                          selected: ref.watch(ConfigOptions.routingMode),
+                        ),
+                    title: 'Routing preset',
+                    presentChoice: (value) => value.present(t),
+                    onChanged: (val) =>
+                        ref.watch(ConfigOptions.directDnsAddress.notifier).reset(),
+                  ),
+                  ChoicePreferenceWidget(
                     selected: ref.watch(ConfigOptions.region),
                     preferences: ref.watch(ConfigOptions.region.notifier),
                     choices: Region.values,

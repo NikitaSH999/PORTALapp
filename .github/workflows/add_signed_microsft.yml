@@ -7,13 +7,11 @@ on:
   release:
     types: [released]   # Run the action when a GitHub release is published
 
-  schedule:
-    - cron:  '0 */6 * * *'  # Run the action every 6 hours
-
   workflow_dispatch:    # Manually run the action
 
 jobs:
   upload-store-msix-to-release:
+    if: ${{ github.event_name != 'release' || startsWith(github.event.release.tag_name, 'v') }}
     runs-on: ubuntu-latest
 
     steps:
@@ -22,4 +20,4 @@ jobs:
       with:
         store-id: 9pdfnl3qv2s5
         token: ${{ secrets.GITHUB_TOKEN }}
-        asset-name-pattern: Hiddify-Windows-Setup-x64		# Optional
+        asset-name-pattern: pokrov-vpn-windows-setup-x64		# Optional

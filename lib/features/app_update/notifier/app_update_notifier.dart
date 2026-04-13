@@ -19,7 +19,9 @@ const _debugUpgrader = true;
 
 @riverpod
 Upgrader upgrader(UpgraderRef ref) => Upgrader(
-      appcastConfig: AppcastConfiguration(url: Constants.appCastUrl),
+      appcastConfig: Constants.hasAppCastUrl
+          ? AppcastConfiguration(url: Constants.appCastUrl)
+          : null,
       debugLogging: _debugUpgrader && kDebugMode,
       durationUntilAlertAgain: const Duration(hours: 12),
       messages: UpgraderMessages(
@@ -42,9 +44,10 @@ class AppUpdateNotifier extends _$AppUpdateNotifier with AppLogger {
     loggy.debug("checking for update");
     state = const AppUpdateState.checking();
     final appInfo = ref.watch(appInfoProvider).requireValue;
-    if (!appInfo.release.allowCustomUpdateChecker) {
+    if (!appInfo.release.allowCustomUpdateChecker ||
+        !Constants.hasReleaseMetadata) {
       loggy.debug(
-        "custom update checkers are not allowed for [${appInfo.release.name}] release",
+        "custom update checks are disabled for [${appInfo.release.name}] release",
       );
       return state = const AppUpdateState.disabled();
     }

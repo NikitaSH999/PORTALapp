@@ -22,8 +22,8 @@ env:
   TARGET_NAME_AppImage: "Hiddify-Linux-x64"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
   TARGET_NAME_rpm: "Hiddify-rpm-x64"
-  TARGET_NAME_apk: "Hiddify-Android"
-  TARGET_NAME_aab: "Hiddify-Android"
+  TARGET_NAME_apk: "pokrov-vpn-android"
+  TARGET_NAME_aab: "pokrov-vpn-android"
   #TARGET_NAME_exe: "Hiddify-Windows-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
@@ -193,7 +193,7 @@ jobs:
           folder: 'dist'
           timestamp-server: 'http://timestamp.digicert.com'
           recursive: true
-          description: 'Hiddify'
+          description: 'POKROV VPN'
 
       - name: Copy to out Windows
         if: matrix.platform == 'windows'
@@ -231,7 +231,7 @@ jobs:
         run: |
           mkdir out
           ls -R ./build/app/outputs
-          cp ./build/app/outputs/bundle/release/app-release.aab out/hiddify-android-market.aab || echo "no aab"
+          cp ./build/app/outputs/bundle/release/app-release.aab out/pokrov-vpn-android-market.aab || echo "no aab"
 
       - name: Copy to out unix
         if: startsWith(matrix.platform,'linux') || matrix.platform == 'macos' || matrix.platform == 'ios'
@@ -310,11 +310,18 @@ jobs:
           deleteOnlyFromDrafts: false
           
       - name: prepare_release_message
+        env:
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          RELEASE_DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
         run: |
           pip install gitchangelog pystache mustache markdown
-          prelease=$(curl --silent "https://api.github.com/repos/hiddify/hiddify-next/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+          prelease=$(curl --silent "https://api.github.com/repos/${RELEASE_REPOSITORY}/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' || true)
           current="${{ github.ref_name }}"
-          sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md > release.md
+          sed \
+            -e "s|RELEASE_TAG|${{ env.TAG_NAME }}|g" \
+            -e "s|RELEASE_REPOSITORY|${RELEASE_REPOSITORY}|g" \
+            -e "s|RELEASE_HISTORY_URL|https://github.com/${RELEASE_REPOSITORY}/blob/${RELEASE_DEFAULT_BRANCH}/HISTORY.md|g" \
+            ./.github/release_message.md > release.md
           echo -e "\n\n<details markdown=1><summary>All changes from $current to the latest commit:</summary>\n\n">>release.md
           gitchangelog "${prelease}.." >> release.md  2>&1 || echo "Error in gitchangelog"
           echo -e "\n\n</details>">>release.md
@@ -349,11 +356,18 @@ jobs:
           ls -R ./out
           ls -R ./.github/
           ls -R ./.git/
-          mv out/hiddify-android-market.aab  hiddify-android-market.aab
+          mv out/pokrov-vpn-android-market.aab  pokrov-vpn-android-market.aab
 
       - name: prepare_release_message
+        env:
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          RELEASE_DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
         run: |
-          sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md >> release.md
+          sed \
+            -e "s|RELEASE_TAG|${{ env.TAG_NAME }}|g" \
+            -e "s|RELEASE_REPOSITORY|${RELEASE_REPOSITORY}|g" \
+            -e "s|RELEASE_HISTORY_URL|https://github.com/${RELEASE_REPOSITORY}/blob/${RELEASE_DEFAULT_BRANCH}/HISTORY.md|g" \
+            ./.github/release_message.md >> release.md
 
       - name: Upload Release
         uses: softprops/action-gh-release@v1
@@ -374,9 +388,9 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: service_account.json
-          packageName: app.hiddify.com
+          packageName: space.pokrov.vpn
           releaseName: ${{ env.TAG_NAME }}
-          releaseFiles: ./hiddify-android-market.aab
+          releaseFiles: ./pokrov-vpn-android-market.aab
           track: 'beta'
 
 
