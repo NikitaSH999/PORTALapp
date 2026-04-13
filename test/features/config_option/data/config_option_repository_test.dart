@@ -9,6 +9,31 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('ConfigOptions.singboxConfigOptions', () {
+    test('defaults to all_except_ru routing for the consumer path', () async {
+      SharedPreferences.setMockInitialValues({});
+      final preferences = await SharedPreferences.getInstance();
+      final container = ProviderContainer(
+        overrides: [
+          sharedPreferencesProvider.overrideWith((ref) async => preferences),
+        ],
+      );
+      addTearDown(container.dispose);
+      await container.read(sharedPreferencesProvider.future);
+      final config =
+          await container.read(ConfigOptions.singboxConfigOptions.future);
+
+      expect(
+          container.read(ConfigOptions.routingMode), RoutingMode.allExceptRu);
+      expect(
+        container.read(ConfigOptions.remoteDnsAddress),
+        'https://1.1.1.1/dns-query',
+      );
+      expect(container.read(ConfigOptions.directDnsAddress), 'local');
+      expect(config.routingMode, RoutingMode.allExceptRu);
+      expect(config.remoteDnsAddress, 'https://1.1.1.1/dns-query');
+      expect(config.directDnsAddress, 'local');
+    });
+
     test('disables Clash API and LAN sharing by default', () async {
       SharedPreferences.setMockInitialValues({});
       final preferences = await SharedPreferences.getInstance();
@@ -20,7 +45,8 @@ void main() {
       addTearDown(container.dispose);
       await container.read(sharedPreferencesProvider.future);
 
-      final config = await container.read(ConfigOptions.singboxConfigOptions.future);
+      final config =
+          await container.read(ConfigOptions.singboxConfigOptions.future);
 
       expect(config.enableClashApi, isFalse);
       expect(config.allowConnectionFromLan, isFalse);
@@ -39,7 +65,8 @@ void main() {
       addTearDown(container.dispose);
       await container.read(sharedPreferencesProvider.future);
 
-      final config = await container.read(ConfigOptions.singboxConfigOptions.future);
+      final config =
+          await container.read(ConfigOptions.singboxConfigOptions.future);
 
       expect(config.enableClashApi, isTrue);
       expect(config.allowConnectionFromLan, isFalse);
@@ -56,7 +83,8 @@ void main() {
       addTearDown(container.dispose);
       await container.read(sharedPreferencesProvider.future);
 
-      final config = await container.read(ConfigOptions.singboxConfigOptions.future);
+      final config =
+          await container.read(ConfigOptions.singboxConfigOptions.future);
       final sanitized = applyReleaseLocalSurfacePolicy(
         config.copyWith(
           enableClashApi: true,

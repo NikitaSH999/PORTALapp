@@ -289,6 +289,34 @@ class ImportPayload {
   final String qrValue;
 }
 
+class PortalConnectionSupportContext {
+  const PortalConnectionSupportContext({
+    this.transport = '',
+    this.routingMode = '',
+    this.ipVersionPreference = '',
+  });
+
+  final String transport;
+  final String routingMode;
+  final String ipVersionPreference;
+}
+
+class PortalConnectionPolicy {
+  const PortalConnectionPolicy({
+    this.routingModeDefault = '',
+    this.transportProfile = '',
+    this.dnsPolicy = '',
+    this.packageCatalogVersion = '',
+    this.supportContext = const PortalConnectionSupportContext(),
+  });
+
+  final String routingModeDefault;
+  final String transportProfile;
+  final String dnsPolicy;
+  final String packageCatalogVersion;
+  final PortalConnectionSupportContext supportContext;
+}
+
 class PortalExperience {
   const PortalExperience({
     required this.isDemo,
@@ -302,6 +330,7 @@ class PortalExperience {
     required this.supportThreads,
     required this.downloads,
     required this.importPayload,
+    this.connectionPolicy = const PortalConnectionPolicy(),
   });
 
   final bool isDemo;
@@ -315,6 +344,7 @@ class PortalExperience {
   final List<SupportThread> supportThreads;
   final List<DownloadTarget> downloads;
   final ImportPayload importPayload;
+  final PortalConnectionPolicy connectionPolicy;
 
   bool get hasProvisionedAccess =>
       session.isAuthorized || importPayload.subscriptionUrl.trim().isNotEmpty;

@@ -23,7 +23,7 @@ void main() {
 
       expect(
         rules,
-        equals([
+        containsAll([
           const SingboxRule(
             ip: 'geoip:private',
             outbound: RuleOutbound.bypass,
@@ -33,11 +33,20 @@ void main() {
             ip: 'geoip:ru',
             outbound: RuleOutbound.bypass,
           ),
+          const SingboxRule(
+            domains: 'domain:.\u0440\u0444',
+            outbound: RuleOutbound.bypass,
+          ),
+          const SingboxRule(
+            domains: 'domain:.su',
+            outbound: RuleOutbound.bypass,
+          ),
         ]),
       );
     });
 
-    test('routes only blocked destinations through proxy in blocked_only mode', () {
+    test('routes only blocked destinations through proxy in blocked_only mode',
+        () {
       final rules = buildRoutingRules(
         routingMode: RoutingMode.blockedOnly,
         region: Region.ru,

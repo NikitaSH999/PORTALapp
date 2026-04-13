@@ -33,6 +33,8 @@ Bot purchase and recovery paths stay valid, but they do not replace the main app
 - `xray` support: advanced compatibility fallback only
 - free trial: `5 days`
 - Telegram reward: `+10 days`
+- recommended public routing mode: `All except RU`
+- public routing mode set: `All except RU` and `Full tunnel`
 
 ## Release Gate Reality
 
@@ -133,6 +135,7 @@ Current client behavior for `v1`:
 
 - app support should prepare account and device context before handing the user into Telegram or email
 - the client must not pretend there is a realtime in-app support chat unless such a backend actually exists
+- public recovery order stays `POKROV app -> web cabinet -> Telegram fallback`
 
 ## Branding Requirements
 
@@ -208,7 +211,8 @@ In scope:
 - Telegram reward `+10 days`
 - release artifact naming and runtime link wiring for Android and Windows
 - public-facing rebrand cleanup for Android and Windows
-- advanced routing modes `Global` and `All except RU`
+- advanced routing modes `All except RU` and `Full tunnel`
+- built-in Android direct package presets for `banks`, `payments`, `marketplaces`, `telecom`, and `gov_media`
 - safe diagnostics that show routing mode and route category without leaking raw config or keys
 - emergency response actions such as changing location, refreshing profile, reconnecting, and contacting support
 
@@ -228,10 +232,10 @@ Recommended RU-facing preset:
 
 - `All except RU`
 
-Current public preset set in code:
+Current public preset set:
 
-- `Global`
 - `All except RU`
+- `Full tunnel`
 
 Planned follow-up preset:
 
@@ -250,10 +254,13 @@ Release rule:
 
 Current implementation status:
 
-- the client now has an explicit routing-mode groundwork layer for `Global` and `All except RU`
+- the client now has an explicit routing-mode groundwork layer for internal `global`, `allExceptRu`, and hidden `blockedOnly`
+- public copy must describe internal `global` as `Full tunnel`
 - `All except RU` already maps Russian and private traffic to direct rules in the generated sing-box option set
 - `Blocked only` remains hidden or internal until geo assets, DNS split policy, and leak checks are complete enough for honest public verification
 - the full preset stack and DNS split policy remain follow-up work
+- consumer defaults now align around `All except RU`, tunneled DoH, and first-party user-agent strings rather than legacy tool impersonation
+- Android direct-routing assistance now uses a versioned built-in package catalog instead of a raw empty selector-only experience
 
 ## Apple Readiness Notes
 

@@ -92,7 +92,16 @@ void main() {
         apiClient: _FakePortalApiClient({
           '/api/auth/session': {
             'ok': true,
-            'user': {'id': 1001, 'username': 'alice'}
+            'user': {
+              'id': 1001,
+              'username': 'alice',
+              'client_policy': {
+                'routing_mode_default': 'all_except_ru',
+                'support_context': {
+                  'routing_mode': 'all_except_ru',
+                },
+              },
+            }
           },
           '/api/dashboard': {
             'tg_id': 1001,
@@ -106,6 +115,13 @@ void main() {
             'active_sessions': 2,
             'device_limit': 5,
             'subscription_url': 'https://portal.example.test/sub/abc',
+            'client_policy': {
+              'dns_policy': 'ru_direct_split',
+              'package_catalog_version': '2026.04.13.1',
+              'support_context': {
+                'ip_version_preference': 'ipv4_only',
+              },
+            },
             'features': {'haptic': true, 'lottie': false}
           },
           '/api/user/1001': {
@@ -115,6 +131,12 @@ void main() {
             'is_active': true,
             'is_admin': false,
             'sub_type': 'PAID',
+            'client_policy': {
+              'transport_profile': 'grpc_443_primary',
+              'support_context': {
+                'transport': 'grpc_443_primary',
+              },
+            },
             'expiry_at': '2026-04-01T00:00:00Z',
             'devices': [
               {
@@ -253,6 +275,80 @@ void main() {
       expect(experience.importPayload.smartUrl, contains('format=smart'));
       expect(
           experience.subscription.payViaBotUrl, contains('portal_service_bot'));
+      expect(experience.connectionPolicy.routingModeDefault, 'all_except_ru');
+      expect(experience.connectionPolicy.transportProfile, 'grpc_443_primary');
+      expect(experience.connectionPolicy.dnsPolicy, 'ru_direct_split');
+      expect(
+        experience.connectionPolicy.packageCatalogVersion,
+        '2026.04.13.1',
+      );
+      expect(
+        experience.connectionPolicy.supportContext.transport,
+        'grpc_443_primary',
+      );
+      expect(
+        experience.connectionPolicy.supportContext.routingMode,
+        'all_except_ru',
+      );
+      expect(
+        experience.connectionPolicy.supportContext.ipVersionPreference,
+        'ipv4_only',
+      );
+    });
+
+    test('ignores malformed client policy payloads without breaking the portal',
+        () async {
+      final repository = PortalRepositoryImpl(
+        apiClient: _FakePortalApiClient({
+          '/api/auth/session': {
+            'ok': true,
+            'user': {
+              'id': 1002,
+              'username': 'bob',
+              'client_policy': 'unexpected',
+            }
+          },
+          '/api/dashboard': {
+            'tg_id': 1002,
+            'sub_type': 'PAID',
+            'current_plan_code': '1_month',
+            'is_active': true,
+            'subscription_url': 'https://portal.example.test/sub/bob',
+            'client_policy': const ['unexpected'],
+          },
+          '/api/user/1002': {
+            'tg_id': 1002,
+            'username': 'bob',
+            'client_policy': {
+              'support_context': const ['unexpected'],
+            },
+          },
+          '/api/public/plans': const {
+            'plans': [],
+          },
+          '/api/tickets?limit=6': const {},
+          '/api/client/apps': const {},
+          '/api/nodes/status': const {},
+        }),
+        config: PortalPublicConfig.fromMap(const {}),
+        sessionStore:
+            _MemoryPortalSessionStore(sessionToken: 'runtime-session-123'),
+      );
+
+      final experience = await repository.getExperience();
+
+      expect(experience.isDemo, isFalse);
+      expect(experience.connectionPolicy.routingModeDefault, isEmpty);
+      expect(experience.connectionPolicy.transportProfile, isEmpty);
+      expect(experience.connectionPolicy.dnsPolicy, isEmpty);
+      expect(experience.connectionPolicy.packageCatalogVersion, isEmpty);
+      expect(experience.connectionPolicy.supportContext.transport, isEmpty);
+      expect(experience.connectionPolicy.supportContext.routingMode, isEmpty);
+      expect(
+        experience.connectionPolicy.supportContext.ipVersionPreference,
+        isEmpty,
+      );
+      expect(experience.subscription.plans, isNotEmpty);
     });
 
     test('falls back to demo experience when portal is unavailable', () async {
@@ -306,6 +402,17 @@ void main() {
                 'subscription_url': 'https://portal.example.test/sub/trial',
                 'is_active': true,
                 'sub_type': 'TRIAL',
+                'client_policy': {
+                  'routing_mode_default': 'all_except_ru',
+                  'transport_profile': 'grpc_443_primary',
+                  'dns_policy': 'ru_direct_split',
+                  'package_catalog_version': '2026.04.13.1',
+                  'support_context': {
+                    'transport': 'grpc_443_primary',
+                    'routing_mode': 'all_except_ru',
+                    'ip_version_preference': 'ipv4_only',
+                  },
+                },
                 'expiry_at': '2026-03-24T00:00:00Z',
                 'devices': [
                   {
@@ -382,6 +489,17 @@ void main() {
                 'subscription_url': 'https://portal.example.test/sub/trial',
                 'is_active': true,
                 'sub_type': 'TRIAL',
+                'client_policy': {
+                  'routing_mode_default': 'all_except_ru',
+                  'transport_profile': 'grpc_443_primary',
+                  'dns_policy': 'ru_direct_split',
+                  'package_catalog_version': '2026.04.13.1',
+                  'support_context': {
+                    'transport': 'grpc_443_primary',
+                    'routing_mode': 'all_except_ru',
+                    'ip_version_preference': 'ipv4_only',
+                  },
+                },
                 'expiry_at': '2026-03-24T00:00:00Z',
                 'devices': [
                   {
@@ -453,6 +571,25 @@ void main() {
       expect(experience.importPayload.subscriptionUrl, contains('/sub/trial'));
       expect(experience.devices.single.title, equals('Android device'));
       expect(experience.locations.single.title, equals('Netherlands'));
+      expect(experience.connectionPolicy.routingModeDefault, 'all_except_ru');
+      expect(experience.connectionPolicy.transportProfile, 'grpc_443_primary');
+      expect(experience.connectionPolicy.dnsPolicy, 'ru_direct_split');
+      expect(
+        experience.connectionPolicy.packageCatalogVersion,
+        '2026.04.13.1',
+      );
+      expect(
+        experience.connectionPolicy.supportContext.transport,
+        'grpc_443_primary',
+      );
+      expect(
+        experience.connectionPolicy.supportContext.routingMode,
+        'all_except_ru',
+      );
+      expect(
+        experience.connectionPolicy.supportContext.ipVersionPreference,
+        'ipv4_only',
+      );
       expect(capturedBody, isNotNull);
       expect(capturedBody!['install_id'], equals('install-123'));
       expect(capturedBody!.containsKey('trial_days'), isFalse);

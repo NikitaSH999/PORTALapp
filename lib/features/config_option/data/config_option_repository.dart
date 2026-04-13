@@ -39,7 +39,7 @@ abstract class ConfigOptions {
   );
   static final routingMode = PreferencesNotifier.create<RoutingMode, String>(
     "routing-mode",
-    RoutingMode.global,
+    RoutingMode.allExceptRu,
     mapFrom: RoutingMode.values.byName,
     mapTo: (value) => value.name,
   );
@@ -72,7 +72,7 @@ abstract class ConfigOptions {
 
   static final remoteDnsAddress = PreferencesNotifier.create<String, String>(
     "remote-dns-address",
-    "udp://1.1.1.1",
+    "https://1.1.1.1/dns-query",
     possibleValues: List.of([
       "local",
       "udp://223.5.5.5",
@@ -87,7 +87,8 @@ abstract class ConfigOptions {
     validator: (value) => value.isNotBlank,
   );
 
-  static final remoteDnsDomainStrategy = PreferencesNotifier.create<DomainStrategy, String>(
+  static final remoteDnsDomainStrategy =
+      PreferencesNotifier.create<DomainStrategy, String>(
     "remote-dns-domain-strategy",
     DomainStrategy.auto,
     mapFrom: (value) => DomainStrategy.values.firstWhere((e) => e.key == value),
@@ -118,7 +119,8 @@ abstract class ConfigOptions {
     validator: (value) => value.isNotBlank,
   );
 
-  static final directDnsDomainStrategy = PreferencesNotifier.create<DomainStrategy, String>(
+  static final directDnsDomainStrategy =
+      PreferencesNotifier.create<DomainStrategy, String>(
     "direct-dns-domain-strategy",
     DomainStrategy.auto,
     mapFrom: (value) => DomainStrategy.values.firstWhere((e) => e.key == value),
@@ -143,7 +145,8 @@ abstract class ConfigOptions {
     validator: (value) => isPort(value.toString()),
   );
 
-  static final tunImplementation = PreferencesNotifier.create<TunImplementation, String>(
+  static final tunImplementation =
+      PreferencesNotifier.create<TunImplementation, String>(
     "tun-implementation",
     TunImplementation.gvisor,
     mapFrom: TunImplementation.values.byName,
@@ -152,7 +155,8 @@ abstract class ConfigOptions {
 
   static final mtu = PreferencesNotifier.create<int, int>("mtu", 9000);
 
-  static final strictRoute = PreferencesNotifier.create<bool, bool>("strict-route", true);
+  static final strictRoute =
+      PreferencesNotifier.create<bool, bool>("strict-route", true);
 
   static final connectionTestUrl = PreferencesNotifier.create<String, String>(
     "connection-test-url",
@@ -189,7 +193,8 @@ abstract class ConfigOptions {
     validator: (value) => isPort(value.toString()),
   );
 
-  static final bypassLan = PreferencesNotifier.create<bool, bool>("bypass-lan", false);
+  static final bypassLan =
+      PreferencesNotifier.create<bool, bool>("bypass-lan", false);
 
   static final allowConnectionFromLan = PreferencesNotifier.create<bool, bool>(
     "allow-connection-from-lan",
@@ -216,14 +221,16 @@ abstract class ConfigOptions {
     false,
   );
 
-  static final tlsFragmentSize = PreferencesNotifier.create<OptionalRange, String>(
+  static final tlsFragmentSize =
+      PreferencesNotifier.create<OptionalRange, String>(
     "tls-fragment-size",
     const OptionalRange(min: 10, max: 30),
     mapFrom: OptionalRange.parse,
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final tlsFragmentSleep = PreferencesNotifier.create<OptionalRange, String>(
+  static final tlsFragmentSleep =
+      PreferencesNotifier.create<OptionalRange, String>(
     "tls-fragment-sleep",
     const OptionalRange(min: 2, max: 8),
     mapFrom: OptionalRange.parse,
@@ -240,7 +247,8 @@ abstract class ConfigOptions {
     false,
   );
 
-  static final tlsPaddingSize = PreferencesNotifier.create<OptionalRange, String>(
+  static final tlsPaddingSize =
+      PreferencesNotifier.create<OptionalRange, String>(
     "tls-padding-size",
     const OptionalRange(min: 1, max: 1500),
     mapFrom: OptionalRange.parse,
@@ -275,7 +283,8 @@ abstract class ConfigOptions {
     false,
   );
 
-  static final warpDetourMode = PreferencesNotifier.create<WarpDetourMode, String>(
+  static final warpDetourMode =
+      PreferencesNotifier.create<WarpDetourMode, String>(
     "warp-detour-mode",
     WarpDetourMode.proxyOverWarp,
     mapFrom: WarpDetourMode.values.byName,
@@ -331,13 +340,15 @@ abstract class ConfigOptions {
     "m4",
   );
 
-  static final warpNoiseDelay = PreferencesNotifier.create<OptionalRange, String>(
+  static final warpNoiseDelay =
+      PreferencesNotifier.create<OptionalRange, String>(
     "warp-noise-delay",
     const OptionalRange(min: 10, max: 30),
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
-  static final warpNoiseSize = PreferencesNotifier.create<OptionalRange, String>(
+  static final warpNoiseSize =
+      PreferencesNotifier.create<OptionalRange, String>(
     "warp-noise-size",
     const OptionalRange(min: 10, max: 30),
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
@@ -348,7 +359,8 @@ abstract class ConfigOptions {
     "warp-wireguard-config",
     "",
   );
-  static final warp2WireguardConfig = PreferencesNotifier.create<String, String>(
+  static final warp2WireguardConfig =
+      PreferencesNotifier.create<String, String>(
     "warp2-wireguard-config",
     "",
   );
@@ -359,7 +371,13 @@ abstract class ConfigOptions {
       if (PlatformUtils.isDesktop && mode == ServiceMode.tun) {
         return true;
       }
-      if (ref.watch(enableTlsFragment) || ref.watch(enableTlsMixedSniCase) || ref.watch(enableTlsPadding) || ref.watch(enableMux) || ref.watch(enableWarp) || ref.watch(bypassLan) || ref.watch(allowConnectionFromLan)) {
+      if (ref.watch(enableTlsFragment) ||
+          ref.watch(enableTlsMixedSniCase) ||
+          ref.watch(enableTlsPadding) ||
+          ref.watch(enableMux) ||
+          ref.watch(enableWarp) ||
+          ref.watch(bypassLan) ||
+          ref.watch(allowConnectionFromLan)) {
         return true;
       }
 
@@ -379,7 +397,8 @@ abstract class ConfigOptions {
     "warp2.wireguard-config",
   };
 
-  static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>> preferences = {
+  static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>>
+      preferences = {
     "region": region,
     "routing-mode": routingMode,
     "block-ads": blockAds,
@@ -576,6 +595,14 @@ List<SingboxRule> buildRoutingRules({
           ip: "geoip:ru",
           outbound: RuleOutbound.bypass,
         ),
+        SingboxRule(
+          domains: "domain:.\u0440\u0444",
+          outbound: RuleOutbound.bypass,
+        ),
+        SingboxRule(
+          domains: "domain:.su",
+          outbound: RuleOutbound.bypass,
+        ),
       ],
     RoutingMode.blockedOnly => const <SingboxRule>[
         SingboxRule(
@@ -595,7 +622,8 @@ class ConfigOptionRepository with ExceptionHandler, InfraLogger {
   final SharedPreferences preferences;
   final Future<SingboxConfigOption> Function() getConfigOptions;
 
-  TaskEither<ConfigOptionFailure, SingboxConfigOption> getFullSingboxConfigOption() {
+  TaskEither<ConfigOptionFailure, SingboxConfigOption>
+      getFullSingboxConfigOption() {
     return exceptionHandler(
       () async {
         return right(await getConfigOptions());

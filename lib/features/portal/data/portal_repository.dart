@@ -243,6 +243,11 @@ class PortalRepositoryImpl implements PortalRepository {
       supportThreads: _buildSupportThreads(ticketsJson),
       downloads: _buildDownloadTargets(appsJson),
       importPayload: _buildImportPayload(dashboard.connectionKey),
+      connectionPolicy: _buildConnectionPolicy(
+        sessionJson: sessionJson,
+        dashboardJson: dashboardJson,
+        userJson: userJson,
+      ),
     );
   }
 
@@ -438,6 +443,44 @@ class PortalRepositoryImpl implements PortalRepository {
     );
   }
 
+  PortalConnectionPolicy _buildConnectionPolicy({
+    required Map<String, dynamic> sessionJson,
+    required Map<String, dynamic> dashboardJson,
+    required Map<String, dynamic> userJson,
+  }) {
+    final sessionUser = _sessionUser(sessionJson);
+    final policySources = <Map<String, dynamic>>[
+      _map(userJson['client_policy']),
+      _map(dashboardJson['client_policy']),
+      _map(sessionUser['client_policy']),
+      _map(sessionJson['client_policy']),
+    ];
+    final supportSources = [
+      for (final source in policySources) _map(source['support_context']),
+    ];
+
+    return PortalConnectionPolicy(
+      routingModeDefault: _firstPolicyString(
+        policySources,
+        'routing_mode_default',
+      ),
+      transportProfile: _firstPolicyString(policySources, 'transport_profile'),
+      dnsPolicy: _firstPolicyString(policySources, 'dns_policy'),
+      packageCatalogVersion: _firstPolicyString(
+        policySources,
+        'package_catalog_version',
+      ),
+      supportContext: PortalConnectionSupportContext(
+        transport: _firstPolicyString(supportSources, 'transport'),
+        routingMode: _firstPolicyString(supportSources, 'routing_mode'),
+        ipVersionPreference: _firstPolicyString(
+          supportSources,
+          'ip_version_preference',
+        ),
+      ),
+    );
+  }
+
   int _healthyNodes(Map<String, dynamic> payload) {
     return _list(payload['nodes'])
         .where((row) => _asBool(_map(row)['is_healthy']))
@@ -526,4 +569,14 @@ bool _isTrialLike(Object? value) {
   return normalized.contains('TRIAL') ||
       normalized.contains('FREE') ||
       normalized.contains('BONUS');
+}
+
+String _firstPolicyString(Iterable<Map<String, dynamic>> sources, String key) {
+  for (final source in sources) {
+    final value = _asString(source[key]);
+    if (value.isNotEmpty) {
+      return value;
+    }
+  }
+  return '';
 }

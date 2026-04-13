@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/preferences/general_preferences.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
+import 'package:hiddify/features/per_app_proxy/data/direct_package_catalog.dart';
 import 'package:hiddify/features/per_app_proxy/model/installed_package_info.dart';
 import 'package:hiddify/features/per_app_proxy/model/per_app_proxy_mode.dart';
 import 'package:hiddify/features/per_app_proxy/overview/per_app_proxy_notifier.dart';
@@ -28,6 +29,15 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
     final showSystemApps = useState(true);
     final isSearching = useState(false);
     final searchQuery = useState("");
+    final directPresets = useMemoized(
+      () =>
+          asyncPackages.whenOrNull(
+            data: (packages) =>
+                resolveDirectPackagePresets(installedPackages: packages),
+          ) ??
+          const <ResolvedDirectPackagePreset>[],
+      [asyncPackages],
+    );
 
     final filteredPackages = useMemoized(
       () {
@@ -143,6 +153,69 @@ class PerAppProxyPage extends HookConsumerWidget with PresLogger {
               ),
             ),
           ),
+          if (perAppProxyMode == PerAppProxyMode.exclude &&
+              !isSearching.value &&
+              searchQuery.value.isBlank &&
+              directPresets.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Quick direct picks',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tap once to keep common essentials working without VPN. You can still fine-tune every app below.',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 12),
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          children: [
+                            for (final preset in directPresets)
+                              FilledButton.tonalIcon(
+                                key: Key('direct-preset-${preset.id}'),
+                                onPressed: preset.isApplied(perAppProxyList)
+                                    ? null
+                                    : () async {
+                                        await ref
+                                            .read(
+                                              perAppProxyListProvider.notifier,
+                                            )
+                                            .update(
+                                              applyDirectPackagePreset(
+                                                currentSelection:
+                                                    perAppProxyList,
+                                                presetPackages:
+                                                    preset.packageNames,
+                                              ),
+                                            );
+                                      },
+                                icon: Icon(
+                                  preset.isApplied(perAppProxyList)
+                                      ? FluentIcons.checkmark_circle_20_filled
+                                      : FluentIcons.add_circle_20_regular,
+                                ),
+                                label: Text(
+                                  '${preset.title} (${preset.apps.length})',
+                                ),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
           switch (filteredPackages) {
             AsyncData(value: final packages) => SliverList.builder(
                 itemBuilder: (context, index) {

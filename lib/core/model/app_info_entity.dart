@@ -18,7 +18,7 @@ class AppInfoEntity with _$AppInfoEntity {
   }) = _AppInfoEntity;
 
   String get userAgent =>
-      "POKROVVPN/$version ($operatingSystem) like ClashMeta v2ray sing-box";
+      "POKROVVPN/$version ($operatingSystem; ${release.key})";
 
   String get presentVersion => environment == Environment.prod
       ? version

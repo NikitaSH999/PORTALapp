@@ -30,6 +30,7 @@ UI state alone is not enough. The backend must create a working account, a worki
 7. Backend provisions a real subscription source.
 8. Backend returns:
    - `session`
+   - `client_policy`
    - `access`
    - `provisioning`
    - experience payload
@@ -45,6 +46,19 @@ Contract note:
 - the client no longer sends caller-controlled `trial_days`
 - the backend always enforces the canonical `5-day` trial from the shared surface facts
 - `provisioning.status` must expose whether the profile is ready immediately or still pending sync
+- the app should read one additive `client_policy` contract from `start-trial`, `user`, and `dashboard` instead of inferring defaults from stale local assumptions
+
+Current `client_policy` fields:
+
+- `routing_mode_default`
+- `transport_profile`
+- `dns_policy`
+- `package_catalog_version`
+- `ruleset_version`
+- `support_context.transport`
+- `support_context.routing_mode`
+- `support_context.ip_version_preference`
+- `support_recovery_order`
 
 ## Client-Side Foundation Already Present
 
@@ -73,6 +87,15 @@ Shared-surface config note:
 
 - client public defaults are synced from root `shared/*.json`
 - Flutter consumes the synced adapter file `lib/features/portal/config/shared_surface_facts.dart`
+- current public language should expose only `All except RU` and `Full tunnel`; internal names such as `global` or `blockedOnly` stay implementation details
+- public consumer connection stays `TUN`-first; loopback proxy mechanics remain advanced or internal-only
+- public routing defaults should stay aligned with shared facts: `All except RU`, `grpc_443_primary`, `ru_direct_split`
+
+Android direct-app note:
+
+- the client now ships a built-in direct package catalog with a versioned stamp
+- current curated categories are `banks`, `payments`, `marketplaces`, `telecom`, and `gov_media`
+- preset taps should append matching installed apps without deleting manual overrides
 
 ## Related Flows
 
@@ -115,6 +138,7 @@ Client UX rule:
 - diagnostics should expose only safe summaries such as routing mode and route category
 - diagnostics must not leak raw config, keys, or detailed topology
 - when no real session exists yet, support and profile surfaces may show prepared context and recovery entry points, but they must not pretend that live threads or live location inventory already exist
+- recovery order in support copy should stay `app -> web cabinet -> Telegram`
 
 ### Download surfaces
 
