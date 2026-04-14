@@ -1,6 +1,6 @@
 {
     "general":  {
-                    "appTitle":  "POKROV Network",
+                    "appTitle":  "POKROV",
                     "reset":  "Reset",
                     "toggle":  {
                                    "enabled":  "Enabled",
@@ -317,9 +317,9 @@
                                   }
                 },
     "play":  {
-                 "title":  "POKROV Network",
+                 "title":  "POKROV",
                  "short_description":  "Auto, SSH, VLESS, VMess, Trojan, Reality, Sing-Box, Clash, XRay, Shadowsocks",
-                 "full_description":  "The key goal of POKROV Network is to provide a user-friendly and efficient network optimization client. It enables you to route and optimize all traffic or selected app traffic to remote high-performance nodes, utilizing advanced connection protocols.\n\nNote: We do not provide any server; users are required to ensure their online activities stay private by using their own self-hosted or trusted infrastructure. \n \nWe Support Routes With:\n- Standard V2Ray/XRay Node Links\n- Clash Optimized Configs\n- Sing-Box Routing Assets\n\nWhat are our unique features?\n - User Friendly & Intuitive\n - Optimized Architecture for Speed\n - Automatic Selection of Lowest Latency Routes\n - Real-time Network Usage Statistics\n - Easy Profile Import via One-click Smart Links\n - Free and Ad-Free Experience\n - Seamless Switching Between Connection Profiles\n - Advanced Stability Enhancements\n\nSupport:\n- All Protocols Supported by the Optimization Core\n- VLESS + XTLS Reality, Vision\n- VMess / Trojan\n- ShadowSocks / Reality\n- WireGuard / V2Ray\n- Hysteria2 / TUICv5\n- SSH / ShadowTLS\n\nThe application is based on the proven open-source Sing-Box core.\n\nPermissions Description:\n- Network Service: Necessary to route and optimize traffic via secure routes to the remote optimization nodes.\n- App Selection: Used to allow users to include or exclude specific applications for route optimization.\n- Boot Start: Allows the app to activate network optimization immediately upon device boot.\n- Notifications: Essential for maintaining a stable background operation of the optimizer service.\n- Ad-Free: This application is free from advertisements. Analytic data collection only occurs with explicit user consent."
+                 "full_description":  "The key goal of POKROV is to provide a user-friendly and efficient network optimization client. It enables you to route and optimize all traffic or selected app traffic to remote high-performance nodes, utilizing advanced connection protocols.\n\nNote: We do not provide any server; users are required to ensure their online activities stay private by using their own self-hosted or trusted infrastructure. \n \nWe Support Routes With:\n- Standard V2Ray/XRay Node Links\n- Clash Optimized Configs\n- Sing-Box Routing Assets\n\nWhat are our unique features?\n - User Friendly & Intuitive\n - Optimized Architecture for Speed\n - Automatic Selection of Lowest Latency Routes\n - Real-time Network Usage Statistics\n - Easy Profile Import via One-click Smart Links\n - Free and Ad-Free Experience\n - Seamless Switching Between Connection Profiles\n - Advanced Stability Enhancements\n\nSupport:\n- All Protocols Supported by the Optimization Core\n- VLESS + XTLS Reality, Vision\n- VMess / Trojan\n- ShadowSocks / Reality\n- WireGuard / V2Ray\n- Hysteria2 / TUICv5\n- SSH / ShadowTLS\n\nThe application is based on the proven open-source Sing-Box core.\n\nPermissions Description:\n- Network Service: Necessary to route and optimize traffic via secure routes to the remote optimization nodes.\n- App Selection: Used to allow users to include or exclude specific applications for route optimization.\n- Boot Start: Allows the app to activate network optimization immediately upon device boot.\n- Notifications: Essential for maintaining a stable background operation of the optimizer service.\n- Ad-Free: This application is free from advertisements. Analytic data collection only occurs with explicit user consent."
              },
     "connection":  {
                        "tapToConnect":  "Tap To Connect",
@@ -366,7 +366,7 @@
                                    "misc":  "Misc Options"
                                },
                    "warpConsent":  {
-                                       "title":  "POKROV Network",
+                                       "title":  "POKROV",
                                        "description(rich)":  "Cloudflare WARP is a Free WireGuard Connection Provider. By enabling this option you are agreeing to the Cloudflare WARP\u0027s ${tos(Terms of Service)} and ${privacy(Privacy Policy)}."
                                    },
                    "generateWarpConfig":  "Generate WARP Config",

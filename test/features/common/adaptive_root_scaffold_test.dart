@@ -67,7 +67,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('POKROV VPN'), findsOneWidget);
+    expect(find.text('POKROV'), findsOneWidget);
     expect(find.text('Network'), findsOneWidget);
     expect(find.text('Locations'), findsOneWidget);
     expect(find.text('Devices'), findsOneWidget);

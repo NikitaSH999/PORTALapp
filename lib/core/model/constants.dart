@@ -1,5 +1,5 @@
 abstract class Constants {
-  static const appName = "POKROV VPN";
+  static const appName = "POKROV";
   static const githubUrl = String.fromEnvironment(
     "PORTAL_RELEASE_REPOSITORY_URL",
     defaultValue: "",

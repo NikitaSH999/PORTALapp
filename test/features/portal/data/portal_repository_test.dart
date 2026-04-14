@@ -285,6 +285,18 @@ void main() {
       expect(experience.locations, hasLength(2));
       expect(experience.locations.map((item) => item.title),
           containsAll(<String>['Netherlands', 'Poland']));
+      expect(experience.locations.first.subtitle, equals('Optimized route'));
+      expect(experience.locations.last.subtitle, equals('Standby route'));
+      expect(
+        experience.locations.every(
+          (item) => !item.subtitle.contains('.example.test'),
+        ),
+        isTrue,
+      );
+      expect(
+        experience.locations.every((item) => !item.subtitle.contains(':443')),
+        isTrue,
+      );
       expect(experience.locations.every((item) => item.regionLabel == 'Region'),
           isTrue);
       expect(experience.supportThreads.single.messages, hasLength(1));

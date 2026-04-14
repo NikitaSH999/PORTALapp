@@ -7,7 +7,7 @@ import 'package:sqlite3/open.dart' as sqlite_open;
 const _sqliteDllCandidates = <String>[
   'build/windows/x64/runner/Release/sqlite3.dll',
   'build/windows/x64/plugins/sqlite3_flutter_libs/Release/sqlite3.dll',
-  'dist/tmp/pokrov-vpn/sqlite3.dll',
+  'dist/tmp/pokrov/sqlite3.dll',
 ];
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {

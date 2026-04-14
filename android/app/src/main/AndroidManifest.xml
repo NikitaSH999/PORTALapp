@@ -28,7 +28,7 @@
         android:name=".Application"
         android:banner="@mipmap/ic_banner"
         android:icon="@mipmap/ic_launcher"
-        android:label="POKROV VPN"
+        android:label="POKROV"
         android:roundIcon="@mipmap/ic_launcher_round"
         tools:targetApi="31">
 
@@ -74,8 +74,12 @@
                 <data android:scheme="clash" />
                 <data android:host="install-config" />
                 <data android:scheme="clashmeta" />
+                <data android:scheme="pokrov" />
+                <data android:host="install-sub" />
                 <data android:scheme="pokrovvpn" />
                 <data android:host="install-sub" />
+                <data android:scheme="pokrov" />
+                <data android:host="import" />
                 <data android:scheme="pokrovvpn" />
                 <data android:host="import" />
             </intent-filter>

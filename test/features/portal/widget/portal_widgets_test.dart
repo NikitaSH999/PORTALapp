@@ -28,7 +28,7 @@ void main() {
       accountId: 'acc_1',
       deviceName: 'Android phone',
       planCode: 'trial_5_days',
-      appVersion: '2.4.0',
+      appVersion: '0.9.0-beta',
       platform: 'android',
       operatingSystemVersion: '14',
       linkedTelegramId: 7001,
@@ -49,15 +49,14 @@ void main() {
     final uri = buildPortalSupportEmailUri(
       contactEmail: 'support@pokrov.space',
       diagnostics: diagnostics,
-      appLabel: 'POKROV VPN',
+      appLabel: 'POKROV',
     );
 
     expect(uri.toString(), contains('mailto:support@pokrov.space'));
-    expect(
-        uri.queryParameters['subject'], equals('POKROV VPN support request'));
+    expect(uri.queryParameters['subject'], equals('POKROV support request'));
     expect(text, contains('Account: acc_1'));
     expect(text, contains('Device: Android phone'));
-    expect(text, contains('App version: 2.4.0'));
+    expect(text, contains('App version: 0.9.0-beta'));
     expect(text, contains('Linked Telegram: @alice (7001)'));
     expect(text, contains('Routing mode: all_except_ru'));
     expect(text, contains('DNS policy: ru_direct_split'));

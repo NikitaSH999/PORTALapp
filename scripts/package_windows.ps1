@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
-$appSlug = if ($env:APP_SLUG) { $env:APP_SLUG } else { "pokrov-vpn" }
+$appSlug = if ($env:APP_SLUG) { $env:APP_SLUG } else { "pokrov" }
 $repoRoot = (Get-Location).Path
 $distDir = Join-Path $repoRoot "dist"
 $outDir = Join-Path $repoRoot "out"
@@ -9,6 +9,7 @@ $portableStageDir = Join-Path $distDir "tmp\$appSlug"
 $releaseRunnerDir = Join-Path $repoRoot "build\windows\x64\runner\Release"
 $msixConfigPath = Join-Path $repoRoot "windows\packaging\msix\make_config.yaml"
 $exeConfigPath = Join-Path $repoRoot "windows\packaging\exe\make_config.yaml"
+$builtMsixPath = Join-Path $releaseRunnerDir "pokrov-windows-setup-x64.msix"
 $canonicalExe = Join-Path $outDir "$appSlug-windows-setup-x64.exe"
 $canonicalMsix = Join-Path $outDir "$appSlug-windows-setup-x64.msix"
 $canonicalPortable = Join-Path $outDir "$appSlug-windows-portable-x64.zip"
@@ -76,23 +77,45 @@ foreach ($artifact in @($canonicalExe, $canonicalMsix, $canonicalPortable)) {
 $setupCandidate = Find-Artifact -pattern "*pokrov*setup*.exe" -description "Windows setup"
 Copy-Item $setupCandidate.FullName -Destination $canonicalExe -Force
 
-$msixCandidate = Find-Artifact -pattern "*.msix" -description "Windows MSIX"
-Copy-Item $msixCandidate.FullName -Destination $canonicalMsix -Force
+if (Test-Path $builtMsixPath) {
+    Copy-Item $builtMsixPath -Destination $canonicalMsix -Force
+} else {
+    $msixCandidate = Find-Artifact -pattern "*.msix" -description "Windows MSIX"
+    Copy-Item $msixCandidate.FullName -Destination $canonicalMsix -Force
+}
 
 $msixInspectDir = Join-Path $distDir "tmp\msix-inspect"
+ $msixZipPath = Join-Path $distDir "tmp\msix-inspect.zip"
 if (Test-Path $msixInspectDir) {
     Remove-Item -Path $msixInspectDir -Recurse -Force
 }
-Expand-Archive -Path $canonicalMsix -DestinationPath $msixInspectDir -Force
+if (Test-Path $msixZipPath) {
+    Remove-Item -Path $msixZipPath -Force
+}
+Copy-Item $canonicalMsix -Destination $msixZipPath -Force
+Expand-Archive -Path $msixZipPath -DestinationPath $msixInspectDir -Force
 $manifestPath = Join-Path $msixInspectDir "AppxManifest.xml"
 if (-not (Test-Path $manifestPath)) {
     throw "Packaged MSIX is missing AppxManifest.xml"
 }
 $manifestText = Get-Content -Path $manifestPath -Raw
-if ($manifestText -match 'hiddify') {
-    throw "Legacy Windows residue detected in MSIX manifest."
+$publicResiduePatterns = @(
+    '<DisplayName>[^<]*VPN[^<]*</DisplayName>',
+    '<PublisherDisplayName>[^<]*VPN[^<]*</PublisherDisplayName>',
+    '<Description>[^<]*VPN[^<]*</Description>',
+    '<uap:DefaultTile ShortName="[^"]*VPN[^"]*"',
+    '<uap:Protocol Name="pokrovvpn">',
+    '<uap:DisplayName>pokrovvpn URI Scheme</uap:DisplayName>',
+    '<DisplayName>[^<]*Hiddify[^<]*</DisplayName>',
+    '<PublisherDisplayName>[^<]*Hiddify[^<]*</PublisherDisplayName>',
+    '<Description>[^<]*Hiddify[^<]*</Description>',
+    '<uap:DefaultTile ShortName="[^"]*Hiddify[^"]*"'
+)
+if ($publicResiduePatterns | Where-Object { $manifestText -match $_ }) {
+    throw "Legacy public Windows residue detected in MSIX manifest."
 }
 Remove-Item -Path $msixInspectDir -Recurse -Force
+Remove-Item -Path $msixZipPath -Force
 
 if (-not (Test-Path $releaseRunnerDir)) {
     throw "Windows runner release directory not found at $releaseRunnerDir"

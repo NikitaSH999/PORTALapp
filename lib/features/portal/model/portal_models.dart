@@ -527,7 +527,7 @@ class PortalExperience {
       supportThreads: const [
         SupportThread(
           id: 1,
-          subject: 'Welcome to POKROV VPN',
+          subject: 'Welcome to POKROV',
           status: 'demo',
           messages: [
             SupportMessage(

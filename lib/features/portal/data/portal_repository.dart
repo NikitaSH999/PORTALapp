@@ -373,8 +373,7 @@ class PortalRepositoryImpl implements PortalRepository {
             fallback: _asString(data['code'], fallback: 'Access point'),
           ),
         ),
-        subtitle:
-            '${_asString(data['host'])}:${_asInt(data['port'], fallback: 443)}',
+        subtitle: _safeLocationSubtitle(data),
         regionLabel: 'Region',
         isActive: _asBool(data['enabled'], fallback: true),
       );
@@ -530,6 +529,14 @@ class PortalRepositoryImpl implements PortalRepository {
     final nestedUser = _map(payload['user']);
     if (nestedUser.isNotEmpty) return nestedUser;
     return payload;
+  }
+
+  String _safeLocationSubtitle(Map<String, dynamic> data) {
+    final isEnabled = _asBool(data['enabled'], fallback: true);
+    final isHealthy = _asBool(data['is_healthy'], fallback: isEnabled);
+    if (isEnabled && isHealthy) return 'Optimized route';
+    if (isEnabled) return 'Ready when needed';
+    return 'Standby route';
   }
 }
 

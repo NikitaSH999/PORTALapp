@@ -37,4 +37,41 @@ void main() {
     expect(find.text('Full tunnel'), findsOneWidget);
     expect(find.text('Global'), findsNothing);
   });
+
+  testWidgets(
+    'hides legacy desktop mode controls and shows admin guidance for full-device optimization',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({
+        'routing-mode': 'global',
+        'service-mode': 'vpn',
+      });
+      final preferences = await SharedPreferences.getInstance();
+
+      await tester.pumpWidget(
+        buildPremiumTestApp(
+          overrides: [
+            sharedPreferencesProvider.overrideWith((ref) => preferences),
+          ],
+          child: const Scaffold(
+            body: QuickSettingsModal(),
+          ),
+        ),
+      );
+
+      await tester.pumpAndSettle();
+
+      expect(find.text('Device optimization'), findsOneWidget);
+      expect(find.text('Advanced and recovery tools'), findsOneWidget);
+      expect(
+        find.text(
+          'Restart POKROV as Administrator before optimizing the whole device.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Open support'), findsOneWidget);
+      expect(find.byType(SwitchListTile), findsNothing);
+      expect(find.text('Proxy'), findsNothing);
+      expect(find.text('System proxy'), findsNothing);
+    },
+  );
 }

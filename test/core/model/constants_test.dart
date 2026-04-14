@@ -4,7 +4,7 @@ import 'package:hiddify/core/model/constants.dart';
 void main() {
   group('Constants', () {
     test('uses the final product name', () {
-      expect(Constants.appName, 'POKROV VPN');
+      expect(Constants.appName, 'POKROV');
     });
 
     test('uses branded support links', () {

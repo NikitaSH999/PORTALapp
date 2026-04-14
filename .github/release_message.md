@@ -25,15 +25,15 @@
     <tbody align=left>
         <tr>
         <td>Android</td><td>
-            <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-vpn-android-universal.apk"><img src="https://img.shields.io/badge/APK-Universal-044d29.svg?logo=android"></a><br>
-            <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-vpn-android-market.aab"><img src="https://img.shields.io/badge/AAB-Market-168039.svg?logo=android"></a>
+            <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-android-universal.apk"><img src="https://img.shields.io/badge/APK-Universal-044d29.svg?logo=android"></a><br>
+            <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-android-market.aab"><img src="https://img.shields.io/badge/AAB-Market-168039.svg?logo=android"></a>
         </td>
         </tr>
         <tr>
             <td>Windows</td><td>
-                <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-vpn-windows-setup-x64.msix"><img src="https://img.shields.io/badge/MSIX-x64-0078d7.svg?logo=windows"></a><br>
-                <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-vpn-windows-setup-x64.exe"><img src="https://img.shields.io/badge/Setup-x64-2d7d9a.svg?logo=windows"></a><br>
-                <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-vpn-windows-portable-x64.zip"><img src="https://img.shields.io/badge/Portable-x64-67b7d1.svg?logo=windows"></a>
+                <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-windows-setup-x64.msix"><img src="https://img.shields.io/badge/MSIX-x64-0078d7.svg?logo=windows"></a><br>
+                <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-windows-setup-x64.exe"><img src="https://img.shields.io/badge/Setup-x64-2d7d9a.svg?logo=windows"></a><br>
+                <a href="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-windows-portable-x64.zip"><img src="https://img.shields.io/badge/Portable-x64-67b7d1.svg?logo=windows"></a>
             </td>
         </tr>
     </tbody>

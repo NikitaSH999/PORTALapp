@@ -22,8 +22,8 @@ env:
   TARGET_NAME_AppImage: "Hiddify-Linux-x64"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
   TARGET_NAME_rpm: "Hiddify-rpm-x64"
-  TARGET_NAME_apk: "pokrov-vpn-android"
-  TARGET_NAME_aab: "pokrov-vpn-android"
+  TARGET_NAME_apk: "pokrov-android"
+  TARGET_NAME_aab: "pokrov-android"
   #TARGET_NAME_exe: "Hiddify-Windows-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
@@ -231,7 +231,7 @@ jobs:
         run: |
           mkdir out
           ls -R ./build/app/outputs
-          cp ./build/app/outputs/bundle/release/app-release.aab out/pokrov-vpn-android-market.aab || echo "no aab"
+          cp ./build/app/outputs/bundle/release/app-release.aab out/pokrov-android-market.aab || echo "no aab"
 
       - name: Copy to out unix
         if: startsWith(matrix.platform,'linux') || matrix.platform == 'macos' || matrix.platform == 'ios'
@@ -356,7 +356,7 @@ jobs:
           ls -R ./out
           ls -R ./.github/
           ls -R ./.git/
-          mv out/pokrov-vpn-android-market.aab  pokrov-vpn-android-market.aab
+          mv out/pokrov-android-market.aab  pokrov-android-market.aab
 
       - name: prepare_release_message
         env:
@@ -390,7 +390,7 @@ jobs:
           serviceAccountJson: service_account.json
           packageName: space.pokrov.vpn
           releaseName: ${{ env.TAG_NAME }}
-          releaseFiles: ./pokrov-vpn-android-market.aab
+          releaseFiles: ./pokrov-android-market.aab
           track: 'beta'
 
 

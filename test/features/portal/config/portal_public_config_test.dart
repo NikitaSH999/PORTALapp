@@ -6,7 +6,7 @@ void main() {
     test('uses branded defaults when no overrides are provided', () {
       final config = PortalPublicConfig.fromMap(const {});
 
-      expect(config.brandName, equals('POKROV VPN'));
+      expect(config.brandName, equals('POKROV'));
       expect(config.apiBaseUrl, equals('https://api.pokrov.space'));
       expect(config.webappUrl, equals('https://app.pokrov.space'));
       expect(config.checkoutUrl, equals('https://pay.pokrov.space/checkout'));
@@ -60,7 +60,7 @@ void main() {
         'PORTAL_BRAND_NAME': '',
       });
 
-      expect(config.brandName, equals('POKROV VPN'));
+      expect(config.brandName, equals('POKROV'));
       expect(config.apiBaseUrl, equals('https://api.pokrov.space'));
       expect(config.webappUrl, equals('https://app.pokrov.space'));
       expect(config.checkoutUrl, equals('https://pay.pokrov.space/checkout'));

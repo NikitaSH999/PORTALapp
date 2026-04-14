@@ -45,6 +45,8 @@ class SupportPage extends HookConsumerWidget {
                       appLabel: config.brandName,
                       isRussian: copy.isRussian,
                     );
+                    final hasSupportThreads = portal.hasProvisionedAccess &&
+                        portal.supportThreads.isNotEmpty;
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,19 +79,90 @@ class SupportPage extends HookConsumerWidget {
                                   ],
                                 ),
                               ),
+                              if (hasSupportThreads) ...[
+                                const Gap(16),
+                                PortalSectionCard(
+                                  tone: PortalSectionTone.neutral,
+                                  padding: const EdgeInsets.all(16),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      PremiumSectionHeader(
+                                        eyebrow: copy.needHelpEyebrow,
+                                        title: copy.supportThreadsTitle,
+                                        subtitle: copy.supportThreadsSubtitle,
+                                      ),
+                                      const Gap(14),
+                                      ...portal.supportThreads.map(
+                                        (thread) => Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 12,
+                                          ),
+                                          child: PortalSectionCard(
+                                            tone: PortalSectionTone.muted,
+                                            padding: const EdgeInsets.all(16),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        copy.localizeServerText(
+                                                          thread.subject,
+                                                        ),
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .titleMedium,
+                                                      ),
+                                                    ),
+                                                    PortalStatusBadge(
+                                                      label: copy.supportStatus(
+                                                        thread.status,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const Gap(10),
+                                                ...thread.messages.take(2).map(
+                                                      (message) => Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(
+                                                          bottom: 8,
+                                                        ),
+                                                        child: Text(
+                                                          copy.localizeServerText(
+                                                            message.body,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                               const Gap(16),
                               Wrap(
                                 spacing: 12,
                                 runSpacing: 12,
                                 children: [
-                                  FilledButton.icon(
-                                    onPressed: () => launchPortalLink(
-                                      context,
-                                      config.supportTelegramUrl,
+                                  if (supportDiagnostics.webappUrl.isNotEmpty)
+                                    FilledButton.icon(
+                                      onPressed: () => launchPortalLink(
+                                        context,
+                                        supportDiagnostics.webappUrl,
+                                      ),
+                                      icon: const Icon(Icons.open_in_browser),
+                                      label: Text(copy.continueInWebCabinet),
                                     ),
-                                    icon: const Icon(Icons.telegram),
-                                    label: Text(copy.openTelegramSupport),
-                                  ),
                                   OutlinedButton.icon(
                                     onPressed: () => launchPortalLink(
                                       context,
@@ -98,19 +171,14 @@ class SupportPage extends HookConsumerWidget {
                                     icon: const Icon(Icons.mail_outline),
                                     label: Text(copy.emailSupport),
                                   ),
-                                  if (supportDiagnostics.webappUrl.isNotEmpty)
-                                    OutlinedButton.icon(
-                                      onPressed: () => launchPortalLink(
-                                        context,
-                                        supportDiagnostics.webappUrl,
-                                      ),
-                                      icon: const Icon(Icons.open_in_browser),
-                                      label: Text(
-                                        copy.isRussian
-                                            ? 'Открыть веб-кабинет'
-                                            : 'Open web cabinet',
-                                      ),
+                                  OutlinedButton.icon(
+                                    onPressed: () => launchPortalLink(
+                                      context,
+                                      config.supportTelegramUrl,
                                     ),
+                                    icon: const Icon(Icons.telegram),
+                                    label: Text(copy.telegramSupportFallback),
+                                  ),
                                   OutlinedButton.icon(
                                     onPressed: () => copyPortalText(
                                       context,
@@ -142,51 +210,6 @@ class SupportPage extends HookConsumerWidget {
                             ),
                           ),
                         ),
-                        const Gap(16),
-                        if (portal.hasProvisionedAccess)
-                          ...portal.supportThreads.map(
-                            (thread) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: PortalSectionCard(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            copy.localizeServerText(
-                                              thread.subject,
-                                            ),
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
-                                          ),
-                                        ),
-                                        PortalStatusBadge(
-                                          label: copy.supportStatus(
-                                            thread.status,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const Gap(10),
-                                    ...thread.messages.take(2).map(
-                                          (message) => Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 8),
-                                            child: Text(
-                                              copy.localizeServerText(
-                                                message.body,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
                       ],
                     );
                   },

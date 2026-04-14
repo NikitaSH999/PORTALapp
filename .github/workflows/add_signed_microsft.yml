@@ -20,4 +20,4 @@ jobs:
       with:
         store-id: 9pdfnl3qv2s5
         token: ${{ secrets.GITHUB_TOKEN }}
-        asset-name-pattern: pokrov-vpn-windows-setup-x64		# Optional
+        asset-name-pattern: pokrov-windows-setup-x64		# Optional

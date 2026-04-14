@@ -1,18 +1,17 @@
-display_name: POKROV VPN
+display_name: POKROV
 
 icon: ..\..\assets\images\windows.ico
 
 keywords:
-  - POKROV VPN
-  - Proxy
-  - VPN
-  - V2ray
-  - Nekoray
+  - POKROV
+  - Secure access
+  - Private connection
+  - Smart routing
+  - Sing-Box
   - Xray
-  - Psiphon
-  - OpenVPN
+  - Resilient transport
 
-generic_name: POKROV VPN
+generic_name: POKROV
 
 actions:
   - name: Start

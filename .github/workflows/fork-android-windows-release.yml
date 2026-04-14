@@ -43,7 +43,7 @@ on:
       mirror_target_dir:
         description: "Target directory on mirror host"
         required: false
-        default: "/var/www/downloads/pokrov-vpn"
+        default: "/var/www/downloads/pokrov"
         type: string
   push:
     tags:
@@ -60,7 +60,7 @@ env:
   IS_GITHUB_ACTIONS: 1
   FLUTTER_VERSION: "3.24.0"
   NDK_VERSION: "r26d"
-  APP_SLUG: "pokrov-vpn"
+  APP_SLUG: "pokrov"
   APP_ANDROID_PACKAGE: ${{ vars.ANDROID_PACKAGE_NAME || 'space.pokrov.vpn' }}
 
 jobs:

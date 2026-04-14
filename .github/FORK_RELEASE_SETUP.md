@@ -50,6 +50,6 @@ Workflow: `.github/workflows/fork-android-windows-release.yml`
    - `pwsh external/client-fork/scripts/release_handoff.ps1`
    - `python external/client-fork/scripts/check_release_urls.py --env-file external/client-fork/release-links.env`
 
-Default artifact slug in this repo is `pokrov-vpn`.
-Default mirror path in this repo is `/var/www/downloads/pokrov-vpn`.
+Default artifact slug in this repo is `pokrov`.
+Default mirror path in this repo is `/var/www/downloads/pokrov`.
 Keep the Android namespace on the legacy `com.hiddify.hiddify` package unless you also migrate the Kotlin source tree under `android/app/src/main/kotlin`.

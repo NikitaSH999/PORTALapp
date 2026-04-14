@@ -87,7 +87,7 @@ PortalExperience buildPortalExperienceFixture({
     supportThreads: const [
       SupportThread(
         id: 1,
-        subject: 'Welcome to POKROV VPN',
+        subject: 'Welcome to POKROV',
         status: 'open',
         messages: [
           SupportMessage(

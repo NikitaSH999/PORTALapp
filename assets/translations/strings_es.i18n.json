@@ -1,6 +1,6 @@
 {
     "general":  {
-                    "appTitle":  "POKROV Network",
+                    "appTitle":  "POKROV",
                     "reset":  "Renicio",
                     "toggle":  {
                                    "enabled":  "Activado",
@@ -310,9 +310,9 @@
                                   }
                 },
     "play":  {
-                 "title":  "POKROV Network",
+                 "title":  "POKROV",
                  "short_description":  "Auto, SSH, VLESS, VMess, Trojan, Reality, Sing-Box, Clash, XRay, Shadowsocks",
-                 "full_description":  "El objetivo clave de POKROV Network es proporcionar un cliente de tunel seguro, facil de usar y eficiente. Le permite enrutar todo el trafico o el trafico de aplicaciones seleccionadas a un servidor remoto de su eleccion, utilizando el permiso del servicio VPN.Nota: No proporcionamos ningun servidor; Los usuarios deben garantizar que sus actividades en linea permanezcan privadas mediante el uso de su propio servidor autohospedado o servidores confiables. Soportamos servidores con:- Enlace de suscripcion normal a V2ray/Xray- Enlace de suscripcion a Choque- Enlace de suscripcion a Sing-Box?Cuales son nuestras caracteristicas unicas? - Facil de usar - Optimizado y Rapido - Seleccionar automaticamente LowestPing - Mostrar informacion de uso del usuario. - Importe facilmente un subvinculo con un solo clic mediante enlaces profundos - Gratis y sin anuncios - Cambie facilmente los subvinculos de usuario - mas y masApoyo:- Todos los protocolos soportados por Sing-Box- VLESS + xtls realidad, vision- VMESS- troyano- Calcetines Shoadow- Realidad-V2ray-Histria2-TUIC-SSH- SombraTLSEl nucleo de la aplicacion se basa en sing-box de codigo abierto. Descripcion del permiso:- Servicio VPN: como el objetivo de esta aplicacion es proporcionar un cliente de tunel seguro, facil de usar y eficiente, necesitamos este permiso para poder enrutar el trafico a traves del tunel al servidor remoto.- CONSULTAR TODOS LOS PAQUETES: este permiso se utiliza para permitir a los usuarios incluir o excluir aplicaciones especificas para la tunelizacion.- RECIBIR ARRANQUE COMPLETADO: este permiso se puede habilitar o deshabilitar desde la configuracion de la aplicacion para activar esta aplicacion al iniciar el dispositivo.- PUBLICAR NOTIFICACIONES: este permiso es esencial ya que empleamos un servicio en primer plano para garantizar el funcionamiento continuo del servicio VPN.- Esta aplicacion esta libre de publicidad. Los datos analiticos y de fallos solo se producen con el consentimiento explicito del usuario en el primer uso de la aplicacion."
+                 "full_description":  "El objetivo clave de POKROV es proporcionar un cliente de tunel seguro, facil de usar y eficiente. Le permite enrutar todo el trafico o el trafico de aplicaciones seleccionadas a un servidor remoto de su eleccion, utilizando el permiso del servicio VPN.Nota: No proporcionamos ningun servidor; Los usuarios deben garantizar que sus actividades en linea permanezcan privadas mediante el uso de su propio servidor autohospedado o servidores confiables. Soportamos servidores con:- Enlace de suscripcion normal a V2ray/Xray- Enlace de suscripcion a Choque- Enlace de suscripcion a Sing-Box?Cuales son nuestras caracteristicas unicas? - Facil de usar - Optimizado y Rapido - Seleccionar automaticamente LowestPing - Mostrar informacion de uso del usuario. - Importe facilmente un subvinculo con un solo clic mediante enlaces profundos - Gratis y sin anuncios - Cambie facilmente los subvinculos de usuario - mas y masApoyo:- Todos los protocolos soportados por Sing-Box- VLESS + xtls realidad, vision- VMESS- troyano- Calcetines Shoadow- Realidad-V2ray-Histria2-TUIC-SSH- SombraTLSEl nucleo de la aplicacion se basa en sing-box de codigo abierto. Descripcion del permiso:- Servicio VPN: como el objetivo de esta aplicacion es proporcionar un cliente de tunel seguro, facil de usar y eficiente, necesitamos este permiso para poder enrutar el trafico a traves del tunel al servidor remoto.- CONSULTAR TODOS LOS PAQUETES: este permiso se utiliza para permitir a los usuarios incluir o excluir aplicaciones especificas para la tunelizacion.- RECIBIR ARRANQUE COMPLETADO: este permiso se puede habilitar o deshabilitar desde la configuracion de la aplicacion para activar esta aplicacion al iniciar el dispositivo.- PUBLICAR NOTIFICACIONES: este permiso es esencial ya que empleamos un servicio en primer plano para garantizar el funcionamiento continuo del servicio VPN.- Esta aplicacion esta libre de publicidad. Los datos analiticos y de fallos solo se producen con el consentimiento explicito del usuario en el primer uso de la aplicacion."
              },
     "connection":  {
                        "tapToConnect":  "Toque para conectarse",
@@ -355,7 +355,7 @@
                                    "misc":  "Opciones varias"
                                },
                    "warpConsent":  {
-                                       "title":  "POKROV Network",
+                                       "title":  "POKROV",
                                        "description(rich)":  "Cloudflare WARP es un proveedor de VPN WireGuard gratuito. Al habilitar esta opcion, acepta los ${tos(Terminos de servicio)} y ${privacy(Politica de privacidad)} de Cloudflare WARP."
                                    },
                    "generateWarpConfig":  "Generar configuracion WARP",

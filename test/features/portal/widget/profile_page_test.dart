@@ -21,13 +21,18 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Profile'), findsOneWidget);
-    expect(find.text('POKROV Network account'), findsOneWidget);
+    expect(find.text('POKROV account'), findsOneWidget);
     expect(find.text('+10 bonus days with Telegram'), findsOneWidget);
     expect(find.text('Link Telegram'), findsOneWidget);
     expect(find.text('Check bonus'), findsOneWidget);
-    expect(find.text('Settings recovery'), findsOneWidget);
+    expect(find.text('Access stays ready'), findsOneWidget);
     expect(find.text('Apps and documents'), findsOneWidget);
     expect(find.text('Open advanced settings'), findsOneWidget);
+    expect(find.text('Advanced recovery tools'), findsOneWidget);
+    expect(find.text('Settings recovery'), findsNothing);
+    expect(find.text('Manual recovery'), findsNothing);
+    expect(find.textContaining('portal.example.test/sub/trial'), findsNothing);
+    expect(find.textContaining('format=smart'), findsNothing);
     expect(find.text('Fallback connection link'), findsNothing);
   });
 }

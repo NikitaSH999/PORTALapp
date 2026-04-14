@@ -34,13 +34,13 @@ void main() {
           appInfoProvider.overrideWith(
             () => _FakeAppInfo(
               AppInfoEntity(
-              name: 'POKROV VPN',
-              version: '2.4.0',
-              buildNumber: '240',
-              release: Release.general,
-              operatingSystem: 'android',
-              operatingSystemVersion: '14',
-              environment: Environment.prod,
+                name: 'POKROV',
+                version: '2.4.0',
+                buildNumber: '240',
+                release: Release.general,
+                operatingSystem: 'android',
+                operatingSystemVersion: '14',
+                environment: Environment.prod,
               ),
             ),
           ),
@@ -54,12 +54,15 @@ void main() {
     expect(find.text('Support'), findsOneWidget);
     expect(find.text('Get help fast'), findsOneWidget);
     expect(find.text('Android device\nAccount acc_1'), findsOneWidget);
-    expect(find.text('Open Telegram support'), findsOneWidget);
+    expect(find.text('Recent requests'), findsOneWidget);
+    expect(find.text('Continue in web cabinet'), findsOneWidget);
+    expect(find.text('Open Telegram fallback'), findsOneWidget);
     expect(find.text('Email support'), findsOneWidget);
-    expect(find.text('Open web cabinet'), findsOneWidget);
     expect(find.text('Copy diagnostics'), findsOneWidget);
+    expect(find.text('Chat with support now'), findsNothing);
     expect(find.byType(TextField), findsNothing);
     expect(find.text('Billing issue'), findsOneWidget);
+    expect(find.textContaining('App version: 2.4.0-beta'), findsOneWidget);
     expect(find.textContaining('Routing mode: all_except_ru'), findsOneWidget);
     expect(find.textContaining('Ruleset: 2026.04.13.rules'), findsOneWidget);
     expect(

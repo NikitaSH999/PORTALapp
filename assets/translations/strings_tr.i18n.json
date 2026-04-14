@@ -1,6 +1,6 @@
 {
     "general":  {
-                    "appTitle":  "POKROV Network",
+                    "appTitle":  "POKROV",
                     "reset":  "S?f?rla",
                     "toggle":  {
                                    "enabled":  "Etkin",
@@ -317,9 +317,9 @@
                                   }
                 },
     "play":  {
-                 "title":  "POKROV Network",
+                 "title":  "POKROV",
                  "short_description":  "Otomatik, SSH, VLESS, Vmess, Trojan, Reality, Sing-Box, Clash, Xray, Shadowsocks",
-                 "full_description":  "POKROV Network\u0027in temel hedefi guvenli, kullan?c? dostu ve verimli bir tunel istemcisi saglamakt?r. Network Hizmeti iznini kullanarak tum trafigi veya secilen uygulama trafigini sectiginiz uzak bir sunucuya yonlendirmenizi saglar. Not: Herhangi bir sunucu saglam?yoruz; kullan?c?lar?n kendi bar?nd?r?lan sunucular?n? veya guvenilir sunucular?n? kullanarak cevrimici etkinliklerinin gizli kalmas?n? saglamalar? gerekir. Sunucular? asag?dakilerle destekliyoruz: - Normal V2ray/Xray Abonelik Baglant?s? - Clash Abonelik Baglant?s? - Sing-Box Abonelik Baglant?s? Benzersiz ozelliklerimiz nelerdir? - Kullan?c? Dostu - Optimize Edilmis ve H?zl? - En Dusuk Ping\u0027i otomatik olarak secin - Kullan?c? kullan?m bilgilerini gosterin - Derin baglant? kullanarak tek t?klamayla alt baglant?y? kolayca ice aktar?n - Ucretsiz ve ADS Yok - Kullan?c? alt baglant?lar?n? kolayca degistirin - giderek daha fazla Destek: - Sing-Box taraf?ndan desteklenen tum Protokoller - VLESS + xtls gerceklik, vizyon - VMESS - Trojan - ShoadowSocks - Reality - V2ray - Hystria2 - TUIC - SSH - ShadowTLS Uygulama cekirdegi acik kaynakli Sing-Box tabanlidir. Izin Ac?klamas?: - Network Hizmeti: Bu uygulaman?n amac? guvenli, kullan?c? dostu ve verimli bir tunel istemcisi saglamak oldugundan, trafigi tunel arac?l?g?yla uzak sunucuya yonlendirebilmek icin bu izne ihtiyac?m?z var. - TUM PAKETLERI SORGULAYIN: Bu izin, kullan?c?lar?n tunelleme icin belirli uygulamalar? dahil etmesine veya haric tutmas?na izin vermek icin kullan?l?r. - ALMA ONYUKLEME TAMAMLANDI: Bu izin, cihaz onyuklemesi s?ras?nda bu uygulamay? etkinlestirmek icin uygulama ayarlar?ndan etkinlestirilebilir veya devre d?s? b?rak?labilir. - BILDIRIMLER SONRASI: Network Hizmetinin surekli cal?smas?n? saglamak icin bir on plan hizmeti kulland?g?m?z icin bu izin onemlidir. - Bu uygulama reklam icermez. Analitik ve kilitlenme verileri yaln?zca uygulaman?n ilk kullan?m?nda kullan?c?n?n ac?k r?zas? ile gerceklesir."
+                 "full_description":  "POKROV\u0027in temel hedefi guvenli, kullan?c? dostu ve verimli bir tunel istemcisi saglamakt?r. Network Hizmeti iznini kullanarak tum trafigi veya secilen uygulama trafigini sectiginiz uzak bir sunucuya yonlendirmenizi saglar. Not: Herhangi bir sunucu saglam?yoruz; kullan?c?lar?n kendi bar?nd?r?lan sunucular?n? veya guvenilir sunucular?n? kullanarak cevrimici etkinliklerinin gizli kalmas?n? saglamalar? gerekir. Sunucular? asag?dakilerle destekliyoruz: - Normal V2ray/Xray Abonelik Baglant?s? - Clash Abonelik Baglant?s? - Sing-Box Abonelik Baglant?s? Benzersiz ozelliklerimiz nelerdir? - Kullan?c? Dostu - Optimize Edilmis ve H?zl? - En Dusuk Ping\u0027i otomatik olarak secin - Kullan?c? kullan?m bilgilerini gosterin - Derin baglant? kullanarak tek t?klamayla alt baglant?y? kolayca ice aktar?n - Ucretsiz ve ADS Yok - Kullan?c? alt baglant?lar?n? kolayca degistirin - giderek daha fazla Destek: - Sing-Box taraf?ndan desteklenen tum Protokoller - VLESS + xtls gerceklik, vizyon - VMESS - Trojan - ShoadowSocks - Reality - V2ray - Hystria2 - TUIC - SSH - ShadowTLS Uygulama cekirdegi acik kaynakli Sing-Box tabanlidir. Izin Ac?klamas?: - Network Hizmeti: Bu uygulaman?n amac? guvenli, kullan?c? dostu ve verimli bir tunel istemcisi saglamak oldugundan, trafigi tunel arac?l?g?yla uzak sunucuya yonlendirebilmek icin bu izne ihtiyac?m?z var. - TUM PAKETLERI SORGULAYIN: Bu izin, kullan?c?lar?n tunelleme icin belirli uygulamalar? dahil etmesine veya haric tutmas?na izin vermek icin kullan?l?r. - ALMA ONYUKLEME TAMAMLANDI: Bu izin, cihaz onyuklemesi s?ras?nda bu uygulamay? etkinlestirmek icin uygulama ayarlar?ndan etkinlestirilebilir veya devre d?s? b?rak?labilir. - BILDIRIMLER SONRASI: Network Hizmetinin surekli cal?smas?n? saglamak icin bir on plan hizmeti kulland?g?m?z icin bu izin onemlidir. - Bu uygulama reklam icermez. Analitik ve kilitlenme verileri yaln?zca uygulaman?n ilk kullan?m?nda kullan?c?n?n ac?k r?zas? ile gerceklesir."
              },
     "connection":  {
                        "tapToConnect":  "Baglanmak icin dokunun",
@@ -366,7 +366,7 @@
                                    "misc":  "Cesitli Secenekler"
                                },
                    "warpConsent":  {
-                                       "title":  "POKROV Network",
+                                       "title":  "POKROV",
                                        "description(rich)":  "Cloudflare WARP ucretsiz bir WireGuard Protocol saglay?c?s?d?r. Bu secenegi etkinlestirerek Cloudflare WARP\u0027?n ${tos(Hizmet Sartlar?)} ve ${privacy(Gizlilik Politikas?)}\u0027n? kabul etmis olursunuz."
                                    },
                    "generateWarpConfig":  "WARP Yap?land?rmas? Olustur",

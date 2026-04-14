@@ -205,7 +205,7 @@ void main() {
       sessionStore: _MemoryPortalSessionStore(),
       loadProfileRepository: () async => profileRepository,
       appInfo: AppInfoEntity(
-        name: 'POKROV VPN',
+        name: 'POKROV',
         version: '1.0.0',
         buildNumber: '100',
         release: Release.general,
@@ -303,7 +303,7 @@ void main() {
       sessionStore: _MemoryPortalSessionStore(),
       loadProfileRepository: () async => profileRepository,
       appInfo: AppInfoEntity(
-        name: 'POKROV VPN',
+        name: 'POKROV',
         version: '1.0.0',
         buildNumber: '100',
         release: Release.general,

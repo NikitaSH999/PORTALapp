@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
     <channel>
-        <title>POKROV VPN Release Feed</title>
+        <title>POKROV Release Feed</title>
         <item>
             <title>Version RELEASE_VERSION</title>
             <pubDate>RELEASE_PUB_DATE</pubDate>
             <enclosure
-                url="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-vpn-android-universal.apk"
+                url="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-android-universal.apk"
                 sparkle:version="RELEASE_VERSION"
                 sparkle:os="android" />
         </item>
@@ -14,7 +14,7 @@
             <title>Version RELEASE_VERSION</title>
             <pubDate>RELEASE_PUB_DATE</pubDate>
             <enclosure
-                url="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-vpn-windows-setup-x64.exe"
+                url="https://github.com/RELEASE_REPOSITORY/releases/download/RELEASE_TAG/pokrov-windows-setup-x64.exe"
                 sparkle:version="RELEASE_VERSION"
                 sparkle:os="windows" />
         </item>

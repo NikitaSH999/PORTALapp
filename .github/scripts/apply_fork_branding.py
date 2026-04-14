@@ -112,23 +112,31 @@ def _rewrite_android_manifest(text: str, brand_name: str, uri_scheme: str) -> st
         r'android:label="[^"]+"',
         f'android:label="{brand_name}"',
     )
-    out = _replace(
-        out,
-        r'(<data android:scheme=")[^"]+(" />\s*[\r\n]+\s*<data android:host="install-sub" />)',
-        rf"\g<1>{uri_scheme}\2",
-    )
-    out = _replace(
-        out,
-        r'(<data android:scheme=")[^"]+(" />\s*[\r\n]+\s*<data android:host="import" />)',
-        rf"\g<1>{uri_scheme}\2",
-    )
+
+    def _rewrite_scheme_for_host(current: str, host: str) -> str:
+        pattern = re.compile(
+            rf'<data android:scheme="[^"]+" />\s*<data android:host="{re.escape(host)}" />',
+            flags=re.MULTILINE,
+        )
+        replacement = (
+            f'<data android:scheme="{uri_scheme}" />\n'
+            f'                <data android:scheme="pokrovvpn" />\n'
+            f'                <data android:host="{host}" />'
+        )
+        updated, n = pattern.subn(replacement, current, count=1)
+        if n == 0:
+            raise RuntimeError(f"pattern not found for Android manifest host: {host}")
+        return updated
+
+    out = _rewrite_scheme_for_host(out, "install-sub")
+    out = _rewrite_scheme_for_host(out, "import")
     return out
 
 
 def main() -> int:
     app_root = Path(__file__).resolve().parents[2]
 
-    brand_name = _read_env("FORK_BRAND_NAME", "POKROV VPN")
+    brand_name = _read_env("FORK_BRAND_NAME", "POKROV")
     repo_url = _read_env("FORK_REPO_URL", "")
     if not repo_url:
         gh_repo = _read_env("GITHUB_REPOSITORY", "")
@@ -146,7 +154,7 @@ def main() -> int:
         "FORK_ANDROID_TEST_NAMESPACE",
         "test.com.hiddify.hiddify",
     )
-    uri_scheme = _read_env("FORK_URI_SCHEME", "pokrovvpn")
+    uri_scheme = _read_env("FORK_URI_SCHEME", "pokrov")
 
     windows_identity_name = _read_env("FORK_WINDOWS_IDENTITY_NAME", "Pokrov.Vpn")
     windows_publisher_name = _read_env("FORK_WINDOWS_PUBLISHER_NAME", brand_name)
@@ -156,6 +164,10 @@ def main() -> int:
     )
     windows_install_dir = _read_env("FORK_WINDOWS_INSTALL_DIR", brand_name)
     exe_stem = _read_env("FORK_WINDOWS_EXE_STEM", "POKROVVPN")
+    windows_output_base_file_name = _read_env(
+        "FORK_WINDOWS_OUTPUT_BASE_FILE_NAME",
+        "pokrov-windows-setup-x64",
+    )
     exe_name = f"{exe_stem}.exe"
     copyright_line = _read_env(
         "FORK_COPYRIGHT",
@@ -271,7 +283,7 @@ def main() -> int:
             publisher_url=windows_publisher_url,
             display_name=brand_name,
             exe_name=exe_name,
-            output_base_file_name=f"{exe_stem}-setup",
+            output_base_file_name=windows_output_base_file_name,
             install_dir_name=f'"{{autopf64}}\\\\{windows_install_dir}"',
         ),
     )

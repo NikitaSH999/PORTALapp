@@ -6,7 +6,7 @@ import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/widget/animated_visibility.dart';
 import 'package:hiddify/core/widget/shimmer_skeleton.dart';
 import 'package:hiddify/features/proxy/active/active_proxy_notifier.dart';
-import 'package:hiddify/features/proxy/active/ip_widget.dart';
+import 'package:hiddify/features/proxy/model/ip_info_entity.dart';
 import 'package:hiddify/features/proxy/model/proxy_failure.dart';
 import 'package:hiddify/features/stats/notifier/stats_notifier.dart';
 import 'package:hiddify/gen/fonts.gen.dart';
@@ -28,87 +28,92 @@ class ActiveProxyFooter extends HookConsumerWidget {
       child: switch (activeProxy) {
         AsyncData(value: final proxy) => Padding(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  child: Column(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final isCompact = constraints.maxWidth < 520;
+                final summary = Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _InfoProp(
+                      icon: FluentIcons.arrow_routing_20_regular,
+                      text: proxy.selectedName.isNotNullOrBlank
+                          ? proxy.selectedName!
+                          : proxy.name,
+                      semanticLabel: t.proxies.activeProxySemanticLabel,
+                    ),
+                    const Gap(8),
+                    _PrivacyStatus(ipInfo: ipInfo),
+                  ],
+                );
+
+                if (isCompact) {
+                  return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _InfoProp(
-                        icon: FluentIcons.arrow_routing_20_regular,
-                        text: proxy.selectedName.isNotNullOrBlank
-                            ? proxy.selectedName!
-                            : proxy.name,
-                        semanticLabel: t.proxies.activeProxySemanticLabel,
-                      ),
-                      const Gap(8),
-                      switch (ipInfo) {
-                        AsyncData(value: final info) => Row(
-                            children: [
-                              IPCountryFlag(countryCode: info.countryCode),
-                              const Gap(8),
-                              IPText(
-                                ip: info.ip,
-                                onLongPress: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
-                                },
-                              ),
-                            ],
-                          ),
-                        AsyncError(error: final UnknownIp _) => Row(
-                            children: [
-                              const Icon(FluentIcons.arrow_sync_20_regular),
-                              const Gap(8),
-                              UnknownIPText(
-                                text: t.proxies.checkIp,
-                                onTap: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
-                                },
-                              ),
-                            ],
-                          ),
-                        AsyncError() => Row(
-                            children: [
-                              const Icon(FluentIcons.error_circle_20_regular),
-                              const Gap(8),
-                              UnknownIPText(
-                                text: t.proxies.unknownIp,
-                                onTap: () async {
-                                  ref
-                                      .read(ipInfoNotifierProvider.notifier)
-                                      .refresh();
-                                },
-                              ),
-                            ],
-                          ),
-                        _ => const Row(
-                            children: [
-                              Icon(FluentIcons.question_circle_20_regular),
-                              Gap(8),
-                              Flexible(
-                                child: ShimmerSkeleton(
-                                  height: 16,
-                                  widthFactor: 1,
-                                ),
-                              ),
-                            ],
-                          ),
-                      },
+                      summary,
+                      const Gap(12),
+                      const _StatsColumn(),
                     ],
-                  ),
-                ),
-                const _StatsColumn(),
-              ],
+                  );
+                }
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Flexible(child: summary),
+                    const Gap(12),
+                    const _StatsColumn(),
+                  ],
+                );
+              },
             ),
           ),
         _ => const SizedBox(),
       },
     );
+  }
+}
+
+class _PrivacyStatus extends StatelessWidget {
+  const _PrivacyStatus({required this.ipInfo});
+
+  final AsyncValue<IpInfo> ipInfo;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (ipInfo) {
+      AsyncData(value: final info) => _InfoProp(
+          icon: FluentIcons.shield_20_regular,
+          text: _hiddenAddressLabel(info.countryCode),
+        ),
+      AsyncError(error: final UnknownIp _) => const _InfoProp(
+          icon: FluentIcons.shield_20_regular,
+          text: 'Connection details hidden',
+        ),
+      AsyncError() => const _InfoProp(
+          icon: FluentIcons.shield_error_20_regular,
+          text: 'Visibility check unavailable',
+        ),
+      _ => const Row(
+          children: [
+            Icon(FluentIcons.shield_20_regular),
+            Gap(8),
+            Flexible(
+              child: ShimmerSkeleton(
+                height: 16,
+                widthFactor: 1,
+              ),
+            ),
+          ],
+        ),
+    };
+  }
+
+  String _hiddenAddressLabel(String countryCode) {
+    final normalizedCode = countryCode.trim().toUpperCase();
+    if (normalizedCode.isEmpty) return 'Connection details hidden';
+    return 'Connection details hidden ($normalizedCode)';
   }
 }
 
@@ -123,22 +128,21 @@ class _StatsColumn extends HookConsumerWidget {
     return Directionality(
       textDirection: TextDirection.values[
           (Directionality.of(context).index + 1) % TextDirection.values.length],
-      child: Flexible(
-        child: Column(
-          children: [
-            _InfoProp(
-              icon: FluentIcons.arrow_bidirectional_up_down_20_regular,
-              text: (stats?.downlinkTotal ?? 0).size(),
-              semanticLabel: t.stats.totalTransferred,
-            ),
-            const Gap(8),
-            _InfoProp(
-              icon: FluentIcons.arrow_download_20_regular,
-              text: (stats?.downlink ?? 0).speed(),
-              semanticLabel: t.stats.speed,
-            ),
-          ],
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _InfoProp(
+            icon: FluentIcons.arrow_bidirectional_up_down_20_regular,
+            text: (stats?.downlinkTotal ?? 0).size(),
+            semanticLabel: t.stats.totalTransferred,
+          ),
+          const Gap(8),
+          _InfoProp(
+            icon: FluentIcons.arrow_download_20_regular,
+            text: (stats?.downlink ?? 0).speed(),
+            semanticLabel: t.stats.speed,
+          ),
+        ],
       ),
     );
   }

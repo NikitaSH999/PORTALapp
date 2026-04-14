@@ -2,7 +2,7 @@
 
 class PortalSharedProductFacts {
   static const platformBrand = 'POKROV';
-  static const clientBrand = 'POKROV VPN';
+  static const clientBrand = 'POKROV';
   static const canonicalTrialDays = 5;
   static const telegramRewardDays = 10;
   static const publicPlatformScope = <String>['android', 'windows'];

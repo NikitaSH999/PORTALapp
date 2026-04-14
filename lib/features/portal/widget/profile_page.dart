@@ -222,34 +222,22 @@ class ProfilePage extends HookConsumerWidget {
                             children: [
                               PremiumSectionHeader(
                                 eyebrow: copy.recoveryEyebrow,
-                                title: copy.recoveryTitle,
-                                subtitle: copy.recoverySubtitle,
+                                title: copy.accessReadyTitle,
+                                subtitle: copy.accessReadySubtitle,
                               ),
                               const Gap(14),
                               PortalListRow(
-                                title: copy.primaryConnectionLink,
-                                subtitle: portal.importPayload.smartUrl.isEmpty
-                                    ? copy.noConnectionLinkYet
-                                    : portal.importPayload.smartUrl,
+                                title: copy.automaticSyncTitle,
+                                subtitle: copy.automaticSyncSubtitle,
                                 leading: const PremiumIconOrb(
-                                  icon: Icons.key_rounded,
+                                  icon: Icons.sync_rounded,
                                   size: 42,
-                                ),
-                                trailing: IconButton(
-                                  onPressed:
-                                      portal.importPayload.smartUrl.isEmpty
-                                          ? null
-                                          : () => copyPortalText(
-                                                context,
-                                                portal.importPayload.smartUrl,
-                                              ),
-                                  icon: const Icon(Icons.copy_rounded),
                                 ),
                               ),
                               const Gap(10),
                               PortalListRow(
-                                title: copy.manualRecovery,
-                                subtitle: copy.manualRecoverySubtitle,
+                                title: copy.advancedRecoveryTools,
+                                subtitle: copy.advancedRecoveryToolsSubtitle,
                                 leading: const PremiumIconOrb(
                                   icon: Icons.settings_suggest_rounded,
                                   size: 42,

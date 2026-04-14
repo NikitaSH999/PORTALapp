@@ -1,11 +1,11 @@
 app_id: 6L903538-42B1-4596-G479-BJ779F21A65D
-publisher: POKROV VPN
+publisher: POKROV
 publisher_url: https://pokrov.space/
-display_name: POKROV VPN
+display_name: POKROV
 executable_name: POKROVVPN.exe
-output_base_file_name: pokrov-vpn-windows-setup-x64
+output_base_file_name: pokrov-windows-setup-x64
 create_desktop_icon: true
-install_dir_name: "{autopf64}\\POKROV VPN"
+install_dir_name: "{autopf64}\\POKROV"
 setup_icon_file: windows\runner\resources\app_icon.ico
 locales:
   - ar

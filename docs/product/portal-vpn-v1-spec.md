@@ -1,14 +1,14 @@
 # POKROV VPN v1 Product Spec
 
-Last updated: 2026-04-12
+Last updated: 2026-04-14
 
 ## Document Status
 
-This file is the living client product spec for `POKROV VPN`.
+This file is the living client product spec for `POKROV`.
 
 ## Summary
 
-`POKROV VPN` is a `consumer-first`, `app-first` VPN application for `Android` and `Windows`.
+`POKROV` is a `consumer-first`, `app-first` connectivity application for `Android` and `Windows`.
 
 `iOS` and `macOS` are not part of the full public `v1` promise. In this release wave they stay in readiness, packaging, and signing-preparation status only.
 
@@ -21,10 +21,13 @@ The target journey is:
 
 Telegram must remain optional for first use. It is a growth, recovery, and reward channel, not the primary login wall.
 Bot purchase and recovery paths stay valid, but they do not replace the main app-first public journey.
+Browser continuation may also use additive email auth on the site and cabinet without replacing the app-first model.
+That browser email path is only trustworthy when transactional sender identity and delivery-confirmation or webhook visibility are live.
 
 ## Locked Product Decisions
 
-- product name: `POKROV VPN`
+- product name: `POKROV`
+- legacy client identifier: `POKROV VPN` only where compatibility removal is not yet feasible
 - UX direction: `consumer-first`
 - account model: `app-first`
 - full public `v1` scope: `Android + Windows`
@@ -33,6 +36,7 @@ Bot purchase and recovery paths stay valid, but they do not replace the main app
 - `xray` support: advanced compatibility fallback only
 - free trial: `5 days`
 - Telegram reward: `+10 days`
+- public user-facing version line: `0.x.x-beta`
 - recommended public routing mode: `All except RU`
 - public routing mode set: `All except RU` and `Full tunnel`
 
@@ -41,9 +45,11 @@ Bot purchase and recovery paths stay valid, but they do not replace the main app
 - public `v1` scope remains `Android + Windows`
 - `Windows` can continue through the normal public release path when its gates are green
 - `Android` is release-blocked until a real release-build audit proves that local proxy, DNS, command, and admin/control listeners are not exposed without acceptable protection
-- as of `2026-04-12`, `python scripts/release_orchestrator.py --gates-only` is green for the documented repo/static/client gate pack, but final Android publication still requires a connected-device `android_localhost_audit.py` run against a release-installed build
+- as of `2026-04-13`, `python scripts/release_orchestrator.py --gates-only` is green for the documented repo/static/client gate pack, but final Android publication still requires a connected-device `android_localhost_audit.py` run against a release-installed build
+- that local green gate snapshot does not yet prove live deploy, live node enablement, or separate `current-origin`, `brain-origin`, and `RU-origin` checks
 - when `release_gate_check.py` includes `android-apk` or `android-aab`, it must require `ANDROID_AUDIT_SERIAL` and treat emulator serials only as adb rehearsal, not as final sign-off
 - release builds must start from a clean `libcore` checkout pinned to the SHA recorded by the parent client repo; `python scripts/run_client_release_gate.py preflight` is the canonical repo-local proof for that condition
+- production Android signing is still mandatory for publication; debug-keystore fallback is local-smoke-only
 - `Clash API` must stay disabled by default in the shipping client; any future use remains explicit advanced opt-in only until the Android local-surface audit is fully closed
 - do not tell users that split tunneling, Private Space, Knox, Shelter, or similar app isolation tools are enough to compensate for an unauthenticated local control surface unless a dedicated security review has proven that claim
 
@@ -75,6 +81,24 @@ The home screen should show:
 - current location or best location
 - trial or subscription state
 - quick access to devices, profile, and support
+- safe route labels instead of raw `host:port`, public IP, or other low-level node internals
+- stable behavior that keeps the previous node when the gain is too small instead of flapping between nearby options
+
+### Route-mode choice after activation
+
+Before the first live route activation, the app must ask how this device should be optimized:
+
+- `Optimize everything on this device` is the recommended default and stays `TUN`-first
+- `Only selected apps` is the consumer split-tunneling path
+
+Public UX rules for that choice:
+
+- Windows should open an executable or process picker for the selected-apps path
+- Android should open an installed-app picker for the selected-apps path
+- the chosen route mode must persist per device and remain editable later from a dedicated route-mode screen
+- the persisted route state should travel through backend-owned `route_mode`, `selected_apps`, `requires_elevated_privileges`, and mirrored `route_policy.*` fields so app, cabinet, and support all see one truth
+- if desktop `TUN` needs elevated rights, the app must explain that before connect and guide the user to relaunch as administrator
+- first-layer UI must not force normal users through raw system-proxy, service-mode, or low-level transport toggles
 
 ### Before trial activation
 
@@ -135,13 +159,32 @@ Support should be reachable from:
 Current client behavior for `v1`:
 
 - app support should prepare account and device context before handing the user into Telegram or email
+- app support should be reachable directly from inside the client instead of forcing the user to leave the app first
 - the client must not pretend there is a realtime in-app support chat unless such a backend actually exists
+- authenticated browser and cabinet support should continue as a real ticket flow with thread replies and file uploads instead of a decorative contact form
 - public recovery order stays `POKROV app -> web cabinet -> Telegram fallback`
 - support diagnostics should show routing mode, DNS policy, transport profile, ruleset/package catalog version, app version, and linked Telegram state without exposing raw secrets or share links
 
+## Smart Connect And Privacy Rules
+
+Quick-connect rules for the public client:
+
+- the backend builds a rollout-compatible shortlist before the client starts latency checks
+- premium users probe up to `5` eligible non-free nodes; free-tier users stay on `NL-free` only
+- shortlist eligibility rejects disabled, draining, unhealthy, stale, overloaded, and transport-incompatible nodes
+- the client combines real device RTT with backend CPU and health penalties and applies a `15%` stickiness threshold before changing nodes
+- existing explicit user-node assignments must be respected instead of bypassed by auto-select
+
+Consumer privacy rules:
+
+- normal consumer screens must not expose public IP, raw connection links, raw JSON/profile editors, sniffing terminology, Clash/local-control surfaces, or low-level topology
+- route labels and support diagnostics should stay safe and human-readable
+- raw subscription copy, edit, regenerate, or share actions must stay out of the first-layer consumer path
+- manual import and recovery tools may remain available behind compatibility/recovery paths after silent import succeeds
+
 ## Branding Requirements
 
-All public and user-visible client surfaces must ship as `POKROV VPN`.
+All public and user-visible client surfaces must ship as `POKROV`.
 
 Replace:
 
@@ -152,12 +195,14 @@ Replace:
 - update metadata
 - release asset names
 - visible `Hiddify` references in UI
+- canonical public URI scheme should be `pokrov`
 
 Tracked separately from public-v1 ship:
 
 - internal `pubspec` name `hiddify`
 - `package:hiddify/...` imports
 - Android Gradle/Kotlin namespace debt that still matches the inherited source tree
+- hidden compatibility URI handlers such as `pokrovvpn://` where update/import continuity still depends on them
 
 Release-facing packaging must still fail if legacy `hiddify` branding leaks into signed Windows `MSIX` identity or public installer surfaces.
 
@@ -169,11 +214,16 @@ Brand source:
 
 Canonical public release artifacts for this fork:
 
-- `pokrov-vpn-android-universal.apk`
-- `pokrov-vpn-android-market.aab`
-- `pokrov-vpn-windows-setup-x64.exe`
-- `pokrov-vpn-windows-setup-x64.msix`
-- `pokrov-vpn-windows-portable-x64.zip`
+- `pokrov-android-universal.apk`
+- `pokrov-android-market.aab`
+- `pokrov-windows-setup-x64.exe`
+- `pokrov-windows-setup-x64.msix`
+- `pokrov-windows-portable-x64.zip`
+
+Public versioning rule:
+
+- user-facing client surfaces, cabinet download badges, and release notes should present the same beta line `0.x.x-beta`
+- inherited upstream display strings such as `2.5.7 dev` must not remain visible in public-facing builds
 
 Current user-facing download surfaces expose only:
 
@@ -205,6 +255,8 @@ In scope:
 - app-first trial activation
 - silent profile provisioning
 - quick connect UX
+- first-run route-mode onboarding with `Optimize everything on this device` and `Only selected apps`
+- smart-connect shortlist and RTT-based auto-select within the existing pool rules
 - locations list
 - devices management
 - profile and renewal
@@ -224,6 +276,7 @@ Out of scope:
 - admin panel inside the client
 - power-user-first navigation
 - manual config import as the primary onboarding path
+- system-proxy-first or service-mode-first onboarding for normal users
 - public `Blocked only` preset until the rule layer, geo assets, and DNS behavior are actually implemented
 - public iOS App Store launch
 - public macOS distribution promise

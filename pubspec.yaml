@@ -1,7 +1,28 @@
 name: hiddify
-description: POKROV VPN for Windows and Android.
+description: POKROV for Windows and Android.
 publish_to: "none"
-version: 2.5.7+20507
+version: 0.9.0-beta+20508
+
+msix_config:
+  display_name: POKROV
+  publisher_display_name: POKROV
+  identity_name: Pokrov.Vpn
+  msix_version: 2.5.8.0
+  output_name: pokrov-windows-setup-x64
+  logo_path: windows\runner\resources\app_icon.ico
+  capabilities: internetClient, internetClientServer, privateNetworkClientServer
+  languages: en-us, zh-cn, zh-tw, tr-tr,fa-ir,ru-ru,pt-br,es-es
+  protocol_activation: pokrovvpn
+  execution_alias: pokrovvpn
+  certificate_path: windows\sign.pfx
+  certificate_password: ""
+  sign_msix: false
+  publisher: CN=POKROV VPN
+  install_certificate: false
+  enable_at_startup: true
+  startup_task:
+    task_id: pokrov
+    parameters: --autostart
 
 environment:
   sdk: ">=3.3.0 <4.0.0"

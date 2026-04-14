@@ -37,7 +37,8 @@ void main() {
 
     await tester.pumpAndSettle();
 
-    expect(find.text('POKROV VPN'), findsOneWidget);
+    expect(find.text('POKROV'), findsOneWidget);
+    expect(find.text('POKROV VPN'), findsNothing);
     expect(find.text('PORTAL VPN'), findsNothing);
     expect(find.text('Zero setup. Five days of speed.'), findsOneWidget);
     expect(find.text('Start 5-day test-drive'), findsOneWidget);

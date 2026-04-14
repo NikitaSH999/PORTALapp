@@ -1,6 +1,6 @@
-# POKROV VPN
+# POKROV
 
-`POKROV VPN` is the consumer `Android + Windows` Flutter client used in this repository.
+`POKROV` is the consumer `Android + Windows` Flutter client used in this repository.
 
 Canonical documentation lives in:
 
@@ -10,7 +10,8 @@ Canonical documentation lives in:
 
 Key release facts:
 
-- brand: `POKROV VPN`
+- brand: `POKROV`
+- public beta line: `0.9.0-beta`
 - onboarding: app-first
 - trial: `5 days`
 - Telegram reward: `+10 days`

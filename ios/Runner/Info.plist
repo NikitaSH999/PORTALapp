@@ -9,7 +9,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>POKROV VPN</string>
+	<string>POKROV</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -33,6 +33,7 @@
 			<string>space.pokrov.vpn.ios</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>pokrov</string>
 				<string>pokrovvpn</string>
 			</array>
 		</dict>

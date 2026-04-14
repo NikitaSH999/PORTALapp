@@ -20,13 +20,29 @@ class AppInfoEntity with _$AppInfoEntity {
   String get userAgent =>
       "POKROVVPN/$version ($operatingSystem; ${release.key})";
 
-  String get presentVersion => environment == Environment.prod
-      ? version
-      : "$version ${environment.name}";
+  String get presentVersion {
+    final normalizedVersion = version.trim();
+    if (normalizedVersion.isEmpty) return '';
+
+    final publicSemver = RegExp(r'(\d+\.\d+\.\d+)').firstMatch(
+      normalizedVersion,
+    );
+    if (publicSemver != null) {
+      return '${publicSemver.group(1)}-beta';
+    }
+
+    if (normalizedVersion.contains('-beta')) {
+      return normalizedVersion.split('+').first;
+    }
+
+    return environment == Environment.prod
+        ? normalizedVersion
+        : "$normalizedVersion ${environment.name}";
+  }
 
   /// formats app info for sharing
   String format() => '''
-$name v$version ($buildNumber) [${environment.name}]
+$name v$presentVersion ($buildNumber) [${environment.name}]
 ${release.name} release
 $operatingSystem [$operatingSystemVersion]''';
 }

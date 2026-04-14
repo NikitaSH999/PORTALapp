@@ -33,14 +33,15 @@ class PortalCopy {
       ? 'Загружаем доступ, устройства и маршруты...'
       : 'Loading access, devices and routes...';
   String get serviceUnavailable => isRussian
-      ? 'Сейчас не получается загрузить данные POKROV Network.'
-      : 'POKROV Network data is not available right now.';
+      ? 'Сейчас не получается загрузить данные POKROV.'
+      : 'POKROV data is not available right now.';
   String get copied =>
       isRussian ? 'Скопировано в буфер обмена.' : 'Copied to clipboard.';
   String get linkOpenFailed =>
       isRussian ? 'Не удалось открыть ссылку.' : 'Could not open the link.';
 
-  String get homeConsoleBadge => isRussian ? 'Центр управления' : 'Control center';
+  String get homeConsoleBadge =>
+      isRussian ? 'Центр управления' : 'Control center';
   String get secureOnTapEyebrow =>
       isRussian ? 'Разгон в одно касание' : 'Boost in one tap';
   String homeStageTitle({required bool isActive}) => isRussian
@@ -49,10 +50,10 @@ class PortalCopy {
   String homeStageBody({required bool isActive}) => isRussian
       ? (isActive
           ? 'Пользуйтесь быстрой почтой, видео и приложениями без лишних пауз.'
-          : 'Запустите тест-драйв или подключите профиль, чтобы открыть полный потенциал POKROV Network.')
+          : 'Запустите тест-драйв или подключите профиль, чтобы открыть полный потенциал POKROV.')
       : (isActive
           ? 'Enjoy fast email, video, and apps without unnecessary pauses.'
-          : 'Start the test-drive or connect a profile first to unlock the full POKROV Network potential.');
+          : 'Start the test-drive or connect a profile first to unlock the full POKROV potential.');
   String get activeProfileLabel =>
       isRussian ? 'Активный профиль' : 'Active profile';
   String get switchAction => isRussian ? 'Сменить' : 'Switch';
@@ -62,8 +63,7 @@ class PortalCopy {
       isRussian ? 'Удалённый профиль готов' : 'Remote profile ready';
   String get localProfileReady =>
       isRussian ? 'Локальный профиль готов' : 'Local profile ready';
-  String get unlimitedTraffic =>
-      isRussian ? 'Полный разгон' : 'Full boost';
+  String get unlimitedTraffic => isRussian ? 'Полный разгон' : 'Full boost';
   String trafficLeft(String value) =>
       isRussian ? 'Осталось $value' : '$value left';
   String daysRemaining(int value) =>
@@ -79,9 +79,9 @@ class PortalCopy {
       ? 'Ссылка подключения скопирована.'
       : 'Subscription link copied.';
 
-  String get quickConnectBadge =>
-      isRussian ? 'Быстрый старт' : 'Quick start';
-  String get routeDeckBadge => isRussian ? 'Маршрут и ускорение' : 'Route & Speed';
+  String get quickConnectBadge => isRussian ? 'Быстрый старт' : 'Quick start';
+  String get routeDeckBadge =>
+      isRussian ? 'Маршрут и ускорение' : 'Route & Speed';
   String nodesReady(String value) {
     if (value == '--') {
       return isRussian ? 'Узлы просыпаются' : 'Nodes waking up';
@@ -130,7 +130,8 @@ class PortalCopy {
   String get locationsGateBody => isRussian
       ? 'Сначала запустите 5-дневный тест-драйв на этом устройстве. После этого приложение получит настройки и покажет доступные узлы разгона.'
       : 'Start the 5-day test-drive on this device first. After that the app receives settings and shows available optimization nodes.';
-  String get openVpnAction => isRussian ? 'Вернуться в приложение' : 'Return to app';
+  String get openVpnAction =>
+      isRussian ? 'Вернуться в приложение' : 'Return to app';
   String get locationsSyncTitle =>
       isRussian ? 'Локации синхронизируются' : 'Locations are syncing';
   String get locationsSyncBody => isRussian
@@ -146,8 +147,8 @@ class PortalCopy {
       ? 'Живая сессия и лимит вашего плана.'
       : 'Your live device session and plan capacity.';
   String get currentDeviceFallback => isRussian
-      ? 'Это устройство уже связано с POKROV Network.'
-      : 'This device is linked to POKROV Network.';
+      ? 'Это устройство уже связано с POKROV.'
+      : 'This device is linked to POKROV.';
   String get activeSessions =>
       isRussian ? 'Активные сессии' : 'Active sessions';
   String get availableSlots =>
@@ -168,8 +169,7 @@ class PortalCopy {
 
   String get profileTitle => shellProfile;
   String get accountEyebrow => isRussian ? 'Аккаунт' : 'Account';
-  String get accountTitle =>
-      isRussian ? 'Аккаунт POKROV Network' : 'POKROV Network account';
+  String get accountTitle => isRussian ? 'Аккаунт POKROV' : 'POKROV account';
   String get accountSubtitle => isRussian
       ? 'Доступ, трафик и продление для этого устройства.'
       : 'Your device-linked access, traffic and renewal context.';
@@ -177,7 +177,8 @@ class PortalCopy {
       isRussian ? 'Остаток трафика' : 'Remaining traffic';
   String get planMetric => isRussian ? 'План' : 'Plan';
   String get appAccount => isRussian ? 'Личный профиль' : 'User profile';
-  String get deviceTrial => isRussian ? 'Тест-драйв устройства' : 'Device test-drive';
+  String get deviceTrial =>
+      isRussian ? 'Тест-драйв устройства' : 'Device test-drive';
   String accountDetails(String accountId, String deviceName) => isRussian
       ? 'ID аккаунта: $accountId\nУстройство: $deviceName'
       : 'Account ID: $accountId\nDevice: $deviceName';
@@ -222,6 +223,11 @@ class PortalCopy {
   String get noConnectionLinkYet => isRussian
       ? 'Пока нет активной ссылки доступа'
       : 'No active access link yet';
+  String get automaticSyncTitle =>
+      isRussian ? 'Automatic sync' : 'Automatic sync';
+  String get automaticSyncSubtitle => isRussian
+      ? 'Access stays ready on this device. Compatibility tools stay optional.'
+      : 'Access stays ready on this device. Compatibility tools stay optional.';
   String get manualRecovery =>
       isRussian ? 'Ручное восстановление' : 'Manual recovery';
   String get manualRecoverySubtitle => isRussian
@@ -318,6 +324,28 @@ class PortalCopy {
       ? 'Сначала выберите активный профиль'
       : 'Choose an active profile first';
   String get trialPlatformsBadge => 'Android + Windows';
+  String get accessReadyTitle =>
+      isRussian ? 'Р”РѕСЃС‚СѓРї РіРѕС‚РѕРІ' : 'Access stays ready';
+  String get accessReadySubtitle => isRussian
+      ? 'POKROV РїРѕРґРґРµСЂР¶РёРІР°РµС‚ РґРѕСЃС‚СѓРї РЅР° СЌС‚РѕРј СѓСЃС‚СЂРѕР№СЃС‚РІРµ. Р РµРґРєРёРµ СЃС†РµРЅР°СЂРёРё РѕСЃС‚Р°СЋС‚СЃСЏ РІ СЂР°СЃС€РёСЂРµРЅРЅС‹С… РЅР°СЃС‚СЂРѕР№РєР°С….'
+      : 'POKROV keeps this device in sync. Edge-case recovery tools stay in Advanced settings.';
+  String get advancedRecoveryTools => isRussian
+      ? 'Р РµР·РµСЂРІРЅС‹Рµ РёРЅСЃС‚СЂСѓРјРµРЅС‚С‹'
+      : 'Advanced recovery tools';
+  String get advancedRecoveryToolsSubtitle => isRussian
+      ? 'РЎРѕРІРјРµСЃС‚РёРјС‹Р№ РёРјРїРѕСЂС‚ Рё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РґР»СЏ СЂРµРґРєРёС… СЃР»СѓС‡Р°РµРІ РѕСЃС‚Р°СЋС‚СЃСЏ РІ СЂР°СЃС€РёСЂРµРЅРЅС‹С… РЅР°СЃС‚СЂРѕР№РєР°С….'
+      : 'Compatibility import and rare recovery tools stay in Advanced settings.';
+  String get supportThreadsTitle =>
+      isRussian ? 'РџРѕСЃР»РµРґРЅРёРµ РѕР±СЂР°С‰РµРЅРёСЏ' : 'Recent requests';
+  String get supportThreadsSubtitle => isRussian
+      ? 'Р•СЃР»Рё РїРѕРјРѕС‰СЊ СѓР¶Рµ РІ РїСѓС‚Рё, РїРѕСЃР»РµРґРЅРёРµ РѕР±РЅРѕРІР»РµРЅРёСЏ РїРѕСЏРІСЏС‚СЃСЏ Р·РґРµСЃСЊ.'
+      : 'If help is already in motion, the latest updates appear here first.';
+  String get continueInWebCabinet => isRussian
+      ? 'РџСЂРѕРґРѕР»Р¶РёС‚СЊ РІ РІРµР±-РєР°Р±РёРЅРµС‚Рµ'
+      : 'Continue in web cabinet';
+  String get telegramSupportFallback => isRussian
+      ? 'РћС‚РєСЂС‹С‚СЊ Telegram-Р·Р°РїР°СЃРЅРѕР№ РїСѓС‚СЊ'
+      : 'Open Telegram fallback';
 
   String supportStatus(String raw) {
     final normalized = raw.trim().toLowerCase();
@@ -374,7 +402,7 @@ class PortalCopy {
       case 'support and account data will appear here after trial activation.':
         return 'Данные поддержки и аккаунта появятся здесь после запуска тест-драйва.';
       case 'welcome to pokrov vpn':
-        return 'Добро пожаловать в POKROV Network';
+        return 'Добро пожаловать в POKROV';
       case 'available after activation':
         return 'Доступно после запуска';
       case 'primary access point':

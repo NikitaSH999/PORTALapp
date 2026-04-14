@@ -33,8 +33,8 @@ void main() {
     expect(xml, contains('RELEASE_TAG'));
     expect(xml, contains('RELEASE_VERSION'));
     expect(xml, contains('RELEASE_PUB_DATE'));
-    expect(xml, contains('pokrov-vpn-android-universal.apk'));
-    expect(xml, contains('pokrov-vpn-windows-setup-x64.exe'));
+    expect(xml, contains('pokrov-android-universal.apk'));
+    expect(xml, contains('pokrov-windows-setup-x64.exe'));
     expect(xml, isNot(contains('hiddify-next')));
     expect(xml, isNot(contains('app.hiddify.com')));
     expect(xml, isNot(contains('NikitaSH999/pokrov-vpn')));
@@ -43,7 +43,7 @@ void main() {
   test('web manifest uses pokrov branding', () async {
     final manifest = await File('web/manifest.json').readAsString();
 
-    expect(manifest, contains('"name": "POKROV VPN"'));
+    expect(manifest, contains('"name": "POKROV"'));
     expect(manifest, contains('"short_name": "POKROV"'));
     expect(manifest, isNot(contains('"name": "Hiddify"')));
   });
@@ -127,15 +127,15 @@ void main() {
       await File('assets/translations/strings_fa.i18n.json').readAsString(),
     ) as Map<String, dynamic>;
 
-    expect(arabic['general']['appTitle'], 'POKROV Network');
-    expect(kurdish['general']['appTitle'], 'POKROV Network');
-    expect(persian['general']['appTitle'], 'POKROV Network');
+    expect(arabic['general']['appTitle'], 'POKROV');
+    expect(kurdish['general']['appTitle'], 'POKROV');
+    expect(persian['general']['appTitle'], 'POKROV');
 
     final kurdishText = kurdish['play']['full_description'] as String;
     final persianText = persian['play']['full_description'] as String;
     expect(kurdishText, isNot(contains('NikitaSH999/pokrov-vpn')));
     expect(persianText, isNot(contains('NikitaSH999/pokrov-vpn')));
-    expect(persianText, contains('POKROV Network'));
+    expect(persianText, contains('POKROV'));
   });
   test('release message and apple readiness metadata use pokrov branding',
       () async {
@@ -146,8 +146,8 @@ void main() {
       'ios/packaging/ios/make_config.yaml',
     ).readAsString();
 
-    expect(releaseMessage, contains('pokrov-vpn-android-universal.apk'));
-    expect(releaseMessage, contains('pokrov-vpn-windows-setup-x64.exe'));
+    expect(releaseMessage, contains('pokrov-android-universal.apk'));
+    expect(releaseMessage, contains('pokrov-windows-setup-x64.exe'));
     expect(
       releaseMessage,
       isNot(contains('Hiddify-Windows-Setup-x64.exe')),
@@ -159,10 +159,10 @@ void main() {
     expect(releaseMessage, isNot(contains('macOS')));
     expect(releaseMessage, isNot(contains('Linux')));
 
-    expect(iosInfoPlist, contains('<string>POKROV VPN</string>'));
+    expect(iosInfoPlist, contains('<string>POKROV</string>'));
     expect(iosInfoPlist, isNot(contains('<string>Hiddify</string>')));
-    expect(iosPackagingConfig, contains('display_name: POKROV VPN'));
-    expect(iosPackagingConfig, contains('generic_name: POKROV VPN'));
+    expect(iosPackagingConfig, contains('display_name: POKROV'));
+    expect(iosPackagingConfig, contains('generic_name: POKROV'));
     expect(iosPackagingConfig, isNot(contains('display_name: Hiddify')));
   });
 
@@ -195,7 +195,7 @@ void main() {
     expect(releaseSetup, contains('space.pokrov.vpn'));
     expect(releaseSetup, isNot(contains('defaults to `app.hiddify.com`')));
     expect(
-        windowsStoreReleaseWorkflow, contains('pokrov-vpn-windows-setup-x64'));
+        windowsStoreReleaseWorkflow, contains('pokrov-windows-setup-x64'));
     expect(
       windowsStoreReleaseWorkflow,
       isNot(contains('asset-name-pattern: Hiddify-Windows-Setup-x64')),
@@ -311,8 +311,10 @@ void main() {
     expect(msixConfig, contains('certificate_password: ""'));
     expect(msixConfig, isNot(contains('portalvpn-dev')));
     expect(exeConfig, contains('publisher_url: https://pokrov.space/'));
-    expect(exeConfig,
-        contains('output_base_file_name: pokrov-vpn-windows-setup-x64'));
+    expect(
+      exeConfig,
+      contains('output_base_file_name: pokrov-windows-setup-x64'),
+    );
     expect(innoTemplate, isNot(contains('HiddifyTunnelService')));
     expect(packageScript, isNot(contains('HiddifyCli.exe')));
     expect(packageScript, contains('*pokrov*setup*.exe'));
@@ -359,7 +361,7 @@ void main() {
           'FORK_REPO_URL or GITHUB_REPOSITORY must be set for release branding.'),
     );
     expect(brandingScript, contains('releases/latest/download/appcast.xml'));
-    expect(flutterTestConfig, contains('dist/tmp/pokrov-vpn/sqlite3.dll'));
+    expect(flutterTestConfig, contains('dist/tmp/pokrov/sqlite3.dll'));
     expect(flutterTestConfig,
         isNot(contains('dist/tmp/hiddify-next/sqlite3.dll')));
   });
