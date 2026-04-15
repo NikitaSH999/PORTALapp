@@ -94,4 +94,28 @@ void main() {
     expect(requestedHeaders['X-App-Session-Token'], equals('runtime-token'));
     expect(requestedHeaders['X-Portal-Install-Id'], equals('install-123'));
   });
+
+  test('ignores bundled web auth headers on native builds', () async {
+    late Map<String, String> requestedHeaders;
+
+    final client = HttpPortalApiClient(
+      config: PortalPublicConfig.fromMap(const {
+        'PORTAL_API_BASE_URL': '',
+        'PORTAL_WEB_SESSION_TOKEN': 'bundled-web-token',
+        'PORTAL_TELEGRAM_INIT_DATA': 'bundled-init-data',
+      }),
+      sessionStore: _MemoryPortalSessionStore(),
+      client: MockClient((request) async {
+        requestedHeaders = request.headers;
+        return http.Response(jsonEncode({'ok': true}), 200);
+      }),
+    );
+
+    await client.getJson('/api/auth/session');
+
+    expect(requestedHeaders.containsKey('Authorization'), isFalse);
+    expect(requestedHeaders.containsKey('X-Web-Auth-Token'), isFalse);
+    expect(requestedHeaders.containsKey('X-Telegram-Init-Data'), isFalse);
+    expect(requestedHeaders['X-Portal-Install-Id'], equals('install-123'));
+  });
 }

@@ -5,7 +5,6 @@ import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/core/widget/pokrov_logo.dart';
 import 'package:hiddify/core/widget/premium_surfaces.dart';
 import 'package:hiddify/features/portal/widget/portal_copy.dart';
-import 'package:hiddify/features/portal/widget/portal_widgets.dart';
 import 'package:hiddify/features/stats/widget/side_bar_stats_overview.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -60,7 +59,7 @@ class AdaptiveRootScaffold extends HookConsumerWidget {
 
     return Scaffold(
       key: RootScaffold.stateKey,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       drawer: isCompact
           ? Drawer(
               width: (width * 0.9).clamp(1, 360),
@@ -133,7 +132,6 @@ class _NavigatorViewport extends StatelessWidget {
   Widget build(BuildContext context) {
     return PremiumPanel(
       padding: EdgeInsets.zero,
-      style: PremiumPanelStyle.neutral,
       borderRadius: BorderRadius.circular(34),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(34),

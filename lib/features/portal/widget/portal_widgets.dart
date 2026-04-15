@@ -134,35 +134,66 @@ class PortalListRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final row = Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (leading != null) ...[
-          leading!,
-          const SizedBox(width: 14),
-        ],
-        Expanded(
-          child: Column(
+    final row = LayoutBuilder(
+      builder: (context, constraints) {
+        final theme = Theme.of(context);
+        final trailingWidget = trailing;
+        final useCompactLayout =
+            trailingWidget != null && constraints.maxWidth < 430;
+        final textBlock = Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(title, style: theme.textTheme.titleMedium),
+            if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                subtitle!,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ],
+        );
+
+        if (useCompactLayout) {
+          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(title, style: Theme.of(context).textTheme.titleMedium),
-              if (subtitle != null && subtitle!.trim().isNotEmpty) ...[
-                const SizedBox(height: 4),
-                Text(
-                  subtitle!,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                ),
-              ],
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (leading != null) ...[
+                    leading!,
+                    const SizedBox(width: 14),
+                  ],
+                  Expanded(child: textBlock),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: trailingWidget,
+              ),
             ],
-          ),
-        ),
-        if (trailing != null) ...[
-          const SizedBox(width: 12),
-          trailing!,
-        ],
-      ],
+          );
+        }
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (leading != null) ...[
+              leading!,
+              const SizedBox(width: 14),
+            ],
+            Expanded(child: textBlock),
+            if (trailingWidget != null) ...[
+              const SizedBox(width: 12),
+              Flexible(child: trailingWidget),
+            ],
+          ],
+        );
+      },
     );
 
     if (onTap == null) return row;
@@ -264,6 +295,35 @@ String buildPortalCheckoutUrl(String rawUrl, {String? planCode}) {
   return uri.replace(queryParameters: query).toString();
 }
 
+double portalAdaptiveTileWidth(
+  BuildContext context, {
+  double horizontalPadding = 32,
+  double spacing = 12,
+  double minWidth = 180,
+  double maxWidth = 260,
+  int preferredColumns = 2,
+}) {
+  final availableWidth = MediaQuery.sizeOf(context).width - horizontalPadding;
+  if (preferredColumns <= 1) {
+    return availableWidth.clamp(minWidth, maxWidth).toDouble();
+  }
+
+  final columnsWidth =
+      (availableWidth - (spacing * (preferredColumns - 1))) / preferredColumns;
+  if (columnsWidth >= minWidth) {
+    return columnsWidth.clamp(minWidth, maxWidth).toDouble();
+  }
+
+  return availableWidth.clamp(minWidth, maxWidth).toDouble();
+}
+
+bool portalUseCompactLayout(
+  BuildContext context, {
+  double breakpoint = 430,
+}) {
+  return MediaQuery.sizeOf(context).width < breakpoint;
+}
+
 class _PortalSupportDiagnosticsCompat {
   const _PortalSupportDiagnosticsCompat({
     required this.accountId,
@@ -291,8 +351,10 @@ class _PortalSupportDiagnosticsCompat {
     required PortalPublicConfig config,
     AppInfoEntity? appInfo,
   }) {
-    final supportContext = _readDynamic(() => portal.connectionPolicy.supportContext);
-    final managedManifest = _readDynamic(() => portal.importPayload.managedManifest);
+    final supportContext =
+        _readDynamic(() => portal.connectionPolicy.supportContext);
+    final managedManifest =
+        _readDynamic(() => portal.importPayload.managedManifest);
 
     return _PortalSupportDiagnosticsCompat(
       accountId: _readString(

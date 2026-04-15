@@ -4,7 +4,6 @@ import 'package:gap/gap.dart';
 import 'package:hiddify/core/localization/translations.dart';
 import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/features/config_option/data/config_option_repository.dart';
-import 'package:hiddify/features/config_option/overview/config_options_page.dart';
 import 'package:hiddify/singbox/model/singbox_config_enum.dart';
 import 'package:hiddify/utils/platform_utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -44,12 +43,12 @@ class QuickSettingsModal extends HookConsumerWidget {
             onTap: () => const ConfigOptionsRoute().go(context),
           ),
           ListTile(
-            title: Text(isRussian
-                ? 'РћС‚РєСЂС‹С‚СЊ РїРѕРґРґРµСЂР¶РєСѓ'
-                : 'Open support'),
+            title: Text(
+              isRussian ? 'Открыть поддержку' : 'Open support',
+            ),
             subtitle: Text(
               isRussian
-                  ? 'РћС‚РєСЂРѕРµРј РїРѕРґРґРµСЂР¶РєСѓ СЃ СѓР¶Рµ РїРѕРґРіРѕС‚РѕРІР»РµРЅРЅС‹Рј РєРѕРЅС‚РµРєСЃС‚РѕРј СѓСЃС‚СЂРѕР№СЃС‚РІР°.'
+                  ? 'Откроем поддержку с уже подготовленным контекстом устройства.'
                   : 'Jump into support with your device context already prepared.',
             ),
             trailing: const Icon(FluentIcons.chat_24_regular),
@@ -60,7 +59,7 @@ class QuickSettingsModal extends HookConsumerWidget {
             title: const Text('Advanced and recovery tools'),
             subtitle: Text(
               isRussian
-                  ? 'РћС‚РєСЂРѕР№С‚Рµ РёС… С‚РѕР»СЊРєРѕ РєРѕРіРґР° РЅСѓР¶РЅС‹ РґРёР°РіРЅРѕСЃС‚РёРєР° РёР»Рё РїРѕРјРѕС‰СЊ СЃ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµРј.'
+                  ? 'Открывайте их только для диагностики, восстановления или редких сценариев поддержки.'
                   : 'Open these only when recovery or support needs extra steps.',
             ),
             trailing: const Icon(FluentIcons.chevron_right_24_regular),
@@ -79,11 +78,11 @@ String _desktopOptimizationMessage({
 }) {
   if (serviceMode != ServiceMode.tun) {
     return isRussian
-        ? 'РџРѕР»РЅР°СЏ РѕРїС‚РёРјРёР·Р°С†РёСЏ СѓСЃС‚СЂРѕР№СЃС‚РІР° РѕСЃС‚Р°РµС‚СЃСЏ РІ СЃРєСЂС‹С‚С‹С… РёРЅСЃС‚СЂСѓРјРµРЅС‚Р°С… СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё. РћР±С‹С‡РЅС‹Р№ СЃС†РµРЅР°СЂРёР№ РІРµРґРµС‚ С‡РµСЂРµР· РїРѕРґРґРµСЂР¶РєСѓ.'
+        ? 'Полная оптимизация устройства остаётся в инструментах совместимости. Поддержка проведёт вас туда только при необходимости.'
         : 'Full-device optimization stays behind compatibility tools. Support will guide you there only when needed.';
   }
 
   return isRussian
-      ? 'РџРµСЂРµР·Р°РїСѓСЃС‚РёС‚Рµ POKROV РѕС‚ РёРјРµРЅРё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°, РїСЂРµР¶РґРµ С‡РµРј РѕРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ РІСЃРµ СѓСЃС‚СЂРѕР№СЃС‚РІРѕ.'
+      ? 'Перезапустите POKROV от имени администратора, чтобы оптимизировать всё устройство.'
       : 'Restart POKROV as Administrator before optimizing the whole device.';
 }

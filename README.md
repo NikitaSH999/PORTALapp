@@ -15,8 +15,11 @@ Key release facts:
 - onboarding: app-first
 - trial: `5 days`
 - Telegram reward: `+10 days`
+- support bot: `@pokrov_supportbot`
+- feedback bot: `@pokrov_feedbackbot`
 - official public channel: `@pokrov_vpn`
 - main bot: `@pokrov_vpnbot`
+- `swazist_bot` and `portal_service_bot` are officially disabled legacy usernames
 
 Focused verification from this workspace:
 

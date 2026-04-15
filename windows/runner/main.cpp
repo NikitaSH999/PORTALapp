@@ -9,7 +9,7 @@
 
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
-  HANDLE hMutexInstance = CreateMutex(NULL, TRUE, L"POKROVVPNMutex");
+  HANDLE hMutexInstance = CreateMutex(NULL, TRUE, L"POKROVMutex");
   const bool already_running = GetLastError() == ERROR_ALREADY_EXISTS;
   HWND handle = FindWindowA(NULL, "POKROV");
   if (handle == NULL) {

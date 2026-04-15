@@ -68,7 +68,7 @@ function InitializeSetup(): Boolean;
 var
   ResultCode: Integer;
 begin
-  Exec('taskkill', '/F /IM POKROVVPN.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('taskkill', '/F /IM POKROV.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Exec('net', 'stop "POKROVTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Exec('sc.exe', 'delete "POKROVTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Result := True;

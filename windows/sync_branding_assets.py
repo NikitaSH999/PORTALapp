@@ -13,13 +13,39 @@ except ModuleNotFoundError as exc:  # pragma: no cover - runtime guard
 
 
 ICON_SIZES = [(16, 16), (20, 20), (24, 24), (32, 32), (40, 40), (48, 48), (64, 64), (128, 128), (256, 256)]
+ICON_CANVAS_SIZE = 1024
+ICON_PADDING_RATIO = 0.14
+
+
+def _prepare_icon_canvas(image: Image.Image) -> Image.Image:
+    rgba = image.convert("RGBA")
+    alpha_bbox = rgba.getchannel("A").getbbox()
+    if alpha_bbox is None:
+        raise SystemExit("Windows branding source icon has no visible alpha content to crop.")
+
+    cropped = rgba.crop(alpha_bbox)
+    source_size = max(cropped.width, cropped.height)
+    target_size = max(1, int(round(ICON_CANVAS_SIZE * (1.0 - (ICON_PADDING_RATIO * 2.0)))))
+    scale = min(target_size / cropped.width, target_size / cropped.height)
+    resized_size = (
+        max(1, int(round(cropped.width * scale))),
+        max(1, int(round(cropped.height * scale))),
+    )
+    resized = cropped.resize(resized_size, Image.Resampling.LANCZOS)
+
+    canvas = Image.new("RGBA", (ICON_CANVAS_SIZE, ICON_CANVAS_SIZE), (0, 0, 0, 0))
+    origin = (
+        (ICON_CANVAS_SIZE - resized.width) // 2,
+        (ICON_CANVAS_SIZE - resized.height) // 2,
+    )
+    canvas.alpha_composite(resized, dest=origin)
+    return canvas
 
 
 def main() -> int:
     windows_dir = Path(__file__).resolve().parent
     app_root = windows_dir.parent
-    external_root = app_root.parent.parent
-    source_icon = external_root / "logogo.png"
+    source_icon = app_root / "assets" / "images" / "source" / "ic_launcher_foreground.png"
     target_icon = windows_dir / "runner" / "resources" / "app_icon.ico"
 
     if not source_icon.exists():
@@ -27,7 +53,8 @@ def main() -> int:
 
     target_icon.parent.mkdir(parents=True, exist_ok=True)
     with Image.open(source_icon) as image:
-        image.convert("RGBA").save(target_icon, format="ICO", sizes=ICON_SIZES)
+        icon_canvas = _prepare_icon_canvas(image)
+        icon_canvas.save(target_icon, format="ICO", sizes=ICON_SIZES)
 
     print(f"Refreshed Windows icon from {source_icon} -> {target_icon}")
     return 0

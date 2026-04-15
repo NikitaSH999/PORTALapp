@@ -58,7 +58,7 @@ concurrency:
 
 env:
   IS_GITHUB_ACTIONS: 1
-  FLUTTER_VERSION: "3.24.0"
+  FLUTTER_VERSION: "3.24.3"
   NDK_VERSION: "r26d"
   APP_SLUG: "pokrov"
   APP_ANDROID_PACKAGE: ${{ vars.ANDROID_PACKAGE_NAME || 'space.pokrov.vpn' }}
@@ -166,10 +166,10 @@ jobs:
       PORTAL_WARP_DEFAULTS_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.event.repository.default_branch || 'main' }}/external/client-fork/app/test.configs/warp
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2.16.0
+        uses: subosito/flutter-action@v2.21.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
@@ -192,7 +192,7 @@ jobs:
         run: python .github/scripts/apply_fork_branding.py
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: zulu
           java-version: "17"
@@ -245,7 +245,7 @@ jobs:
           ls -la out
 
       - name: Upload Android artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: android-release
           path: out/*
@@ -281,10 +281,10 @@ jobs:
       PORTAL_WARP_DEFAULTS_URL: https://raw.githubusercontent.com/${{ github.repository }}/${{ github.event.repository.default_branch || 'main' }}/external/client-fork/app/test.configs/warp
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2.16.0
+        uses: subosito/flutter-action@v2.21.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: stable
@@ -342,7 +342,7 @@ jobs:
           Get-ChildItem -Path out -File
 
       - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-release
           path: out/*
@@ -353,7 +353,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           merge-multiple: true
           path: release-out
@@ -395,14 +395,14 @@ jobs:
           cat release-meta/appcast.xml
 
       - name: Upload handoff env
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: release-handoff
           path: release-meta/release-links.env
           retention-days: 7
 
       - name: Upload updater feed
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: release-appcast
           path: release-meta/appcast.xml

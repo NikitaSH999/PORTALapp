@@ -1,5 +1,19 @@
 # Changelog
 
+## [Portal Fork Sync Note] - 2026-04-15
+
+- Verified the active upstream is `hiddify/hiddify-app`, not the legacy `hiddify-next` line.
+- Checked local tags against upstream: `v4.1.2` is available upstream, with `v4.1.1` and `v4.1.0` behind it.
+- Performed a safe partial sync only in project metadata and GitHub automation:
+  - refreshed direct dependency constraints toward the versions already resolved in `pubspec.lock`
+  - refreshed GitHub Actions versions and release automation metadata
+  - kept the fork-specific Android/Windows release workflow and branding paths intact
+- Did not perform a full upstream migration in this pass:
+  - `pubspec.yaml` remains pinned to the proven Flutter `3.24.x` toolchain for the Portal fork
+  - `dependencies.properties` remains pinned to `core.version=3.1.8`
+  - moving to upstream `4.x` app/core/toolchain still requires a wider `lib/`, native/core, and release validation pass
+  - this note reflects the real status so release handoff is not misleading
+
 ## [0.16.0.dev] - 2024-2-18
 
 ### New Features and Improvements

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:hiddify/features/portal/config/portal_public_config.dart';
 import 'package:hiddify/features/portal/data/portal_session_store.dart';
 import 'package:http/http.dart' as http;
@@ -66,9 +67,11 @@ class HttpPortalApiClient implements PortalApiClient {
 
   Map<String, String> _headers({bool contentType = false}) {
     final runtimeSessionToken = sessionStore?.readSessionTokenSync() ?? '';
+    final bundledSessionToken = kIsWeb ? config.webSessionToken : '';
+    final bundledTelegramInitData = kIsWeb ? config.telegramInitData : '';
     final authToken = runtimeSessionToken.isNotEmpty
         ? runtimeSessionToken
-        : config.webSessionToken;
+        : bundledSessionToken;
     final installId = sessionStore?.readInstallIdSync() ?? '';
     return {
       if (contentType) 'Content-Type': 'application/json',
@@ -77,8 +80,8 @@ class HttpPortalApiClient implements PortalApiClient {
       if (runtimeSessionToken.isNotEmpty)
         'X-App-Session-Token': runtimeSessionToken,
       if (installId.isNotEmpty) 'X-Portal-Install-Id': installId,
-      if (config.telegramInitData.isNotEmpty)
-        'X-Telegram-Init-Data': config.telegramInitData,
+      if (bundledTelegramInitData.isNotEmpty)
+        'X-Telegram-Init-Data': bundledTelegramInitData,
     };
   }
 

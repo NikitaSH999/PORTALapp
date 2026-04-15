@@ -27,6 +27,8 @@ class SubscriptionPage extends HookConsumerWidget {
                 child: PortalAsyncBody(
                   value: experience,
                   builder: (context, portal) {
+                    final metricWidth = portalAdaptiveTileWidth(context);
+                    final useCompactLayout = portalUseCompactLayout(context);
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -59,7 +61,7 @@ class SubscriptionPage extends HookConsumerWidget {
                                 runSpacing: 12,
                                 children: [
                                   SizedBox(
-                                    width: 220,
+                                    width: metricWidth,
                                     child: PortalMetricTile(
                                       icon: Icons.event_available_rounded,
                                       label: copy.expiresMetric,
@@ -69,7 +71,7 @@ class SubscriptionPage extends HookConsumerWidget {
                                     ),
                                   ),
                                   SizedBox(
-                                    width: 220,
+                                    width: metricWidth,
                                     child: PortalMetricTile(
                                       icon: Icons.devices_rounded,
                                       label: copy.deviceLimitMetric,
@@ -120,27 +122,48 @@ class SubscriptionPage extends HookConsumerWidget {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          copy.localizeServerText(plan.label),
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall
-                                              ?.copyWith(
-                                                fontWeight: FontWeight.w700,
-                                              ),
+                                  if (useCompactLayout) ...[
+                                    Text(
+                                      copy.localizeServerText(plan.label),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineSmall
+                                          ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                    if (plan.badge.isNotEmpty) ...[
+                                      const Gap(8),
+                                      Chip(
+                                        label: Text(
+                                          copy.localizeServerText(plan.badge),
                                         ),
                                       ),
-                                      if (plan.badge.isNotEmpty)
-                                        Chip(
-                                          label: Text(
-                                            copy.localizeServerText(plan.badge),
+                                    ],
+                                  ] else
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            copy.localizeServerText(plan.label),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .headlineSmall
+                                                ?.copyWith(
+                                                  fontWeight: FontWeight.w700,
+                                                ),
                                           ),
                                         ),
-                                    ],
-                                  ),
+                                        if (plan.badge.isNotEmpty)
+                                          Chip(
+                                            label: Text(
+                                              copy.localizeServerText(
+                                                plan.badge,
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
                                   const Gap(6),
                                   Text(
                                     copy.planSummary(

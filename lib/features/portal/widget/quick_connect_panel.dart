@@ -26,6 +26,8 @@ class PortalQuickConnectPanel extends StatelessWidget {
     final heroTitle = copy.heroStatusTitle(
       trialLike: experience.subscription.isTrialLike,
     );
+    final metricWidth = portalAdaptiveTileWidth(context);
+    final useCompactLayout = portalUseCompactLayout(context);
 
     return PortalSectionCard(
       tone: PortalSectionTone.accent,
@@ -66,48 +68,98 @@ class PortalQuickConnectPanel extends StatelessWidget {
           PortalSectionCard(
             tone: PortalSectionTone.muted,
             padding: const EdgeInsets.all(18),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const PremiumIconOrb(
-                  icon: Icons.travel_explore_rounded,
-                  size: 54,
-                ),
-                const Gap(14),
-                Expanded(
-                  child: Column(
+            child: useCompactLayout
+                ? Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        copy.autoRouteTitle,
-                        style: theme.textTheme.titleLarge,
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const PremiumIconOrb(
+                            icon: Icons.travel_explore_rounded,
+                            size: 54,
+                          ),
+                          const Gap(14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  copy.autoRouteTitle,
+                                  style: theme.textTheme.titleLarge,
+                                ),
+                                const Gap(4),
+                                Text(
+                                  location != null
+                                      ? copy.localizeServerText(location.title)
+                                      : copy.autoSelectTitle,
+                                  style: theme.textTheme.titleMedium,
+                                ),
+                                const Gap(2),
+                                Text(
+                                  location?.subtitle.isNotEmpty == true
+                                      ? copy.localizeServerText(
+                                          location!.subtitle,
+                                        )
+                                      : copy.bestPathNow,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const Gap(4),
-                      Text(
-                        location != null
-                            ? copy.localizeServerText(location.title)
-                            : copy.autoSelectTitle,
-                        style: theme.textTheme.titleMedium,
+                      const Gap(14),
+                      OutlinedButton(
+                        onPressed: onOpenLocations,
+                        child: Text(copy.chooseRouteAction),
                       ),
-                      const Gap(2),
-                      Text(
-                        location?.subtitle.isNotEmpty == true
-                            ? copy.localizeServerText(location!.subtitle)
-                            : copy.bestPathNow,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                    ],
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const PremiumIconOrb(
+                        icon: Icons.travel_explore_rounded,
+                        size: 54,
+                      ),
+                      const Gap(14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              copy.autoRouteTitle,
+                              style: theme.textTheme.titleLarge,
+                            ),
+                            const Gap(4),
+                            Text(
+                              location != null
+                                  ? copy.localizeServerText(location.title)
+                                  : copy.autoSelectTitle,
+                              style: theme.textTheme.titleMedium,
+                            ),
+                            const Gap(2),
+                            Text(
+                              location?.subtitle.isNotEmpty == true
+                                  ? copy.localizeServerText(location!.subtitle)
+                                  : copy.bestPathNow,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: theme.colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
                         ),
+                      ),
+                      const Gap(12),
+                      OutlinedButton(
+                        onPressed: onOpenLocations,
+                        child: Text(copy.chooseRouteAction),
                       ),
                     ],
                   ),
-                ),
-                const Gap(12),
-                OutlinedButton(
-                  onPressed: onOpenLocations,
-                  child: Text(copy.chooseRouteAction),
-                ),
-              ],
-            ),
           ).animate().fadeIn(duration: 280.ms).slideY(begin: 0.06, end: 0),
           const Gap(16),
           Wrap(
@@ -115,7 +167,7 @@ class PortalQuickConnectPanel extends StatelessWidget {
             runSpacing: 12,
             children: [
               SizedBox(
-                width: 220,
+                width: metricWidth,
                 child: PortalMetricTile(
                   label: copy.protectedUntil,
                   value: formatPortalDate(experience.dashboard.expiresAt),
@@ -124,7 +176,7 @@ class PortalQuickConnectPanel extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: 220,
+                width: metricWidth,
                 child: PortalMetricTile(
                   label: copy.remainingTraffic,
                   value: formatPortalTraffic(experience.usage.remainingGb),
@@ -133,7 +185,7 @@ class PortalQuickConnectPanel extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: 220,
+                width: metricWidth,
                 child: PortalMetricTile(
                   label: copy.liveDevices,
                   value:

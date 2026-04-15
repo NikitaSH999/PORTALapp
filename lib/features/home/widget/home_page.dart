@@ -71,7 +71,38 @@ class HomePage extends HookConsumerWidget {
                 },
               AsyncError(:final error) =>
                 SliverErrorBodyPlaceholder(t.presentShortError(error)),
-              _ => const SliverToBoxAdapter(),
+              _ => SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 520),
+                        child: PortalSectionCard(
+                          tone: PortalSectionTone.muted,
+                          child: Row(
+                            children: [
+                              const SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.4,
+                                ),
+                              ),
+                              const Gap(12),
+                              Expanded(
+                                child: Text(
+                                  copy.loadingAccessDeck,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
             },
           ],
         ),
@@ -89,16 +120,13 @@ class _HomeTitle extends StatelessWidget {
       spacing: 8,
       runSpacing: 8,
       crossAxisAlignment: WrapCrossAlignment.center,
-      children: const [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PokrovLogo(width: 30, height: 30),
-            Gap(10),
-            Text(Constants.appName),
-          ],
+      children: [
+        const PokrovLogo(width: 30, height: 30),
+        Text(
+          Constants.appName,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
-        AppVersionLabel(),
+        const AppVersionLabel(),
       ],
     );
   }

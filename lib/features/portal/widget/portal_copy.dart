@@ -18,7 +18,7 @@ class PortalCopy {
   static final RegExp _monthsPattern =
       RegExp(r'^(\d+)\s+months?$', caseSensitive: false);
 
-  String get shellVpn => 'Network';
+  String get shellVpn => isRussian ? 'Сеть' : 'Network';
   String get shellLocations => isRussian ? 'Локации' : 'Locations';
   String get shellDevices => isRussian ? 'Устройства' : 'Devices';
   String get shellProfile => isRussian ? 'Профиль' : 'Profile';
@@ -224,9 +224,9 @@ class PortalCopy {
       ? 'Пока нет активной ссылки доступа'
       : 'No active access link yet';
   String get automaticSyncTitle =>
-      isRussian ? 'Automatic sync' : 'Automatic sync';
+      isRussian ? 'Автосинхронизация' : 'Automatic sync';
   String get automaticSyncSubtitle => isRussian
-      ? 'Access stays ready on this device. Compatibility tools stay optional.'
+      ? 'Доступ на этом устройстве остаётся готовым. Инструменты совместимости можно не трогать.'
       : 'Access stays ready on this device. Compatibility tools stay optional.';
   String get manualRecovery =>
       isRussian ? 'Ручное восстановление' : 'Manual recovery';
@@ -325,26 +325,26 @@ class PortalCopy {
       : 'Choose an active profile first';
   String get trialPlatformsBadge => 'Android + Windows';
   String get accessReadyTitle =>
-      isRussian ? 'Р”РѕСЃС‚СѓРї РіРѕС‚РѕРІ' : 'Access stays ready';
+      isRussian ? 'Доступ уже готов' : 'Access stays ready';
   String get accessReadySubtitle => isRussian
-      ? 'POKROV РїРѕРґРґРµСЂР¶РёРІР°РµС‚ РґРѕСЃС‚СѓРї РЅР° СЌС‚РѕРј СѓСЃС‚СЂРѕР№СЃС‚РІРµ. Р РµРґРєРёРµ СЃС†РµРЅР°СЂРёРё РѕСЃС‚Р°СЋС‚СЃСЏ РІ СЂР°СЃС€РёСЂРµРЅРЅС‹С… РЅР°СЃС‚СЂРѕР№РєР°С….'
+      ? 'POKROV поддерживает доступ на этом устройстве. Редкие сценарии восстановления остаются в расширенных настройках.'
       : 'POKROV keeps this device in sync. Edge-case recovery tools stay in Advanced settings.';
   String get advancedRecoveryTools => isRussian
-      ? 'Р РµР·РµСЂРІРЅС‹Рµ РёРЅСЃС‚СЂСѓРјРµРЅС‚С‹'
+      ? 'Инструменты восстановления'
       : 'Advanced recovery tools';
   String get advancedRecoveryToolsSubtitle => isRussian
-      ? 'РЎРѕРІРјРµСЃС‚РёРјС‹Р№ РёРјРїРѕСЂС‚ Рё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёРµ РґР»СЏ СЂРµРґРєРёС… СЃР»СѓС‡Р°РµРІ РѕСЃС‚Р°СЋС‚СЃСЏ РІ СЂР°СЃС€РёСЂРµРЅРЅС‹С… РЅР°СЃС‚СЂРѕР№РєР°С….'
+      ? 'Совместимый импорт и редкие инструменты восстановления остаются в расширенных настройках.'
       : 'Compatibility import and rare recovery tools stay in Advanced settings.';
   String get supportThreadsTitle =>
-      isRussian ? 'РџРѕСЃР»РµРґРЅРёРµ РѕР±СЂР°С‰РµРЅРёСЏ' : 'Recent requests';
+      isRussian ? 'Последние обращения' : 'Recent requests';
   String get supportThreadsSubtitle => isRussian
-      ? 'Р•СЃР»Рё РїРѕРјРѕС‰СЊ СѓР¶Рµ РІ РїСѓС‚Рё, РїРѕСЃР»РµРґРЅРёРµ РѕР±РЅРѕРІР»РµРЅРёСЏ РїРѕСЏРІСЏС‚СЃСЏ Р·РґРµСЃСЊ.'
+      ? 'Если поддержка уже в работе, последние обновления появятся здесь.'
       : 'If help is already in motion, the latest updates appear here first.';
   String get continueInWebCabinet => isRussian
-      ? 'РџСЂРѕРґРѕР»Р¶РёС‚СЊ РІ РІРµР±-РєР°Р±РёРЅРµС‚Рµ'
+      ? 'Продолжить в веб-кабинете'
       : 'Continue in web cabinet';
   String get telegramSupportFallback => isRussian
-      ? 'РћС‚РєСЂС‹С‚СЊ Telegram-Р·Р°РїР°СЃРЅРѕР№ РїСѓС‚СЊ'
+      ? 'Открыть Telegram-поддержку'
       : 'Open Telegram fallback';
 
   String supportStatus(String raw) {
@@ -401,6 +401,7 @@ class PortalCopy {
         return 'Подключите профиль, чтобы открыть настройки, локации, устройства, поддержку и загрузки, не выходя из приложения.';
       case 'support and account data will appear here after trial activation.':
         return 'Данные поддержки и аккаунта появятся здесь после запуска тест-драйва.';
+      case 'welcome to pokrov':
       case 'welcome to pokrov vpn':
         return 'Добро пожаловать в POKROV';
       case 'available after activation':

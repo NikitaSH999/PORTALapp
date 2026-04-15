@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:fpdart/fpdart.dart';
+import 'package:hiddify/features/per_app_proxy/data/windows_executable_catalog.dart';
 import 'package:hiddify/features/per_app_proxy/model/installed_package_info.dart';
 import 'package:hiddify/utils/utils.dart';
 
@@ -19,6 +21,10 @@ class PerAppProxyRepositoryImpl
   TaskEither<String, List<InstalledPackageInfo>> getInstalledPackages() {
     return TaskEither(
       () async {
+        if (Platform.isWindows) {
+          loggy.debug("discovering windows executable suggestions");
+          return right(await discoverWindowsExecutables());
+        }
         loggy.debug("getting installed packages info");
         final result =
             await _methodChannel.invokeMethod<String>("get_installed_packages");

@@ -7,10 +7,10 @@ $distDir = Join-Path $repoRoot "dist"
 $outDir = Join-Path $repoRoot "out"
 $portableStageDir = Join-Path $distDir "tmp\$appSlug"
 $releaseRunnerDir = Join-Path $repoRoot "build\windows\x64\runner\Release"
-$runnerExePath = Join-Path $releaseRunnerDir "POKROVVPN.exe"
+$runnerExePath = Join-Path $releaseRunnerDir "POKROV.exe"
 $msixConfigPath = Join-Path $repoRoot "windows\packaging\msix\make_config.yaml"
 $exeConfigPath = Join-Path $repoRoot "windows\packaging\exe\make_config.yaml"
-$brandingSourceIcon = (Resolve-Path (Join-Path $repoRoot "..\..\logogo.png")).Path
+$brandingSourceIcon = (Resolve-Path (Join-Path $repoRoot "assets\images\source\ic_launcher_foreground.png")).Path
 $brandingSyncScript = Join-Path $repoRoot "windows\sync_branding_assets.py"
 $brandingAppIcon = Join-Path $repoRoot "windows\runner\resources\app_icon.ico"
 $builtMsixPath = Join-Path $releaseRunnerDir "pokrov-windows-setup-x64.msix"
@@ -163,7 +163,7 @@ xcopy ".github\help\mac-windows\*.url" $portableStageDir /E /H /C /I /Y | Out-Nu
 
 $legacyResidue = Get-ChildItem -Path $portableStageDir -Recurse -File |
     Where-Object {
-        $_.Name -like "*Hiddify*"
+        $_.Name -like "*Hiddify*" -or $_.Name -like "*POKROVVPN*"
     }
 
 if ($legacyResidue) {

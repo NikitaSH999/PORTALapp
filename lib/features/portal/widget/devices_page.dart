@@ -32,6 +32,7 @@ class DevicesPage extends HookConsumerWidget {
                         (portal.usage.deviceLimit - portal.usage.activeSessions)
                             .clamp(0, portal.usage.deviceLimit);
                     final currentDevice = _currentDevice(portal);
+                    final metricWidth = portalAdaptiveTileWidth(context);
 
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -71,7 +72,7 @@ class DevicesPage extends HookConsumerWidget {
                                 runSpacing: 12,
                                 children: [
                                   SizedBox(
-                                    width: 220,
+                                    width: metricWidth,
                                     child: PortalMetricTile(
                                       icon: Icons.link_rounded,
                                       label: copy.activeSessions,
@@ -80,7 +81,7 @@ class DevicesPage extends HookConsumerWidget {
                                     ),
                                   ),
                                   SizedBox(
-                                    width: 220,
+                                    width: metricWidth,
                                     child: PortalMetricTile(
                                       icon: Icons.devices_other_rounded,
                                       label: copy.availableSlots,
@@ -88,7 +89,7 @@ class DevicesPage extends HookConsumerWidget {
                                     ),
                                   ),
                                   SizedBox(
-                                    width: 220,
+                                    width: metricWidth,
                                     child: PortalMetricTile(
                                       icon: Icons.cloud_done_outlined,
                                       label: copy.healthyNodes,
@@ -173,6 +174,7 @@ class DevicesPage extends HookConsumerWidget {
                                     ),
                                     trailing: Wrap(
                                       spacing: 8,
+                                      runSpacing: 8,
                                       children: [
                                         if (target.primaryUrl.isNotEmpty)
                                           OutlinedButton(

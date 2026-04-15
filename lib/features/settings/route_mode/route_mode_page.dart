@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hiddify/core/router/app_router.dart';
 import 'package:hiddify/core/widget/premium_surfaces.dart';
 import 'package:hiddify/features/common/nested_app_bar.dart';
 import 'package:hiddify/features/per_app_proxy/model/installed_package_info.dart';
@@ -15,8 +17,23 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 Future<void> showRouteModePage(
   BuildContext context, {
   bool requiredSetup = false,
-}) {
-  return Navigator.of(context, rootNavigator: true).push(
+}) async {
+  final navigatorContext = rootNavigatorKey.currentContext ?? context;
+  await Future<void>.delayed(Duration.zero);
+  final router = GoRouter.maybeOf(navigatorContext);
+  if (router != null) {
+    final location = Uri(
+      path: '/route-mode',
+      queryParameters: requiredSetup
+          ? const {'requiredSetup': 'true'}
+          : const <String, String>{},
+    ).toString();
+    await router.push<void>(location);
+    return;
+  }
+
+  if (!navigatorContext.mounted) return;
+  await Navigator.of(navigatorContext).push(
     MaterialPageRoute<void>(
       fullscreenDialog: true,
       builder: (_) => RouteModePage(requiredSetup: requiredSetup),
@@ -36,7 +53,8 @@ class RouteModePage extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final copy = _RouteModeCopy.of(context);
     final pickerSupport = ref.watch(routeModePickerSupportProvider);
-    final completed = ref.watch(routeModeChoiceCompletedProvider).valueOrNull;
+    final completed =
+        ref.watch(routeModeChoiceCompletedProvider).valueOrNull ?? false;
     final currentMode = ref.watch(consumerRouteModeProvider);
     final selectedTargets = ref.watch(consumerSelectedAppsProvider);
     final desktopPrivilege = ref.watch(desktopPrivilegeProvider).valueOrNull;
@@ -47,17 +65,22 @@ class RouteModePage extends HookConsumerWidget {
 
     final selectedMode = useState<ConsumerRouteMode?>(null);
     final draftSelection = useState<Set<String>>(<String>{});
-    final hydrated = useState(false);
+    final hasLocalEdits = useState(false);
     final isSaving = useState(false);
 
     useEffect(() {
-      if (hydrated.value) return null;
-      hydrated.value = true;
+      if (hasLocalEdits.value || isSaving.value) return null;
       selectedMode.value =
-          completed == true ? currentMode : ConsumerRouteMode.allTraffic;
+          completed ? currentMode : ConsumerRouteMode.allTraffic;
       draftSelection.value = selectedTargets.toSet();
       return null;
-    }, [completed, currentMode, selectedTargets]);
+    }, [
+      completed,
+      currentMode,
+      selectedTargets,
+      hasLocalEdits.value,
+      isSaving.value,
+    ]);
 
     Future<void> saveAllTraffic() async {
       if (isSaving.value) return;
@@ -81,197 +104,207 @@ class RouteModePage extends HookConsumerWidget {
       }
     }
 
+    void selectMode(ConsumerRouteMode mode) {
+      hasLocalEdits.value = true;
+      selectedMode.value = mode;
+    }
+
     return PopScope(
-      canPop: !requiredSetup || completed == true,
+      canPop: !requiredSetup || completed,
       child: Scaffold(
-        backgroundColor: Colors.transparent,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: PremiumPageBackground(
-          child: CustomScrollView(
-            slivers: [
-              NestedAppBar(
-                title: Text(copy.pageTitle),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                sliver: SliverToBoxAdapter(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      PortalSectionCard(
-                        tone: PortalSectionTone.accent,
-                        child: PremiumSectionHeader(
-                          eyebrow: requiredSetup
-                              ? copy.requiredEyebrow
-                              : copy.pageEyebrow,
-                          title: copy.heroTitle,
-                          subtitle: copy.heroSubtitle,
-                        ),
-                      ),
-                      const Gap(16),
-                      _RouteModeOptionCard(
-                        title: copy.allTrafficTitle,
-                        body: copy.allTrafficBody,
-                        selected:
-                            selectedMode.value == ConsumerRouteMode.allTraffic,
-                        onTap: () =>
-                            selectedMode.value = ConsumerRouteMode.allTraffic,
-                      ),
-                      const Gap(12),
-                      _RouteModeOptionCard(
-                        title: copy.selectedAppsTitle,
-                        body: copy.selectedAppsBody(pickerSupport.kind),
-                        selected: selectedMode.value ==
-                            ConsumerRouteMode.selectedApps,
-                        onTap: () =>
-                            selectedMode.value = ConsumerRouteMode.selectedApps,
-                      ),
-                      if (Platform.isWindows &&
-                          selectedMode.value == ConsumerRouteMode.allTraffic &&
-                          desktopPrivilege == false) ...[
-                        const Gap(16),
+          child: SafeArea(
+            bottom: false,
+            child: CustomScrollView(
+              slivers: [
+                NestedAppBar(
+                  title: Text(copy.pageTitle),
+                ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                  sliver: SliverToBoxAdapter(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         PortalSectionCard(
-                          tone: PortalSectionTone.muted,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              PremiumSectionHeader(
-                                eyebrow: copy.desktopEyebrow,
-                                title: copy.desktopTitle,
-                                subtitle: copy.desktopBody,
-                              ),
-                              const Gap(12),
-                              OutlinedButton(
-                                onPressed: null,
-                                child: Text(copy.restartAsAdmin),
-                              ),
-                            ],
+                          tone: PortalSectionTone.accent,
+                          child: PremiumSectionHeader(
+                            eyebrow: requiredSetup
+                                ? copy.requiredEyebrow
+                                : copy.pageEyebrow,
+                            title: copy.heroTitle,
+                            subtitle: copy.heroSubtitle,
                           ),
                         ),
-                      ],
-                      if (selectedMode.value ==
-                          ConsumerRouteMode.selectedApps) ...[
                         const Gap(16),
-                        PortalSectionCard(
-                          tone: PortalSectionTone.neutral,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              PremiumSectionHeader(
-                                eyebrow: copy.selectionEyebrow,
-                                title: copy.selectionTitle(
-                                  pickerSupport.kind,
+                        _RouteModeOptionCard(
+                          title: copy.allTrafficTitle,
+                          body: copy.allTrafficBody,
+                          selected: selectedMode.value ==
+                              ConsumerRouteMode.allTraffic,
+                          onTap: () => selectMode(ConsumerRouteMode.allTraffic),
+                        ),
+                        const Gap(12),
+                        _RouteModeOptionCard(
+                          title: copy.selectedAppsTitle,
+                          body: copy.selectedAppsBody(pickerSupport.kind),
+                          selected: selectedMode.value ==
+                              ConsumerRouteMode.selectedApps,
+                          onTap: () =>
+                              selectMode(ConsumerRouteMode.selectedApps),
+                        ),
+                        if (Platform.isWindows &&
+                            selectedMode.value ==
+                                ConsumerRouteMode.allTraffic &&
+                            desktopPrivilege == false) ...[
+                          const Gap(16),
+                          PortalSectionCard(
+                            tone: PortalSectionTone.muted,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                PremiumSectionHeader(
+                                  eyebrow: copy.desktopEyebrow,
+                                  title: copy.desktopTitle,
+                                  subtitle: copy.desktopBody,
                                 ),
-                                subtitle: copy.selectionSubtitle(
-                                  pickerSupport.kind,
+                                const Gap(12),
+                                OutlinedButton(
+                                  onPressed: null,
+                                  child: Text(copy.restartAsAdmin),
                                 ),
-                              ),
-                              const Gap(12),
-                              if (pickerSupport.kind ==
-                                  RouteModePickerKind.manualExecutableEntry)
-                                _WindowsExecutableSelection(
-                                  targets: draftSelection.value.toList()
-                                    ..sort(),
-                                  copy: copy,
-                                  onAddPressed: () async {
-                                    final value =
-                                        await _showWindowsExecutableDialog(
-                                      context,
-                                      copy,
-                                    );
-                                    if (value == null || !context.mounted) {
-                                      return;
-                                    }
-                                    draftSelection.value =
-                                        normalizeRouteTargets(
-                                      [...draftSelection.value, value],
-                                      caseInsensitive: true,
-                                    ).toSet();
-                                  },
-                                  onRemove: (value) {
-                                    final next = draftSelection.value.toSet()
-                                      ..remove(value);
-                                    draftSelection.value = next;
-                                  },
-                                )
-                              else
-                                switch (packagesAsync) {
-                                  AsyncData(:final value) =>
-                                    _PackageSelectionList(
-                                      packages: value,
-                                      selectedPackages: draftSelection.value,
-                                      onToggle: (packageName) {
-                                        final next =
-                                            draftSelection.value.toSet();
-                                        if (!next.add(packageName)) {
-                                          next.remove(packageName);
-                                        }
-                                        draftSelection.value = next;
-                                      },
-                                    ),
-                                  AsyncLoading() => const Padding(
-                                      padding: EdgeInsets.all(12),
-                                      child: Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.4,
+                              ],
+                            ),
+                          ),
+                        ],
+                        if (selectedMode.value ==
+                            ConsumerRouteMode.selectedApps) ...[
+                          const Gap(16),
+                          PortalSectionCard(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                PremiumSectionHeader(
+                                  eyebrow: copy.selectionEyebrow,
+                                  title: copy.selectionTitle(
+                                    pickerSupport.kind,
+                                  ),
+                                  subtitle: copy.selectionSubtitle(
+                                    pickerSupport.kind,
+                                  ),
+                                ),
+                                const Gap(12),
+                                if (pickerSupport.kind ==
+                                    RouteModePickerKind.manualExecutableEntry)
+                                  _WindowsExecutableSelection(
+                                    targets: draftSelection.value.toList()
+                                      ..sort(),
+                                    copy: copy,
+                                    onAddPressed: () async {
+                                      final value =
+                                          await _showWindowsExecutableDialog(
+                                        context,
+                                        copy,
+                                      );
+                                      if (value == null || !context.mounted) {
+                                        return;
+                                      }
+                                      hasLocalEdits.value = true;
+                                      draftSelection.value =
+                                          normalizeRouteTargets(
+                                        [...draftSelection.value, value],
+                                        caseInsensitive: true,
+                                      ).toSet();
+                                    },
+                                    onRemove: (value) {
+                                      hasLocalEdits.value = true;
+                                      final next = draftSelection.value.toSet()
+                                        ..remove(value);
+                                      draftSelection.value = next;
+                                    },
+                                  )
+                                else
+                                  switch (packagesAsync) {
+                                    AsyncData(:final value) =>
+                                      _PackageSelectionList(
+                                        packages: value,
+                                        selectedPackages: draftSelection.value,
+                                        onToggle: (packageName) {
+                                          hasLocalEdits.value = true;
+                                          final next =
+                                              draftSelection.value.toSet();
+                                          if (!next.add(packageName)) {
+                                            next.remove(packageName);
+                                          }
+                                          draftSelection.value = next;
+                                        },
+                                      ),
+                                    AsyncLoading() => const Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: Center(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.4,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  AsyncError() => Padding(
-                                      padding: const EdgeInsets.all(12),
-                                      child: Text(copy.selectionError),
-                                    ),
-                                  _ => const SizedBox.shrink(),
-                                },
-                              const Gap(12),
-                              Text(
-                                copy.selectedCount(
-                                  draftSelection.value.length,
-                                  pickerSupport.kind,
+                                    AsyncError() => Padding(
+                                        padding: const EdgeInsets.all(12),
+                                        child: Text(copy.selectionError),
+                                      ),
+                                    _ => const SizedBox.shrink(),
+                                  },
+                                const Gap(12),
+                                Text(
+                                  copy.selectedCount(
+                                    draftSelection.value.length,
+                                    pickerSupport.kind,
+                                  ),
+                                  style: Theme.of(context).textTheme.bodyMedium,
                                 ),
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                      const Gap(16),
-                      Wrap(
-                        spacing: 12,
-                        runSpacing: 12,
-                        children: [
-                          FilledButton(
-                            onPressed: isSaving.value
-                                ? null
-                                : selectedMode.value ==
-                                        ConsumerRouteMode.selectedApps
-                                    ? (draftSelection.value.isEmpty
-                                        ? null
-                                        : saveSelectedApps)
-                                    : selectedMode.value ==
-                                            ConsumerRouteMode.allTraffic
-                                        ? saveAllTraffic
-                                        : null,
-                            child: Text(
-                              selectedMode.value ==
-                                      ConsumerRouteMode.selectedApps
-                                  ? copy.selectedAppsAction
-                                  : copy.allTrafficAction,
+                              ],
                             ),
                           ),
-                          if (!requiredSetup)
-                            OutlinedButton(
+                        ],
+                        const Gap(16),
+                        Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
+                          children: [
+                            FilledButton(
                               onPressed: isSaving.value
                                   ? null
-                                  : () => Navigator.of(context).maybePop(),
-                              child: Text(copy.cancelAction),
+                                  : selectedMode.value ==
+                                          ConsumerRouteMode.selectedApps
+                                      ? (draftSelection.value.isEmpty
+                                          ? null
+                                          : saveSelectedApps)
+                                      : selectedMode.value ==
+                                              ConsumerRouteMode.allTraffic
+                                          ? saveAllTraffic
+                                          : null,
+                              child: Text(
+                                selectedMode.value ==
+                                        ConsumerRouteMode.selectedApps
+                                    ? copy.selectedAppsAction
+                                    : copy.allTrafficAction,
+                              ),
                             ),
-                        ],
-                      ),
-                    ],
+                            if (!requiredSetup)
+                              OutlinedButton(
+                                onPressed: isSaving.value
+                                    ? null
+                                    : () => Navigator.of(context).maybePop(),
+                                child: Text(copy.cancelAction),
+                              ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -476,119 +509,82 @@ class _RouteModeCopy {
   final bool isRussian;
 
   static _RouteModeCopy of(BuildContext context) {
-    return _RouteModeCopy._(
-      Localizations.localeOf(context).languageCode.toLowerCase().startsWith(
-            'ru',
-          ),
-    );
+    final code = Localizations.localeOf(context).languageCode.toLowerCase();
+    return _RouteModeCopy._(code.startsWith('ru'));
   }
 
-  String get pageTitle => isRussian ? 'Режим маршрута' : 'Route mode';
-  String get pageEyebrow => isRussian ? 'Маршрут устройства' : 'Device route';
+  String get pageTitle => isRussian ? 'Route mode' : 'Route mode';
+  String get pageEyebrow => isRussian ? 'Device route' : 'Device route';
   String get requiredEyebrow => isRussian
-      ? 'Нужно перед первым подключением'
+      ? 'Required before first connect'
       : 'Required before first connect';
   String get heroTitle => isRussian
-      ? 'Как оптимизировать это устройство?'
+      ? 'How should this device be optimized?'
       : 'How should this device be optimized?';
   String get heroSubtitle => isRussian
-      ? 'Выберите один спокойный режим для этого устройства. Позже его можно поменять в настройках.'
+      ? 'Choose one calm default for this device. You can change it later in Settings.'
       : 'Choose one calm default for this device. You can change it later in Settings.';
   String get allTrafficTitle => isRussian
-      ? 'Оптимизировать всё на этом устройстве'
+      ? 'Optimize everything on this device'
       : 'Optimize everything on this device';
   String get allTrafficBody => isRussian
-      ? 'Рекомендуемый вариант. POKROV оптимизирует весь поддерживаемый трафик на этом устройстве.'
+      ? 'Recommended for most devices. POKROV keeps supported traffic optimized across this device.'
       : 'Recommended for most devices. POKROV keeps supported traffic optimized across this device.';
   String get selectedAppsTitle =>
-      isRussian ? 'Только выбранные приложения' : 'Only selected apps';
+      isRussian ? 'Only selected apps' : 'Only selected apps';
 
   String selectedAppsBody(RouteModePickerKind pickerKind) {
     if (pickerKind == RouteModePickerKind.manualExecutableEntry) {
-      return isRussian
-          ? 'Выберите .exe-файлы приложений, которые должны идти через POKROV.'
-          : 'Choose the app .exe files that should use POKROV.';
+      return 'Choose the app .exe files that should use POKROV.';
     }
-    return isRussian
-        ? 'Выберите приложения, которые должны идти через POKROV.'
-        : 'Choose the apps that should use POKROV.';
+    return 'Choose the apps that should use POKROV.';
   }
 
-  String get selectionEyebrow =>
-      isRussian ? 'Выбор приложений' : 'App selection';
+  String get selectionEyebrow => 'App selection';
 
   String selectionTitle(RouteModePickerKind pickerKind) {
     if (pickerKind == RouteModePickerKind.manualExecutableEntry) {
-      return isRussian
-          ? 'Какие .exe-файлы должны идти через POKROV?'
-          : 'Choose the .exe files that should use POKROV.';
+      return 'Choose the .exe files that should use POKROV.';
     }
-    return isRussian
-        ? 'Какие приложения должны идти через POKROV?'
-        : 'Which apps should use POKROV?';
+    return 'Which apps should use POKROV?';
   }
 
   String selectionSubtitle(RouteModePickerKind pickerKind) {
     if (pickerKind == RouteModePickerKind.manualExecutableEntry) {
-      return isRussian
-          ? 'Добавьте хотя бы один .exe-файл. Остальной трафик на компьютере останется обычным.'
-          : 'Add at least one app executable. The rest of this PC stays direct.';
+      return 'Add at least one app executable. The rest of this PC stays direct.';
     }
-    return isRussian
-        ? 'Выберите хотя бы одно приложение. Остальной трафик останется обычным.'
-        : 'Pick at least one app. The rest of the device stays direct.';
+    return 'Pick at least one app. The rest of the device stays direct.';
   }
 
-  String get selectionError => isRussian
-      ? 'Не удалось загрузить список приложений. Пока можно выбрать оптимизацию всего устройства.'
-      : 'Could not load installed apps right now. You can still optimize the whole device.';
+  String get selectionError =>
+      'Could not load installed apps right now. You can still optimize the whole device.';
 
   String selectedCount(int count, RouteModePickerKind pickerKind) {
     if (pickerKind == RouteModePickerKind.manualExecutableEntry) {
-      return isRussian
-          ? 'Выбрано .exe-файлов: $count'
-          : 'Selected .exe files: $count';
+      return 'Selected .exe files: $count';
     }
-    return isRussian ? 'Выбрано приложений: $count' : 'Selected apps: $count';
+    return 'Selected apps: $count';
   }
 
-  String get allTrafficAction => isRussian
-      ? 'Оптимизировать всё на этом устройстве'
-      : 'Optimize everything on this device';
-  String get selectedAppsAction => isRussian
-      ? 'Использовать только выбранные приложения'
-      : 'Use only selected apps';
-  String get addExecutableAction =>
-      isRussian ? 'Добавить .exe-файл' : 'Add .exe file';
-  String get addAppAction => isRussian ? 'Добавить приложение' : 'Add app';
-  String get addExecutableDialogTitle =>
-      isRussian ? 'Добавить .exe-файл' : 'Add an app .exe';
-  String get addExecutableDialogBody => isRussian
-      ? 'Укажите .exe-файл приложения, которое должно идти через POKROV.'
-      : 'Enter the app .exe file that should use POKROV.';
-  String get addExecutableHint => isRussian
-      ? r'Например: C:\Program Files\App\App.exe'
-      : r'For example: C:\Program Files\App\App.exe';
-  String get addExecutableExample => isRussian
-      ? r'Пример: C:\Program Files\Telegram Desktop\Telegram.exe'
-      : r'Example: C:\Program Files\Telegram Desktop\Telegram.exe';
-  String get addExecutableValidation => isRussian
-      ? 'Укажите корректный .exe-файл.'
-      : 'Enter a valid .exe file path.';
-  String get windowsExecutableHint => isRussian
-      ? 'Добавьте .exe-файлы приложений, которые должны идти через POKROV.'
-      : 'Add the app .exe files that should use POKROV.';
-  String get windowsExecutableEmpty =>
-      isRussian ? 'Пока файлы не добавлены.' : 'No .exe files selected yet.';
-  String get cancelAction => isRussian ? 'Отмена' : 'Cancel';
-  String get desktopEyebrow =>
-      isRussian ? 'Оптимизация компьютера' : 'Desktop optimization';
-  String get desktopTitle => isRussian
-      ? 'Для всего устройства нужны права администратора'
-      : 'Whole-device optimization needs Administrator rights';
-  String get desktopBody => isRussian
-      ? 'Перед оптимизацией всего устройства перезапустите POKROV от имени администратора.'
-      : 'Restart POKROV as Administrator before optimizing the whole device.';
-  String get restartAsAdmin =>
-      isRussian ? 'Нужен запуск от администратора' : 'Restart as Administrator';
+  String get allTrafficAction => 'Optimize everything on this device';
+  String get selectedAppsAction => 'Use only selected apps';
+  String get addExecutableAction => 'Add .exe file';
+  String get addAppAction => 'Add app';
+  String get addExecutableDialogTitle => 'Add an app .exe';
+  String get addExecutableDialogBody =>
+      'Enter the app .exe file that should use POKROV.';
+  String get addExecutableHint => r'For example: C:\Program Files\App\App.exe';
+  String get addExecutableExample =>
+      r'Example: C:\Program Files\Telegram Desktop\Telegram.exe';
+  String get addExecutableValidation => 'Enter a valid .exe file path.';
+  String get windowsExecutableHint =>
+      'Add the app .exe files that should use POKROV.';
+  String get windowsExecutableEmpty => 'No .exe files selected yet.';
+  String get cancelAction => 'Cancel';
+  String get desktopEyebrow => 'Desktop optimization';
+  String get desktopTitle =>
+      'Whole-device optimization needs Administrator rights';
+  String get desktopBody =>
+      'Restart POKROV as Administrator before optimizing the whole device.';
+  String get restartAsAdmin => 'Restart as Administrator';
 }

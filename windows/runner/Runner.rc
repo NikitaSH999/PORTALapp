@@ -92,9 +92,9 @@ BEGIN
             VALUE "CompanyName", "POKROV" "\0"
             VALUE "FileDescription", "POKROV" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "pokrovvpn" "\0"
+            VALUE "InternalName", "pokrov" "\0"
             VALUE "LegalCopyright", "Copyright (C) POKROV. All rights reserved." "\0"
-            VALUE "OriginalFilename", "POKROVVPN.exe" "\0"
+            VALUE "OriginalFilename", "POKROV.exe" "\0"
             VALUE "ProductName", "POKROV" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

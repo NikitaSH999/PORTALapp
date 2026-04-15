@@ -41,8 +41,16 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
               final completed = await ref
                   .read(routeModeChoiceCompletedProvider.future)
                   .catchError((_) => false);
-              if (!context.mounted || completed == true) return;
-              await showRouteModePage(context, requiredSetup: true);
+              await Future<void>.delayed(Duration.zero);
+              final navigatorContext = rootNavigatorKey.currentContext;
+              if ((!context.mounted && navigatorContext == null) ||
+                  completed == true) {
+                return;
+              }
+              await showRouteModePage(
+                navigatorContext ?? context,
+                requiredSetup: true,
+              );
             }());
           },
           error: (error, _) => messenger.showSnackBar(
@@ -64,7 +72,8 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
       hasScrollBody: false,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-        child: Center(
+        child: Align(
+          alignment: Alignment.topCenter,
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 640),
             child: LayoutBuilder(
@@ -210,8 +219,9 @@ class EmptyProfilesHomeBody extends HookConsumerWidget {
                                 ? null
                                 : () => ref
                                     .read(
-                                        portalTrialActivationControllerProvider
-                                            .notifier)
+                                      portalTrialActivationControllerProvider
+                                          .notifier,
+                                    )
                                     .activateTrial(
                                       locale: Localizations.localeOf(context),
                                     ),

@@ -84,6 +84,8 @@ class ProfilePage extends HookConsumerWidget {
                 child: PortalAsyncBody(
                   value: experience,
                   builder: (context, portal) {
+                    final metricWidth = portalAdaptiveTileWidth(context);
+                    final useCompactActions = portalUseCompactLayout(context);
                     final linkedTelegramLabel = portal
                             .session.linkedTelegramUsername.isNotEmpty
                         ? '@${portal.session.linkedTelegramUsername}'
@@ -110,7 +112,7 @@ class ProfilePage extends HookConsumerWidget {
                                 runSpacing: 12,
                                 children: [
                                   SizedBox(
-                                    width: 220,
+                                    width: metricWidth,
                                     child: PortalMetricTile(
                                       icon: Icons.data_usage_rounded,
                                       label: copy.remainingTrafficMetric,
@@ -120,7 +122,7 @@ class ProfilePage extends HookConsumerWidget {
                                     ),
                                   ),
                                   SizedBox(
-                                    width: 220,
+                                    width: metricWidth,
                                     child: PortalMetricTile(
                                       icon: Icons.verified_user_outlined,
                                       label: copy.planMetric,
@@ -150,7 +152,6 @@ class ProfilePage extends HookConsumerWidget {
                         ),
                         const Gap(16),
                         PortalSectionCard(
-                          tone: PortalSectionTone.neutral,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -248,7 +249,6 @@ class ProfilePage extends HookConsumerWidget {
                         ),
                         const Gap(16),
                         PortalSectionCard(
-                          tone: PortalSectionTone.neutral,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -287,28 +287,58 @@ class ProfilePage extends HookConsumerWidget {
                         const Gap(16),
                         PortalSectionCard(
                           tone: PortalSectionTone.muted,
-                          child: Row(
-                            children: [
-                              const PremiumIconOrb(
-                                icon: Icons.tune_rounded,
-                                size: 48,
-                              ),
-                              const Gap(14),
-                              Expanded(
-                                child: PremiumSectionHeader(
-                                  eyebrow: copy.advancedEyebrow,
-                                  title: copy.advancedTitle,
-                                  subtitle: copy.advancedSubtitle,
+                          child: useCompactActions
+                              ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const PremiumIconOrb(
+                                          icon: Icons.tune_rounded,
+                                          size: 48,
+                                        ),
+                                        const Gap(14),
+                                        Expanded(
+                                          child: PremiumSectionHeader(
+                                            eyebrow: copy.advancedEyebrow,
+                                            title: copy.advancedTitle,
+                                            subtitle: copy.advancedSubtitle,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const Gap(16),
+                                    FilledButton(
+                                      onPressed: () =>
+                                          const SettingsRoute().push(context),
+                                      child: Text(copy.openAdvancedSettings),
+                                    ),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    const PremiumIconOrb(
+                                      icon: Icons.tune_rounded,
+                                      size: 48,
+                                    ),
+                                    const Gap(14),
+                                    Expanded(
+                                      child: PremiumSectionHeader(
+                                        eyebrow: copy.advancedEyebrow,
+                                        title: copy.advancedTitle,
+                                        subtitle: copy.advancedSubtitle,
+                                      ),
+                                    ),
+                                    const Gap(16),
+                                    FilledButton(
+                                      onPressed: () =>
+                                          const SettingsRoute().push(context),
+                                      child: Text(copy.openAdvancedSettings),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              const Gap(16),
-                              FilledButton(
-                                onPressed: () =>
-                                    const SettingsRoute().push(context),
-                                child: Text(copy.openAdvancedSettings),
-                              ),
-                            ],
-                          ),
                         ),
                       ],
                     );

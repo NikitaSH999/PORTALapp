@@ -1,7 +1,6 @@
 import 'package:fluentui_system_icons/fluentui_system_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hiddify/core/localization/translations.dart';
@@ -10,7 +9,6 @@ import 'package:hiddify/core/router/router.dart';
 import 'package:hiddify/core/widget/adaptive_icon.dart';
 import 'package:hiddify/core/widget/adaptive_menu.dart';
 import 'package:hiddify/features/common/confirmation_dialogs.dart';
-import 'package:hiddify/features/common/qr_code_dialog.dart';
 import 'package:hiddify/features/profile/model/profile_entity.dart';
 import 'package:hiddify/features/profile/notifier/profile_notifier.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_notifier.dart';
@@ -50,9 +48,12 @@ class ProfileTile extends HookConsumerWidget {
       _ => null,
     };
 
-    final effectiveMargin = isMain ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8) : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
+    final effectiveMargin = isMain
+        ? const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+        : const EdgeInsets.only(left: 12, right: 12, bottom: 12);
     final double effectiveElevation = profile.active ? 12 : 4;
-    final effectiveOutlineColor = profile.active ? theme.colorScheme.outlineVariant : Colors.transparent;
+    final effectiveOutlineColor =
+        profile.active ? theme.colorScheme.outlineVariant : Colors.transparent;
 
     return Card(
       margin: effectiveMargin,
@@ -96,7 +97,9 @@ class ProfileTile extends HookConsumerWidget {
                       if (selectActiveMutation.state.isInProgress) return;
                       if (profile.active) return;
                       selectActiveMutation.setFuture(
-                        ref.read(profilesOverviewNotifierProvider.notifier).selectActiveProfile(profile.id),
+                        ref
+                            .read(profilesOverviewNotifierProvider.notifier)
+                            .selectActiveProfile(profile.id),
                       );
                     }
                   },
@@ -116,17 +119,20 @@ class ProfileTile extends HookConsumerWidget {
                               color: Colors.transparent,
                               clipBehavior: Clip.antiAlias,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                     child: Text(
                                       profile.name,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: theme.textTheme.titleMedium?.copyWith(
+                                      style:
+                                          theme.textTheme.titleMedium?.copyWith(
                                         fontFamily: FontFamily.emoji,
                                       ),
-                                      semanticsLabel: t.profile.activeProfileNameSemanticLabel(
+                                      semanticsLabel: t.profile
+                                          .activeProfileNameSemanticLabel(
                                         name: profile.name,
                                       ),
                                     ),
@@ -194,7 +200,9 @@ class ProfileActionButton extends HookConsumerWidget {
               if (ref.read(updateProfileProvider(profile.id)).isLoading) {
                 return;
               }
-              ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
+              ref
+                  .read(updateProfileProvider(profile.id).notifier)
+                  .updateProfile(profile as RemoteProfileEntity);
             },
             child: const Icon(FluentIcons.arrow_sync_24_filled),
           ),
@@ -234,7 +242,9 @@ class ProfileActionsMenu extends HookConsumerWidget {
       initialOnFailure: (err) {
         CustomToast.error(t.presentShortError(err)).show(context);
       },
-      initialOnSuccess: () => CustomToast.success(t.profile.share.exportConfigToClipboardSuccess).show(context),
+      initialOnSuccess: () =>
+          CustomToast.success(t.profile.share.exportConfigToClipboardSuccess)
+              .show(context),
     );
     final deleteProfileMutation = useMutation(
       initialOnFailure: (err) {
@@ -251,59 +261,39 @@ class ProfileActionsMenu extends HookConsumerWidget {
             if (ref.read(updateProfileProvider(profile.id)).isLoading) {
               return;
             }
-            ref.read(updateProfileProvider(profile.id).notifier).updateProfile(profile as RemoteProfileEntity);
+            ref
+                .read(updateProfileProvider(profile.id).notifier)
+                .updateProfile(profile as RemoteProfileEntity);
           },
         ),
-      AdaptiveMenuItem(
-        title: t.profile.share.buttonText,
-        icon: AdaptiveIcon(context).share,
-        subItems: [
-          if (profile case RemoteProfileEntity(:final url, :final name)) ...[
+      if (profile is! RemoteProfileEntity)
+        AdaptiveMenuItem(
+          title: t.profile.share.buttonText,
+          icon: AdaptiveIcon(context).share,
+          subItems: [
             AdaptiveMenuItem(
-              title: t.profile.share.exportSubLinkToClipboard,
+              title: t.profile.share.exportConfigToClipboard,
               onTap: () async {
-                final link = LinkParser.generateSubShareLink(url, name);
-                if (link.isNotEmpty) {
-                  await Clipboard.setData(ClipboardData(text: link));
-                  if (context.mounted) {
-                    CustomToast(t.profile.share.exportToClipboardSuccess).show(context);
-                  }
+                if (exportConfigMutation.state.isInProgress) {
+                  return;
                 }
-              },
-            ),
-            AdaptiveMenuItem(
-              title: t.profile.share.subLinkQrCode,
-              onTap: () async {
-                final link = LinkParser.generateSubShareLink(url, name);
-                if (link.isNotEmpty) {
-                  await QrCodeDialog(
-                    link,
-                    message: name,
-                  ).show(context);
-                }
+                exportConfigMutation.setFuture(
+                  ref
+                      .read(profilesOverviewNotifierProvider.notifier)
+                      .exportConfigToClipboard(profile),
+                );
               },
             ),
           ],
-          AdaptiveMenuItem(
-            title: t.profile.share.exportConfigToClipboard,
-            onTap: () async {
-              if (exportConfigMutation.state.isInProgress) {
-                return;
-              }
-              exportConfigMutation.setFuture(
-                ref.read(profilesOverviewNotifierProvider.notifier).exportConfigToClipboard(profile),
-              );
-            },
-          ),
-        ],
-      ),
-      AdaptiveMenuItem(
-        icon: FluentIcons.edit_24_regular,
-        title: t.profile.edit.buttonTxt,
-        onTap: () async {
-          await ProfileDetailsRoute(profile.id).push(context);
-        },
-      ),
+        ),
+      if (profile is! RemoteProfileEntity)
+        AdaptiveMenuItem(
+          icon: FluentIcons.edit_24_regular,
+          title: t.profile.edit.buttonTxt,
+          onTap: () async {
+            await ProfileDetailsRoute(profile.id).push(context);
+          },
+        ),
       AdaptiveMenuItem(
         icon: FluentIcons.delete_24_regular,
         title: t.profile.delete.buttonTxt,
@@ -319,7 +309,9 @@ class ProfileActionsMenu extends HookConsumerWidget {
           );
           if (deleteConfirmed) {
             deleteProfileMutation.setFuture(
-              ref.read(profilesOverviewNotifierProvider.notifier).deleteProfile(profile),
+              ref
+                  .read(profilesOverviewNotifierProvider.notifier)
+                  .deleteProfile(profile),
             );
           }
         },
@@ -349,7 +341,8 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
       return (t.profile.subscription.remainingDuration(duration: "∞"), null);
     } else {
       return (
-        t.profile.subscription.remainingDuration(duration: subInfo.remaining.inDays),
+        t.profile.subscription
+            .remainingDuration(duration: subInfo.remaining.inDays),
         null,
       );
     }
@@ -371,7 +364,8 @@ class ProfileSubscriptionInfo extends HookConsumerWidget {
               subInfo.total > 10 * 1099511627776 //10TB
                   ? "∞ GiB"
                   : subInfo.consumption.sizeOf(subInfo.total),
-              semanticsLabel: t.profile.subscription.remainingTrafficSemanticLabel(
+              semanticsLabel:
+                  t.profile.subscription.remainingTrafficSemanticLabel(
                 consumed: subInfo.consumption.sizeGB(),
                 total: subInfo.total.sizeGB(),
               ),

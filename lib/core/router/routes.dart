@@ -15,6 +15,7 @@ import 'package:hiddify/features/profile/add/add_profile_modal.dart';
 import 'package:hiddify/features/profile/details/profile_details_page.dart';
 import 'package:hiddify/features/profile/overview/profiles_overview_page.dart';
 import 'package:hiddify/features/settings/overview/settings_overview_page.dart';
+import 'package:hiddify/features/settings/route_mode/route_mode_page.dart';
 import 'package:hiddify/utils/utils.dart';
 
 part 'routes.g.dart';
@@ -165,6 +166,26 @@ class IntroRoute extends GoRouteData {
       fullscreenDialog: true,
       name: name,
       child: IntroPage(),
+    );
+  }
+}
+
+@TypedGoRoute<RouteModeRoute>(path: "/route-mode", name: RouteModeRoute.name)
+class RouteModeRoute extends GoRouteData {
+  const RouteModeRoute({this.requiredSetup = false});
+
+  final bool requiredSetup;
+
+  static const name = "Route Mode";
+
+  static final GlobalKey<NavigatorState> $parentNavigatorKey = rootNavigatorKey;
+
+  @override
+  Page<void> buildPage(BuildContext context, GoRouterState state) {
+    return MaterialPage(
+      fullscreenDialog: true,
+      name: name,
+      child: RouteModePage(requiredSetup: requiredSetup),
     );
   }
 }

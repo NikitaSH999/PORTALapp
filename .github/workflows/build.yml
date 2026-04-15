@@ -15,7 +15,7 @@ on:
 env:
   IS_GITHUB_ACTIONS: 1
   CHANNEL: "${{ inputs.channel }}"
-  FLUTTER_VERSION: '3.24.0'
+  FLUTTER_VERSION: '3.24.3'
   NDK_VERSION: r26d
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   TAG_NAME: "${{ inputs.tag-name }}"
@@ -36,8 +36,8 @@ jobs:
       draftBuildCode: ${{ steps.draftBuildCode.outputs.datetime }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: subosito/flutter-action@v2.16.0 #issue with 2.13
+      - uses: actions/checkout@v6
+      - uses: subosito/flutter-action@v2.21.0 # issue with older versions
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           channel: 'stable'
@@ -91,11 +91,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Import Apple Codesign Certificates
         if: ${{ inputs.upload-artifact && startsWith(matrix.os,'macos') }}
-        uses: apple-actions/import-codesign-certs@v3
+        uses: apple-actions/import-codesign-certs@v6
         with: 
             p12-file-base64: "${{ secrets.APPLE_CERTIFICATE_P12 }}"
             p12-password: "${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}"
@@ -114,7 +114,7 @@ jobs:
 
       
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2.16.0 #issue with 2.13
+        uses: subosito/flutter-action@v2.21.0 # issue with older versions
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           # flutter-version-file: pubspec.yaml
@@ -124,7 +124,7 @@ jobs:
       
       - name: Setup Java
         if: startsWith(matrix.platform,'android')
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'zulu'
           java-version: 17
@@ -267,7 +267,7 @@ jobs:
 
       - name: Upload Artifact
         if: env.UPLOAD_ARTIFACT == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{matrix.platform}}
           path: ./out
@@ -285,13 +285,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
         with:
           # by default, it uses a depth of 1
           # this fetches all history so that we can read each commit
           fetch-depth: 0
       - name: Download Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           merge-multiple: true
           pattern: "*"
@@ -326,7 +326,7 @@ jobs:
           gitchangelog "${prelease}.." >> release.md  2>&1 || echo "Error in gitchangelog"
           echo -e "\n\n</details>">>release.md
       - name: Create or Update Draft Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -342,10 +342,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Download Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           merge-multiple: true
           pattern: "*"
@@ -370,7 +370,7 @@ jobs:
             ./.github/release_message.md >> release.md
 
       - name: Upload Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: ${{ success() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -402,13 +402,13 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           merge-multiple: true
           pattern: "*ios*"
           path: ./out/
 
-      - uses: Apple-Actions/import-codesign-certs@v2
+      - uses: Apple-Actions/import-codesign-certs@v6
         with:
           p12-file-base64: ${{ secrets.APPLE_UPLOAD_CERTIFICATE_P12 }}
           p12-password: ${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}
@@ -434,7 +434,7 @@ jobs:
           echo "${{secrets.APPLE_DIST_PROVISIONING_PROFILES_TARGZ_BASE64}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
         #echo "${{secrets.NEW_APPLE_STORE_PROVISIONING_PROFILES_TARXZ_BASE64}}"|base64 --decode | tar xJ -C ~/Library/MobileDevice/Provisioning\ Profiles
 
-      - uses: Apple-Actions/upload-testflight-build@v1
+      - uses: Apple-Actions/upload-testflight-build@v4
         with:
           app-path: 'out/Hiddify-iOS.ipa' 
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
