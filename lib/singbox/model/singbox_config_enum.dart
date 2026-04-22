@@ -16,7 +16,8 @@ enum ServiceMode {
 
   final String key;
 
-  static ServiceMode get defaultMode => PlatformUtils.isDesktop ? systemProxy : tun;
+  static ServiceMode get defaultMode =>
+      PlatformUtils.isDesktop ? systemProxy : tun;
 
   /// supported service mode based on platform, use this instead of [values] in UI
   static List<ServiceMode> get choices {
@@ -36,18 +37,18 @@ enum ServiceMode {
   //     };
 
   String present(TranslationsEn t) => switch (this) {
-    proxy => t.pages.settings.inbound.serviceModes.proxy,
-    systemProxy => t.pages.settings.inbound.serviceModes.systemProxy,
-    tun => t.pages.settings.inbound.serviceModes.tun,
-    // tunService => t.pages.settings.inbound.serviceModes.tunService,
-  };
+        proxy => t.pages.settings.inbound.serviceModes.proxy,
+        systemProxy => t.pages.settings.inbound.serviceModes.systemProxy,
+        tun => t.pages.settings.inbound.serviceModes.tun,
+        // tunService => t.pages.settings.inbound.serviceModes.tunService,
+      };
 
   String presentShort(TranslationsEn t) => switch (this) {
-    proxy => t.pages.settings.inbound.shortServiceModes.proxy,
-    systemProxy => t.pages.settings.inbound.shortServiceModes.systemProxy,
-    tun => t.pages.settings.inbound.shortServiceModes.tun,
-    // tunService => t.pages.settings.inbound.shortServiceModes.tunService,
-  };
+        proxy => t.pages.settings.inbound.shortServiceModes.proxy,
+        systemProxy => t.pages.settings.inbound.shortServiceModes.systemProxy,
+        tun => t.pages.settings.inbound.shortServiceModes.tun,
+        // tunService => t.pages.settings.inbound.shortServiceModes.tunService,
+      };
 }
 
 @JsonEnum(valueField: 'key')
@@ -61,10 +62,12 @@ enum BalancerStrategy {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-    roundRobin => t.pages.settings.routing.balancerStrategy.roundRobin,
-    consistentHash => t.pages.settings.routing.balancerStrategy.consistentHash,
-    stickySession => t.pages.settings.routing.balancerStrategy.stickySession,
-  };
+        roundRobin => t.pages.settings.routing.balancerStrategy.roundRobin,
+        consistentHash =>
+          t.pages.settings.routing.balancerStrategy.consistentHash,
+        stickySession =>
+          t.pages.settings.routing.balancerStrategy.stickySession,
+      };
 }
 
 @JsonEnum(valueField: 'key')
@@ -79,11 +82,11 @@ enum IPv6Mode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-    disable => t.pages.settings.routing.ipv6Modes.disable,
-    enable => t.pages.settings.routing.ipv6Modes.enable,
-    prefer => t.pages.settings.routing.ipv6Modes.prefer,
-    only => t.pages.settings.routing.ipv6Modes.only,
-  };
+        disable => t.pages.settings.routing.ipv6Modes.disable,
+        enable => t.pages.settings.routing.ipv6Modes.enable,
+        prefer => t.pages.settings.routing.ipv6Modes.prefer,
+        only => t.pages.settings.routing.ipv6Modes.only,
+      };
 }
 
 @JsonEnum(valueField: 'key')
@@ -99,11 +102,43 @@ enum DomainStrategy {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-    auto => t.pages.settings.dns.domainStrategy.auto,
-    preferIpv6 => t.pages.settings.dns.domainStrategy.preferIpv6,
-    preferIpv4 => t.pages.settings.dns.domainStrategy.preferIpv4,
-    ipv4Only => t.pages.settings.dns.domainStrategy.ipv4Only,
-    ipv6Only => t.pages.settings.dns.domainStrategy.ipv6Only,
+        auto => t.pages.settings.dns.domainStrategy.auto,
+        preferIpv6 => t.pages.settings.dns.domainStrategy.preferIpv6,
+        preferIpv4 => t.pages.settings.dns.domainStrategy.preferIpv4,
+        ipv4Only => t.pages.settings.dns.domainStrategy.ipv4Only,
+        ipv6Only => t.pages.settings.dns.domainStrategy.ipv6Only,
+      };
+}
+
+enum RoutingMode {
+  global,
+  allExceptRu,
+  blockedOnly,
+}
+
+RoutingMode normalizeConsumerRoutingMode(RoutingMode value) {
+  return value == RoutingMode.blockedOnly ? RoutingMode.allExceptRu : value;
+}
+
+List<RoutingMode> consumerRoutingChoices({RoutingMode? selected}) {
+  final normalizedSelected =
+      selected == null ? null : normalizeConsumerRoutingMode(selected);
+
+  return const [RoutingMode.allExceptRu, RoutingMode.global]
+      .where(
+        (value) =>
+            normalizedSelected == null || value != RoutingMode.blockedOnly,
+      )
+      .toList(growable: false);
+}
+
+String presentConsumerRoutingMode(RoutingMode value, TranslationsEn t) {
+  final _ = t;
+  final normalized = normalizeConsumerRoutingMode(value);
+  return switch (normalized) {
+    RoutingMode.allExceptRu => 'All except RU',
+    RoutingMode.global => 'Full tunnel',
+    RoutingMode.blockedOnly => 'All except RU',
   };
 }
 
@@ -113,10 +148,10 @@ enum TunImplementation {
   gvisor;
 
   String present(TranslationsEn t) => switch (this) {
-    mixed => t.pages.settings.inbound.tunImplementations.mixed,
-    system => t.pages.settings.inbound.tunImplementations.system,
-    gvisor => t.pages.settings.inbound.tunImplementations.gvisor,
-  };
+        mixed => t.pages.settings.inbound.tunImplementations.mixed,
+        system => t.pages.settings.inbound.tunImplementations.system,
+        gvisor => t.pages.settings.inbound.tunImplementations.gvisor,
+      };
 }
 
 enum MuxProtocol { h2mux, smux, yamux }
@@ -131,12 +166,12 @@ enum WarpDetourMode {
   final String key;
 
   String present(TranslationsEn t) => switch (this) {
-    proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarp,
-    warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxy,
-  };
+        proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarp,
+        warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxy,
+      };
 
   String presentExplain(TranslationsEn t) => switch (this) {
-    proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarpExplain,
-    warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxyExplain,
-  };
+        proxyOverWarp => t.pages.settings.warp.detourModes.proxyOverWarpExplain,
+        warpOverProxy => t.pages.settings.warp.detourModes.warpOverProxyExplain,
+      };
 }

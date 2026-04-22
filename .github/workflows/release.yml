@@ -1,20 +1,13 @@
-name: Release
-on:
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+'
-      - 'v[0-9]+.[0-9]+.[0-9]+.*'
+name: Legacy Release Disabled
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+on:
+  workflow_dispatch:
 
 jobs:
-  build-release:
-    uses: ./.github/workflows/build.yml
-    secrets: inherit
-    permissions: write-all
-    with:
-      upload-artifact: true
-      tag-name: "${{ github.ref_name }}"
-      channel: "${{ github.ref_type == 'tag' && endsWith(github.ref_name, 'dev') && 'dev' || github.ref_type != 'tag' && 'dev' || 'prod' }}"
+  disabled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use fork Android + Windows release workflow
+        run: |
+          echo "Legacy release.yml publishing is disabled for this fork."
+          echo "Use .github/workflows/fork-android-windows-release.yml instead."

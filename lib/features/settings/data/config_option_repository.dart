@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dartx/dartx.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:hiddify/core/model/optional_range.dart';
@@ -15,6 +16,9 @@ import 'package:hiddify/utils/utils.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+const kBlockedOnlyRuleSetUrl =
+    'https://github.com/savely-krasovsky/antizapret-sing-box/releases/latest/download/antizapret.srs';
+
 abstract class ConfigOptions {
   static final serviceMode = PreferencesNotifier.create<ServiceMode, String>(
     "service-mode",
@@ -23,10 +27,12 @@ abstract class ConfigOptions {
     mapTo: (value) => value.key,
   );
 
-  static final balancerStrategy = PreferencesNotifier.create<BalancerStrategy, String>(
+  static final balancerStrategy =
+      PreferencesNotifier.create<BalancerStrategy, String>(
     "balancer-strategy",
     BalancerStrategy.roundRobin,
-    mapFrom: (value) => BalancerStrategy.values.firstWhere((e) => e.key == value),
+    mapFrom: (value) =>
+        BalancerStrategy.values.firstWhere((e) => e.key == value),
     mapTo: (value) => value.key,
   );
 
@@ -36,8 +42,16 @@ abstract class ConfigOptions {
     mapFrom: Region.values.byName,
     mapTo: (value) => value.name,
   );
-  static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>("use-xray-core-when-possible", false);
-  static final blockAds = PreferencesNotifier.create<bool, bool>("block-ads", false);
+  static final routingMode = PreferencesNotifier.create<RoutingMode, String>(
+    "routing-mode",
+    RoutingMode.allExceptRu,
+    mapFrom: _readRoutingModePreference,
+    mapTo: (value) => value.name,
+  );
+  static final useXrayCoreWhenPossible = PreferencesNotifier.create<bool, bool>(
+      "use-xray-core-when-possible", false);
+  static final blockAds =
+      PreferencesNotifier.create<bool, bool>("block-ads", false);
   static final logLevel = PreferencesNotifier.create<LogLevel, String>(
     "log-level",
     LogLevel.warn,
@@ -45,7 +59,8 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
 
-  static final resolveDestination = PreferencesNotifier.create<bool, bool>("resolve-destination", false);
+  static final resolveDestination =
+      PreferencesNotifier.create<bool, bool>("resolve-destination", false);
 
   static final ipv6Mode = PreferencesNotifier.create<IPv6Mode, String>(
     "ipv6-mode",
@@ -56,22 +71,23 @@ abstract class ConfigOptions {
 
   static final remoteDnsAddress = PreferencesNotifier.create<String, String>(
     "remote-dns-address",
-    "tcp://8.8.8.8",
+    "https://1.1.1.1/dns-query",
     possibleValues: List.of([
       "local",
-      // "udp://223.5.5.5",
-      // "udp://1.1.1.1",
-      // "udp://1.1.1.2",
-      "tcp://8.8.8.8",
+      "udp://223.5.5.5",
+      "udp://1.1.1.1",
+      "udp://1.1.1.2",
       "tcp://1.1.1.1",
       "https://1.1.1.1/dns-query",
-      "https://dns.cloudflare.com/dns-query",
-      "tcp://4.4.2.2",
+      "https://sky.rethinkdns.com/dns-query",
+      "4.4.2.2",
+      "8.8.8.8",
     ]),
     validator: (value) => value.isNotBlank,
   );
 
-  static final remoteDnsDomainStrategy = PreferencesNotifier.create<DomainStrategy, String>(
+  static final remoteDnsDomainStrategy =
+      PreferencesNotifier.create<DomainStrategy, String>(
     "remote-dns-domain-strategy",
     DomainStrategy.auto,
     mapFrom: (value) => DomainStrategy.values.firstWhere((e) => e.key == value),
@@ -92,11 +108,18 @@ abstract class ConfigOptions {
       "4.4.2.2",
       "8.8.8.8",
     ]),
-    defaultValueFunction: (ref) => ref.read(region) == Region.cn ? "223.5.5.5" : "1.1.1.1",
+    defaultValueFunction: (ref) {
+      return switch (normalizeConsumerRoutingMode(ref.read(routingMode))) {
+        RoutingMode.global => "udp://1.1.1.1",
+        RoutingMode.allExceptRu => "local",
+        RoutingMode.blockedOnly => "local",
+      };
+    },
     validator: (value) => value.isNotBlank,
   );
 
-  static final directDnsDomainStrategy = PreferencesNotifier.create<DomainStrategy, String>(
+  static final directDnsDomainStrategy =
+      PreferencesNotifier.create<DomainStrategy, String>(
     "direct-dns-domain-strategy",
     DomainStrategy.auto,
     mapFrom: (value) => DomainStrategy.values.firstWhere((e) => e.key == value),
@@ -125,7 +148,8 @@ abstract class ConfigOptions {
     validator: (value) => isPort(value.toString()),
   );
 
-  static final tunImplementation = PreferencesNotifier.create<TunImplementation, String>(
+  static final tunImplementation =
+      PreferencesNotifier.create<TunImplementation, String>(
     "tun-implementation",
     TunImplementation.gvisor,
     mapFrom: TunImplementation.values.byName,
@@ -134,7 +158,8 @@ abstract class ConfigOptions {
 
   static final mtu = PreferencesNotifier.create<int, int>("mtu", 9000);
 
-  static final strictRoute = PreferencesNotifier.create<bool, bool>("strict-route", true);
+  static final strictRoute =
+      PreferencesNotifier.create<bool, bool>("strict-route", true);
 
   static final connectionTestUrl = PreferencesNotifier.create<String, String>(
     "connection-test-url",
@@ -161,7 +186,8 @@ abstract class ConfigOptions {
     mapTo: const IntervalInSecondsConverter().toJson,
   );
 
-  static final enableClashApi = PreferencesNotifier.create<bool, bool>("enable-clash-api", true);
+  static final enableClashApi =
+      PreferencesNotifier.create<bool, bool>("enable-clash-api", false);
 
   static final clashApiPort = PreferencesNotifier.create<int, int>(
     "clash-api-port",
@@ -169,17 +195,22 @@ abstract class ConfigOptions {
     validator: (value) => isPort(value.toString()),
   );
 
-  static final bypassLan = PreferencesNotifier.create<bool, bool>("bypass-lan", false);
+  static final bypassLan =
+      PreferencesNotifier.create<bool, bool>("bypass-lan", false);
 
-  static final allowConnectionFromLan = PreferencesNotifier.create<bool, bool>("allow-connection-from-lan", false);
+  static final allowConnectionFromLan = PreferencesNotifier.create<bool, bool>(
+      "allow-connection-from-lan", false);
 
-  static final enableFakeDns = PreferencesNotifier.create<bool, bool>("enable-fake-dns", false);
+  static final enableFakeDns =
+      PreferencesNotifier.create<bool, bool>("enable-fake-dns", false);
 
   // static final enableDnsRouting = PreferencesNotifier.create<bool, bool>("enable-dns-routing", true);
 
-  static final independentDnsCache = PreferencesNotifier.create<bool, bool>("independent-dns-cache", true);
+  static final independentDnsCache =
+      PreferencesNotifier.create<bool, bool>("independent-dns-cache", true);
 
-  static final enableTlsFragment = PreferencesNotifier.create<bool, bool>("enable-tls-fragment", false);
+  static final enableTlsFragment =
+      PreferencesNotifier.create<bool, bool>("enable-tls-fragment", false);
 
   static final fragmentPackets = PreferencesNotifier.create<String, String>(
     "fragment-packets",
@@ -187,34 +218,41 @@ abstract class ConfigOptions {
     possibleValues: ["tlshello", "1-1", "1-2", "1-3", "1-4", "1-5"],
   );
 
-  static final tlsFragmentSize = PreferencesNotifier.create<OptionalRange, String>(
+  static final tlsFragmentSize =
+      PreferencesNotifier.create<OptionalRange, String>(
     "tls-fragment-size",
     const OptionalRange(min: 10, max: 30),
     mapFrom: OptionalRange.parse,
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final tlsFragmentSleep = PreferencesNotifier.create<OptionalRange, String>(
+  static final tlsFragmentSleep =
+      PreferencesNotifier.create<OptionalRange, String>(
     "tls-fragment-sleep",
     const OptionalRange(min: 2, max: 8),
     mapFrom: OptionalRange.parse,
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final enableTlsMixedSniCase = PreferencesNotifier.create<bool, bool>("enable-tls-mixed-sni-case", false);
+  static final enableTlsMixedSniCase = PreferencesNotifier.create<bool, bool>(
+      "enable-tls-mixed-sni-case", false);
 
-  static final enableTlsPadding = PreferencesNotifier.create<bool, bool>("enable-tls-padding", false);
+  static final enableTlsPadding =
+      PreferencesNotifier.create<bool, bool>("enable-tls-padding", false);
 
-  static final tlsPaddingSize = PreferencesNotifier.create<OptionalRange, String>(
+  static final tlsPaddingSize =
+      PreferencesNotifier.create<OptionalRange, String>(
     "tls-padding-size",
     const OptionalRange(min: 1, max: 1500),
     mapFrom: OptionalRange.parse,
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final enableMux = PreferencesNotifier.create<bool, bool>("enable-mux", false);
+  static final enableMux =
+      PreferencesNotifier.create<bool, bool>("enable-mux", false);
 
-  static final muxPadding = PreferencesNotifier.create<bool, bool>("mux-padding", false);
+  static final muxPadding =
+      PreferencesNotifier.create<bool, bool>("mux-padding", false);
 
   static final muxMaxStreams = PreferencesNotifier.create<int, int>(
     "mux-max-streams",
@@ -229,25 +267,34 @@ abstract class ConfigOptions {
     mapTo: (value) => value.name,
   );
 
-  static final enableWarp = PreferencesNotifier.create<bool, bool>("enable-warp", false);
+  static final enableWarp =
+      PreferencesNotifier.create<bool, bool>("enable-warp", false);
 
-  static final warpDetourMode = PreferencesNotifier.create<WarpDetourMode, String>(
+  static final warpDetourMode =
+      PreferencesNotifier.create<WarpDetourMode, String>(
     "warp-detour-mode",
     WarpDetourMode.warpOverProxy,
     mapFrom: WarpDetourMode.values.byName,
     mapTo: (value) => value.name,
   );
 
-  static final warpLicenseKey = PreferencesNotifier.create<String, String>("warp-license-key", "");
-  static final warp2LicenseKey = PreferencesNotifier.create<String, String>("warp2s-license-key", "");
+  static final warpLicenseKey =
+      PreferencesNotifier.create<String, String>("warp-license-key", "");
+  static final warp2LicenseKey =
+      PreferencesNotifier.create<String, String>("warp2s-license-key", "");
 
-  static final warpAccountId = PreferencesNotifier.create<String, String>("warp-account-id", "");
-  static final warp2AccountId = PreferencesNotifier.create<String, String>("warp2-account-id", "");
+  static final warpAccountId =
+      PreferencesNotifier.create<String, String>("warp-account-id", "");
+  static final warp2AccountId =
+      PreferencesNotifier.create<String, String>("warp2-account-id", "");
 
-  static final warpAccessToken = PreferencesNotifier.create<String, String>("warp-access-token", "");
-  static final warp2AccessToken = PreferencesNotifier.create<String, String>("warp2-access-token", "");
+  static final warpAccessToken =
+      PreferencesNotifier.create<String, String>("warp-access-token", "");
+  static final warp2AccessToken =
+      PreferencesNotifier.create<String, String>("warp2-access-token", "");
 
-  static final warpCleanIp = PreferencesNotifier.create<String, String>("warp-clean-ip", "auto");
+  static final warpCleanIp =
+      PreferencesNotifier.create<String, String>("warp-clean-ip", "auto");
 
   static final warpPort = PreferencesNotifier.create<int, int>(
     "warp-port",
@@ -261,23 +308,28 @@ abstract class ConfigOptions {
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
-  static final warpNoiseMode = PreferencesNotifier.create<String, String>("warp-noise-mode", "m4");
+  static final warpNoiseMode =
+      PreferencesNotifier.create<String, String>("warp-noise-mode", "m4");
 
-  static final warpNoiseDelay = PreferencesNotifier.create<OptionalRange, String>(
+  static final warpNoiseDelay =
+      PreferencesNotifier.create<OptionalRange, String>(
     "warp-noise-delay",
     const OptionalRange(min: 10, max: 30),
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
-  static final warpNoiseSize = PreferencesNotifier.create<OptionalRange, String>(
+  static final warpNoiseSize =
+      PreferencesNotifier.create<OptionalRange, String>(
     "warp-noise-size",
     const OptionalRange(min: 10, max: 30),
     mapFrom: (value) => OptionalRange.parse(value, allowEmpty: true),
     mapTo: const OptionalRangeJsonConverter().toJson,
   );
 
-  static final warpWireguardConfig = PreferencesNotifier.create<String, String>("warp-wireguard-config", "");
-  static final warp2WireguardConfig = PreferencesNotifier.create<String, String>("warp2-wireguard-config", "");
+  static final warpWireguardConfig =
+      PreferencesNotifier.create<String, String>("warp-wireguard-config", "");
+  static final warp2WireguardConfig =
+      PreferencesNotifier.create<String, String>("warp2-wireguard-config", "");
 
   static final hasExperimentalFeatures = Provider.autoDispose<bool>((ref) {
     // final mode = ref.watch(serviceMode);
@@ -303,8 +355,10 @@ abstract class ConfigOptions {
     "warp2.wireguard-config",
   };
 
-  static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>> preferences = {
+  static final Map<String, StateNotifierProvider<PreferencesNotifier, dynamic>>
+      preferences = {
     "region": region,
+    "routing-mode": routingMode,
     "balancer-strategy": balancerStrategy,
     "block-ads": blockAds,
     "use-xray-core-when-possible": useXrayCoreWhenPossible,
@@ -365,51 +419,15 @@ abstract class ConfigOptions {
   };
 
   static final singboxConfigOptions = Provider<SingboxConfigOption>((ref) {
-    // final region = ref.watch(Preferences.region);
-    final rules = <SingboxRule>[];
-    // final rules = switch (region) {
-    //   Region.ir => [
-    //       const SingboxRule(
-    //         domains: "domain:.ir,geosite:ir",
-    //         ip: "geoip:ir",
-    //         outbound: RuleOutbound.bypass,
-    //       ),
-    //     ],
-    //   Region.cn => [
-    //       const SingboxRule(
-    //         domains: "domain:.cn,geosite:cn",
-    //         ip: "geoip:cn",
-    //         outbound: RuleOutbound.bypass,
-    //       ),
-    //     ],
-    //   Region.ru => [
-    //       const SingboxRule(
-    //         domains: "domain:.ru",
-    //         ip: "geoip:ru",
-    //         outbound: RuleOutbound.bypass,
-    //       ),
-    //     ],
-    //   Region.af => [
-    //       const SingboxRule(
-    //         domains: "domain:.af,geosite:af",
-    //         ip: "geoip:af",
-    //         outbound: RuleOutbound.bypass,
-    //       ),
-    //     ],
-    //   Region.id => [
-    //       const SingboxRule(
-    //         domains: "domain:.id,geosite:id",
-    //         ip: "geoip:id",
-    //         outbound: RuleOutbound.bypass,
-    //       ),
-    //     ],
-    //   _ => <SingboxRule>[],
-    // };
-
     final mode = ref.watch(serviceMode);
-    // final reg = ref.watch(Preferences.region.notifier).raw();
+    final regionValue = ref.watch(region);
+    final routingModeValue = ref.watch(routingMode);
+    final rules = buildRoutingRules(
+      routingMode: routingModeValue,
+      region: regionValue,
+    );
 
-    return SingboxConfigOption(
+    final config = SingboxConfigOption(
       region: ref.watch(region).name,
       balancerStrategy: ref.watch(balancerStrategy),
       blockAds: ref.watch(blockAds),
@@ -485,24 +503,94 @@ abstract class ConfigOptions {
       ),
       rules: rules,
     );
+
+    return applyReleaseLocalSurfacePolicy(
+      config,
+      isAndroid: defaultTargetPlatform == TargetPlatform.android,
+      isReleaseMode: kReleaseMode,
+    );
   });
 }
 
+SingboxConfigOption applyReleaseLocalSurfacePolicy(
+  SingboxConfigOption config, {
+  required bool isAndroid,
+  required bool isReleaseMode,
+}) {
+  if (!isAndroid || !isReleaseMode) {
+    return config;
+  }
+
+  return config.copyWith(
+    enableClashApi: false,
+    allowConnectionFromLan: false,
+    mixedPort: 0,
+    tproxyPort: 0,
+    redirectPort: 0,
+    directPort: 0,
+  );
+}
+
+List<SingboxRule> buildRoutingRules({
+  required RoutingMode routingMode,
+  required Region? region,
+}) {
+  final _ = region;
+  return switch (routingMode) {
+    RoutingMode.global => const <SingboxRule>[],
+    RoutingMode.allExceptRu => const <SingboxRule>[
+        SingboxRule(
+          ip: "geoip:private",
+          outbound: RuleOutbound.bypass,
+        ),
+        SingboxRule(
+          domains: "domain:.ru",
+          ip: "geoip:ru",
+          outbound: RuleOutbound.bypass,
+        ),
+        SingboxRule(
+          domains: "domain:.рф",
+          outbound: RuleOutbound.bypass,
+        ),
+        SingboxRule(
+          domains: "domain:.su",
+          outbound: RuleOutbound.bypass,
+        ),
+      ],
+    RoutingMode.blockedOnly => const <SingboxRule>[
+        SingboxRule(
+          ruleSetUrl: kBlockedOnlyRuleSetUrl,
+          outbound: RuleOutbound.proxy,
+        ),
+      ],
+  };
+}
+
 class ConfigOptionRepository with ExceptionHandler, InfraLogger {
-  ConfigOptionRepository({required this.preferences, required SingboxConfigOption Function() getConfigOptions})
-    : _getConfigOptions = getConfigOptions;
+  ConfigOptionRepository(
+      {required this.preferences,
+      required SingboxConfigOption Function() getConfigOptions})
+      : _getConfigOptions = getConfigOptions;
 
   final SharedPreferences preferences;
   final SingboxConfigOption Function() _getConfigOptions;
 
   Either<ConfigOptionFailure, SingboxConfigOption> fullOptions() =>
-      Either.tryCatch(() => _getConfigOptions(), ConfigOptionFailure.unexpected);
+      Either.tryCatch(
+          () => _getConfigOptions(), ConfigOptionFailure.unexpected);
 
-  Either<ConfigOptionFailure, SingboxConfigOption> fullOptionsOverrided(String? profileOverride) =>
-      Either.tryCatch(() => _getConfigOptions(), ConfigOptionFailure.unexpected).flatMap(
+  Either<ConfigOptionFailure, SingboxConfigOption> fullOptionsOverrided(
+          String? profileOverride) =>
+      Either.tryCatch(() => _getConfigOptions(), ConfigOptionFailure.unexpected)
+          .flatMap(
         (options) => Either.tryCatch(() {
-          final json = ProfileParser.applyProfileOverride(options.toJson(), profileOverride);
+          final json = ProfileParser.applyProfileOverride(
+              options.toJson(), profileOverride);
           return SingboxConfigOption.fromJson(json);
         }, ConfigOptionFailure.unexpected),
       );
+}
+
+RoutingMode _readRoutingModePreference(String value) {
+  return normalizeConsumerRoutingMode(RoutingMode.values.byName(value));
 }

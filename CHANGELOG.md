@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased] - 2026-04-15
+
+### POKROV Upstream Intake Baseline
+
+- Started the client docs and closure lane for the upstream intake pinned to `fbc6cbd4ed6a978e5923c8203a93080019a7777b`.
+- Recorded must-preserve POKROV app-first, route-mode, routing-label, deep-link, branding, and artifact contracts without claiming rebase closure.
+- Marked the upstream `hiddify-core` layout, Flutter `3.38.5`, and remaining internal Hiddify identifiers as intake realities to port around rather than public product truth.
+- Reserved final generated outputs, packaged artifacts, and final validation ownership for Worker 10 in this intake lane.
+
 ## [0.16.0.dev] - 2024-2-18
 
 ### New Features and Improvements

@@ -48,6 +48,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.CancellationException
 class ServiceNotification(private val status: MutableLiveData<Status>, private val service: Service) : BroadcastReceiver(){
     companion object {
+        private const val brandName = "POKROV"
         private const val notificationId = 1
         private const val notificationChannel = "service"
         var coreClient: CoreClient?=null
@@ -74,7 +75,7 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         NotificationCompat.Builder(service, notificationChannel)
                 .setShowWhen(false)
                 .setOngoing(true)
-                .setContentTitle("Hiddify")
+                .setContentTitle(brandName)
                 .setOnlyAlertOnce(true)
                 .setSmallIcon(R.drawable.ic_stat_logo)
                 .setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -109,13 +110,13 @@ class ServiceNotification(private val status: MutableLiveData<Status>, private v
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Application.notification.createNotificationChannel(
                 NotificationChannel(
-                    notificationChannel, "hiddify service", NotificationManager.IMPORTANCE_LOW
+                    notificationChannel, "$brandName service", NotificationManager.IMPORTANCE_LOW
                 )
             )
         }
         service.startForeground(
             notificationId, notificationBuilder
-                .setContentTitle(profileName.takeIf { it.isNotBlank() } ?: "Hiddify")
+                .setContentTitle(profileName.takeIf { it.isNotBlank() } ?: brandName)
                 .setContentText(service.getString(contentTextId)).build()
         )
     }

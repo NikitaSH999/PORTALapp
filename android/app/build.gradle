@@ -71,7 +71,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "app.hiddify.com"
+        applicationId "space.pokrov.vpn"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
@@ -146,6 +146,7 @@ dependencies {
     implementation 'io.grpc:grpc-okhttp:1.64.0'
     implementation 'io.grpc:grpc-protobuf-lite:1.64.0'
     implementation 'io.grpc:grpc-stub:1.64.0'
+    testImplementation 'junit:junit:4.13.2'
 //    protoPath(project(':hiddify_api'))
 //    implementation project(':hiddify_api')
 

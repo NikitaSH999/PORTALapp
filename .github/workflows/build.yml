@@ -15,23 +15,23 @@ on:
 env:
   IS_GITHUB_ACTIONS: 1
   CHANNEL: "${{ inputs.channel }}"
-  FLUTTER_VERSION: '3.38.5'
+  FLUTTER_VERSION: "3.38.5"
   NDK_VERSION: r28c
   UPLOAD_ARTIFACT: "${{ inputs.upload-artifact }}"
   TAG_NAME: "${{ inputs.tag-name }}"
+  APP_SLUG: pokrov
+  APP_ANDROID_PACKAGE: ${{ vars.ANDROID_PACKAGE_NAME || 'space.pokrov.vpn' }}
   TARGET_NAME_gz: "Hiddify-Linux-x64-AppImage.tar"
   TARGET_NAME_AppImage: "Hiddify-Linux-x64-AppImage"
   TARGET_NAME_deb: "Hiddify-Debian-x64"
-  # TARGET_NAME_rpm: "Hiddify-rpm-x64"
-  TARGET_NAME_apk: "Hiddify-Android"
-  TARGET_NAME_aab: "Hiddify-Android"
-  TARGET_NAME_exe: "Hiddify-Windows-Setup-x64"
-  TARGET_NAME_msix: "Hiddify-Windows-x64"
-  TARGET_NAME_zip: "Hiddify-Windows-Portable-x64"
+  TARGET_NAME_apk: "pokrov-android"
+  TARGET_NAME_aab: "pokrov-android-market"
+  TARGET_NAME_exe: "pokrov-windows-setup-x64"
+  TARGET_NAME_msix: "pokrov-windows-setup-x64"
+  TARGET_NAME_zip: "pokrov-windows-portable-x64"
   TARGET_NAME_dmg: "Hiddify-MacOS"
   TARGET_NAME_pkg: "Hiddify-MacOS-Installer"
   TARGET_NAME_ipa: "Hiddify-iOS"
-  
 
 jobs:
   test:
@@ -40,27 +40,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: subosito/flutter-action@v2.21.0 #issue with 2.13
+      - uses: subosito/flutter-action@v2.21.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
+          channel: stable
           cache: true
-          
+
       - name: Prepare
         run: make linux-amd64-prepare
+
       - name: Test
         run: flutter test
 
       - name: make draftBuildCode
         id: draftBuildCode
-        run: echo "::set-output name=datetime::$(date +'%d.%H.%M')"
-
+        run: echo "datetime=$(date +'%d.%H.%M')" >> "$GITHUB_OUTPUT"
 
   build:
     needs: test
     permissions: write-all
     continue-on-error: true
-
     strategy:
       fail-fast: false
       matrix:
@@ -83,126 +82,85 @@ jobs:
             aarch: amd64
             targets: deb,gz,AppImage
 
-          # - platform: linux-amd64
-          #   os: ubuntu-22.04
-          #   aarch: amd64
-          #   targets: deb,gz
-
-          # - platform: linux-arm64
-          #   os: ubuntu-24.04-arm
-          #   aarch: arm64
-          #   targets: deb,gz
-
-          # - platform: linux-amd64-musl
-          #   os: ubuntu-22.04
-          #   aarch: amd64
-          #   targets: deb,gz
-
-          # - platform: linux-arm64-musl
-          #   os: ubuntu-24.04-arm
-          #   aarch: arm64
-          #   targets: deb,gz
-            
           - platform: macos
             os: macos-15
             aarch: universal
             targets: dmg,pkg
-            
-          # - platform: ios
-          #   os: macos-15
-          #   aarch: universal
-          #   filename: hiddify-ios
-          #   targets: ipa
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout
         uses: actions/checkout@v6
 
       - name: Import Apple Codesign Certificates
-        if: ${{ inputs.upload-artifact && startsWith(matrix.os,'macos') }}
+        if: ${{ inputs.upload-artifact && startsWith(matrix.os, 'macos') }}
         uses: apple-actions/import-codesign-certs@v6
-        with: 
-            p12-file-base64: "${{ secrets.APPLE_CERTIFICATE_P12 }}"
-            p12-password: "${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}"
+        with:
+          p12-file-base64: "${{ secrets.APPLE_CERTIFICATE_P12 }}"
+          p12-password: "${{ secrets.APPLE_CERTIFICATE_P12_PASSWORD }}"
 
       - name: Import Apple Mobile Provisioning Profile
-        if: ${{ inputs.upload-artifact && startsWith(matrix.os,'macos') }}
+        if: ${{ inputs.upload-artifact && startsWith(matrix.os, 'macos') }}
         run: |
-           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-           echo "${{secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
-           ls ~/Library/MobileDevice/Provisioning\ Profiles
-           security unlock-keychain -p "" signing_temp.keychain
-           security find-identity -v -p codesigning
-        #   ls ~/Library/MobileDevice/Provisioning\ Profiles
-        #   echo "${{secrets.NEW_APPLE_MOBILE_PROVISIONING_PROFILES_TARXZ_BASE64}}"|base64 --decode | tar xJ -C ~/Library/MobileDevice/Provisioning\ Profiles
-        #   # echo "${{secrets.NEW_APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64_2}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
-          
-
-
-      # - name: Setup Flutter for arm64
-      #   if: ${{ startsWith(matrix.platform,'linux-arm64') }}
-      #   uses: hurelhuyag/flutter-arm64-action@HEAD
-      #   with:
-      #     channel: 'stable'
-      #     flutter-version: ${{ env.FLUTTER_VERSION }}
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.APPLE_MOBILE_PROVISIONING_PROFILES_TARGZ_BASE64 }}" | base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
+          ls ~/Library/MobileDevice/Provisioning\ Profiles
+          security unlock-keychain -p "" signing_temp.keychain
+          security find-identity -v -p codesigning
 
       - name: Setup Flutter
-        uses: subosito/flutter-action@v2.21.0 #issue with 2.13
+        uses: subosito/flutter-action@v2.21.0
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          # flutter-version-file: pubspec.yaml
-          channel: 'stable'
+          channel: stable
           cache: true
 
+      - name: Apply fork branding overrides
+        if: ${{ startsWith(matrix.platform, 'android') || startsWith(matrix.platform, 'windows') }}
+        env:
+          FORK_BRAND_NAME: POKROV
+          FORK_REPO_URL: https://github.com/${{ github.repository }}
+          FORK_ANDROID_APPLICATION_ID: ${{ vars.ANDROID_APPLICATION_ID || 'space.pokrov.vpn' }}
+          FORK_ANDROID_NAMESPACE: ${{ vars.ANDROID_NAMESPACE || 'com.hiddify.hiddify' }}
+          FORK_ANDROID_TEST_NAMESPACE: ${{ vars.ANDROID_TEST_NAMESPACE || 'test.com.hiddify.hiddify' }}
+          FORK_URI_SCHEME: ${{ vars.URI_SCHEME || 'pokrov' }}
+          FORK_WINDOWS_IDENTITY_NAME: ${{ vars.WINDOWS_IDENTITY_NAME || 'Pokrov.Vpn' }}
+          FORK_WINDOWS_PUBLISHER_NAME: ${{ vars.WINDOWS_PUBLISHER_NAME || 'POKROV' }}
+          FORK_WINDOWS_PUBLISHER_URL: ${{ vars.WINDOWS_PUBLISHER_URL || 'https://pokrov.space/' }}
+          FORK_WINDOWS_INSTALL_DIR: ${{ vars.WINDOWS_INSTALL_DIR || 'POKROV' }}
+          FORK_WINDOWS_EXE_STEM: ${{ vars.WINDOWS_EXE_STEM || 'POKROVVPN' }}
+          FORK_WINDOWS_OUTPUT_BASE_FILE_NAME: ${{ vars.WINDOWS_OUTPUT_BASE_FILE_NAME || 'pokrov-windows-setup-x64' }}
+          FORK_COPYRIGHT: ${{ vars.BRAND_COPYRIGHT || 'Copyright (C) POKROV. All rights reserved.' }}
+          FORK_TELEGRAM_CHANNEL_URL: https://t.me/pokrov_vpn
+          FORK_PRIVACY_POLICY_URL: https://pokrov.space/privacy-policy/
+          FORK_TERMS_URL: https://pokrov.space/terms/
+        run: python .github/scripts/apply_fork_branding.py
+
       - name: Clean up disk space
-        if: startsWith(matrix.platform,'android')
+        if: startsWith(matrix.platform, 'android')
         run: |
           df -h
           sudo rm -rf /usr/share/dotnet
-          df -h
           sudo rm -rf /opt/ghc
-          df -h
           sudo rm -rf /opt/hostedtoolcache/CodeQL
-          df -h
           rm -rf ~/.gradle/caches
-          df -h
           sudo apt-get autoremove -y
+          sudo apt-get clean
           df -h
-          sudo apt-get clean 
-          df -h
-          tree
-      
+
       - name: Setup Java
-        if: startsWith(matrix.platform,'android')
+        if: startsWith(matrix.platform, 'android')
         uses: actions/setup-java@v5
         with:
-          distribution: 'zulu'
+          distribution: zulu
           java-version: 17
-      # - name: Setup NDK
-      #   if: startsWith(matrix.platform,'android')
-      #   uses: nttld/setup-ndk@v1
-      #   id: setup-ndk
-      #   with:
-      #     ndk-version: ${{ env.NDK_VERSION }}
-      #     add-to-path: true
-      #     link-to-sdk: true
 
       - name: Setup Android SDK
+        if: startsWith(matrix.platform, 'android')
         uses: android-actions/setup-android@v3
-        if: startsWith(matrix.platform,'android')
-      # - name: Cache Android SDK
-      #   uses: actions/cache@v5
-      #   if: startsWith(matrix.platform,'android')
-      #   with:
-      #     path: |
-      #       /usr/local/lib/android/sdk
-      #     key: android-sdk-${{ runner.os }}-${{ env.NDK_VERSION }}
-      #     restore-keys: |
-      #       android-sdk-${{ runner.os }}-      
-      - name: Cache Gradle
-        uses: actions/cache@v5
-        if: startsWith(matrix.platform,'android')
 
+      - name: Cache Gradle
+        if: startsWith(matrix.platform, 'android')
+        uses: actions/cache@v5
         with:
           path: |
             ~/.gradle/caches
@@ -210,14 +168,14 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-${{ runner.os }}-
-                  
+
       - name: Setup dependencies
         run: |
-          make ${{ matrix.platform }}-install-deps  
+          make ${{ matrix.platform }}-install-deps
           echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
 
       - name: Setup Android Signing Properties
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'android') }}
+        if: ${{ inputs.upload-artifact && startsWith(matrix.platform, 'android') }}
         run: |
           echo "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 --decode > android/key.jks
           echo "storeFile=$(pwd)/android/key.jks" > android/key.properties
@@ -226,66 +184,89 @@ jobs:
           echo "keyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}" >> android/key.properties
 
       - name: Setup Windows Signing Properties
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
+        if: ${{ inputs.upload-artifact && startsWith(matrix.platform, 'windows') }}
+        shell: pwsh
         run: |
-            [IO.File]::WriteAllBytes("windows\sign.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_SIGNING_KEY }}"))
-            (Get-Content "windows\packaging\msix\make_config.yaml") -replace '^certificate_password:.*$', 'certificate_password: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}' | Set-Content "windows\packaging\msix\make_config.yaml"
-        
-      # - name: Temporary disable Permission Handler for windows due to its issue in permission
-      #   if: ${{ startsWith(matrix.platform,'windows') }}
-      #   run: |
-      #     (Get-Content -Path "pubspec.yaml") -notmatch "permission_handler" | Set-Content -Path "pubspec.yaml"
-      #     (Get-Content -Path "lib\features\profile\add\add_profile_modal.dart") -notmatch "qr_code_scanner_screen" | Set-Content -Path "lib\features\profile\add\add_profile_modal.dart"
-      #     (Get-Content -Path lib\features\profile\add\add_profile_modal.dart) -replace 'await QRCodeScannerScreen\(\).open\(context\);', 'null;' | Set-Content -Path lib\features\profile\add\add_profile_modal.dart
-      #     Remove-Item -Path "lib\features\common\qr_code_scanner_screen.dart"
-
-
-
+          [IO.File]::WriteAllBytes("windows\sign.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_SIGNING_KEY }}"))
+          (Get-Content "windows\packaging\msix\make_config.yaml") `
+            -replace '^certificate_password:.*$', 'certificate_password: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}' `
+            | Set-Content "windows\packaging\msix\make_config.yaml"
 
       - name: Prepare for ${{ matrix.platform }}
-        run: |
-          make ${{ matrix.platform }}-prepare
-
+        run: make ${{ matrix.platform }}-prepare
 
       - name: Build ${{ matrix.platform }}
         env:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-        run: |
-          make ${{ matrix.platform }}-release
+        run: make ${{ matrix.platform }}-release
 
       - name: Code Sign
-        if: ${{ inputs.upload-artifact && startsWith(matrix.platform,'windows') }}
+        if: ${{ inputs.upload-artifact && startsWith(matrix.platform, 'windows') }}
         uses: hiddify/signtool-code-sign-sha256@main
         with:
-          certificate: '${{ secrets.WINDOWS_SIGNING_KEY }}'
-          cert-password: '${{ secrets.WINDOWS_SIGNING_PASSWORD }}'
-          cert-sha1: '${{ secrets.WINDOWS_SIGNING_SHA1 }}'
-          folder: 'dist'
-          timestamp-server: 'http://timestamp.digicert.com'
+          certificate: "${{ secrets.WINDOWS_SIGNING_KEY }}"
+          cert-password: "${{ secrets.WINDOWS_SIGNING_PASSWORD }}"
+          cert-sha1: "${{ secrets.WINDOWS_SIGNING_SHA1 }}"
+          folder: dist
+          timestamp-server: http://timestamp.digicert.com
           recursive: true
-          description: 'Hiddify'
+          description: POKROV
 
-      - name: Copy to out Windows
+      - name: Package Windows outputs
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: .\scripts\package_windows.ps1
+
+      - name: Normalize Windows artifacts
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
-          Get-ChildItem -Path dist -Recurse | Select-Object FullName
-          New-Item -ItemType Directory -Path "out" -Force | Out-Null
-          $targets = "${{ matrix.targets }}".Split(',')
-          foreach ($ext in $targets) {
-            $ext = $ext.Trim()
-            $key = "TARGET_NAME_$ext"
-            $targetName = (Get-Item "env:$key").Value
-            
-            $files = Get-ChildItem -Path dist -Recurse -Filter "*.$ext"
-            
-            foreach ($file in $files) {
-                $destination = Join-Path -Path "out" -ChildPath "$targetName.$ext"
-                Move-Item -Path $file.FullName -Destination $destination -Force
+          $outDir = Join-Path (Get-Location) "out"
+          $renames = @{
+            "Hiddify-Windows-Setup-x64.exe" = "${{ env.TARGET_NAME_exe }}.exe"
+            "Hiddify-Windows-Setup-x64.msix" = "${{ env.TARGET_NAME_msix }}.msix"
+            "Hiddify-Windows-Portable-x64.zip" = "${{ env.TARGET_NAME_zip }}.zip"
+          }
+
+          foreach ($sourceName in $renames.Keys) {
+            $sourcePath = Join-Path $outDir $sourceName
+            $targetPath = Join-Path $outDir $renames[$sourceName]
+            if (Test-Path $sourcePath) {
+              Move-Item -Path $sourcePath -Destination $targetPath -Force
+            } elseif (-not (Test-Path $targetPath)) {
+              throw "Missing expected Windows artifact: $sourceName"
             }
           }
-          Get-ChildItem -Path out
-          
+
+          $portablePath = Join-Path $outDir "${{ env.TARGET_NAME_zip }}.zip"
+          $portableTemp = Join-Path $env:RUNNER_TEMP "portable-normalized"
+          if (Test-Path $portableTemp) {
+            Remove-Item -Path $portableTemp -Recurse -Force
+          }
+          Expand-Archive -Path $portablePath -DestinationPath $portableTemp -Force
+          Get-ChildItem -Path $portableTemp -Recurse -Filter *.url | Remove-Item -Force
+
+          $children = Get-ChildItem -Path $portableTemp
+          $portableRoot = $portableTemp
+          if ($children.Count -eq 1 -and $children[0].PSIsContainer) {
+            $normalizedRoot = Join-Path $portableTemp "POKROV"
+            if ($children[0].FullName -ne $normalizedRoot) {
+              Move-Item -Path $children[0].FullName -Destination $normalizedRoot -Force
+            }
+            $portableRoot = $normalizedRoot
+          }
+
+          Set-Content -Path (Join-Path $portableRoot "POKROV Install.url") -Value "[InternetShortcut]`r`nURL=https://pokrov.space/install/`r`n"
+          Remove-Item -Path $portablePath -Force
+          Compress-Archive -Path (Join-Path $portableTemp '*') -DestinationPath $portablePath -Force
+
+          $hashFile = Join-Path $outDir "SHA256SUMS-windows.txt"
+          Remove-Item -Path $hashFile -ErrorAction SilentlyContinue
+          foreach ($file in Get-ChildItem -Path $outDir -File | Sort-Object Name) {
+            $hash = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash  $($file.Name)" | Out-File -FilePath $hashFile -Append -Encoding utf8
+          }
+
       - name: Upload Debug Symbols
         if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
         env:
@@ -295,55 +276,43 @@ jobs:
           SENTRY_DIST: ${{ matrix.platform == 'android-aab' && 'google-play' || 'general' }}
         run: |
           dart pub global activate sentry_dart_plugin
-          dart run sentry_dart_plugin 
-      
-      
+          dart run sentry_dart_plugin
 
-              
       - name: Copy to out Android APK
         if: matrix.platform == 'android-apk'
         run: |
-          mkdir out
+          mkdir -p out
           ls -R ./build/app/outputs
-          cp ./build/app/outputs/flutter-apk/*arm64-v8a*.apk out/${TARGET_NAME_apk}-arm64.apk || echo "no arm64 apk"
-          cp ./build/app/outputs/flutter-apk/*armeabi-v7a*.apk out/${TARGET_NAME_apk}-arm7.apk || echo "no arm7 apk"
-          cp ./build/app/outputs/flutter-apk/*x86_64*.apk out/${TARGET_NAME_apk}-x86_64.apk || echo "no x64 apk"
-          cp ./build/app/outputs/flutter-apk/app-release.apk out/${TARGET_NAME_apk}-universal.apk || echo "no universal apk"
+          cp ./build/app/outputs/flutter-apk/app-release.apk out/${TARGET_NAME_apk}-universal.apk
 
       - name: Copy to out Android AAB
         if: matrix.platform == 'android-aab'
         run: |
-          mkdir out
+          mkdir -p out
           ls -R ./build/app/outputs
-          cp ./build/app/outputs/bundle/release/app-release.aab out/hiddify-android-market.aab || echo "no aab"
+          cp ./build/app/outputs/bundle/release/app-release.aab out/${TARGET_NAME_aab}.aab
 
       - name: Copy to out unix
-        if: startsWith(matrix.platform,'linux') || matrix.platform == 'macos' || matrix.platform == 'ios'
+        if: startsWith(matrix.platform, 'linux') || matrix.platform == 'macos' || matrix.platform == 'ios'
         run: |
           ls -R dist/
           mkdir out
           mkdir tmp_out
-          
+
           for EXT in $(echo ${{ matrix.targets }} | tr ',' '\n'); do
             KEY=TARGET_NAME_${EXT}
             FILENAME=${!KEY}
-            echo "For $EXT ($KEY) filename is ${FILENAME}"
             mv dist/*/*.$EXT tmp_out/${FILENAME}.$EXT
-            ls tmp_out
             [[ "$EXT" != "gz" ]] && chmod +x tmp_out/${FILENAME}.$EXT || echo "Skipping chmod for gz"
-            if [ "${{matrix.platform}}" == "linux" ];then
+            if [ "${{ matrix.platform }}" = "linux" ]; then
               cp ./.github/help/linux/* tmp_out/
             else
               cp ./.github/help/mac-windows/* tmp_out/
             fi
-            if [[ "${{matrix.platform}}" == 'ios' ]];then
-              echo mv tmp_out/${FILENAME}.$EXT out/
+            if [ "${{ matrix.platform }}" = "ios" ]; then
               mv tmp_out/${FILENAME}.$EXT out/
             else
               cd tmp_out
-              # 7z a ${FILENAME}.zip ./
-              # mv ${FILENAME}.zip ../out/
-              # [[ $EXT == 'AppImage' ]]&& mv ${FILENAME}.$EXT ../out/ # added for appimage link
               mv ${FILENAME}.$EXT ../out/
               cd ..
             fi
@@ -353,15 +322,16 @@ jobs:
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: actions/upload-artifact@v6
         with:
-          name: ${{matrix.platform}}
+          name: ${{ matrix.platform }}
           path: ./out
           retention-days: 1
 
       - name: Clean up keychain and provisioning profile
-        if: ${{ always() && startsWith(matrix.os,'macos')}}
+        if: ${{ always() && startsWith(matrix.os, 'macos') }}
         run: |
-          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db ||echo ok
-          rm ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision ||echo ok
+          security delete-keychain $RUNNER_TEMP/app-signing.keychain-db || echo ok
+          rm ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision || echo ok
+
   update-draft:
     permissions: write-all
     if: ${{ inputs.upload-artifact }}
@@ -371,62 +341,52 @@ jobs:
       - name: checkout
         uses: actions/checkout@v6
         with:
-          # by default, it uses a depth of 1
-          # this fetches all history so that we can read each commit
           fetch-depth: 0
+
       - name: Download Artifact
         uses: actions/download-artifact@v7
         with:
           merge-multiple: true
           pattern: "*"
           path: ./out/
-          
-
-      - name: Display Files Structure
-        run: ls -R
-        working-directory: ./out
 
       - name: Delete Current Release Assets
         uses: 8Mi-Tech/delete-release-assets-action@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          tag: 'draft'
+          tag: draft
           deleteOnlyFromDrafts: false
-          
+
       - name: prepare_release_message
         continue-on-error: true
+        env:
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          RELEASE_DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
         run: |
-          set +e 
-          sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md > release.md
           pip install gitchangelog pystache mustache markdown
-          prelease=$(curl --silent "https://api.github.com/repos/hiddify/hiddify-app/releases/latest" | grep -Po '"tag_name": "\K([^"]*)') 
-          echo -e "\n\n<details markdown=1><summary>All changes from $current to the latest commit:</summary>\n\n">>release.md
-          gitchangelog "${prelease}.." >> release.md  2>&1 || echo "Error in gitchangelog"
-          echo -e "\n\n</details>">>release.md
+          prelease=$(curl --silent "https://api.github.com/repos/${RELEASE_REPOSITORY}/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")' || true)
+          current="${{ env.TAG_NAME }}"
+          sed \
+            -e "s|RELEASE_TAG|${{ env.TAG_NAME }}|g" \
+            -e "s|RELEASE_REPOSITORY|${RELEASE_REPOSITORY}|g" \
+            -e "s|RELEASE_HISTORY_URL|https://github.com/${RELEASE_REPOSITORY}/blob/${RELEASE_DEFAULT_BRANCH}/HISTORY.md|g" \
+            ./.github/release_message.md > release.md
+          if [ -n "$prelease" ]; then
+            echo -e "\n\n<details markdown=1><summary>All changes from $current to the latest commit:</summary>\n\n" >> release.md
+            gitchangelog "${prelease}.." >> release.md 2>&1 || echo "Error in gitchangelog"
+            echo -e "\n\n</details>" >> release.md
+          fi
+
       - name: Create or Update Draft Release
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: ./out/*
-          name: 'draft'
-          tag_name: 'draft'
-          body_path: './release.md'
+          name: draft
+          tag_name: draft
+          body_path: ./release.md
           prerelease: true
-
-      - name: Create or Update Draft Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_FOR_HIDDIFY_APP_REPO }}
-          GITHUB_REPOSITORY: hiddify/hiddify-app
-        with:
-          files: ./out/*
-          name: 'draft'
-          tag_name: 'draft'
-          body_path: './release.md'
-          target_commitish: '530bf77839a74d4f13847ba244a20734ac7ab119'
-          prerelease: true
-          repository: hiddify/hiddify-app
 
   upload-release:
     permissions: write-all
@@ -447,13 +407,18 @@ jobs:
       - name: Display Files Structure
         run: |
           ls -R ./out
-          ls -R ./.github/
-          ls -R ./.git/
-          mv out/hiddify-android-market.aab  hiddify-android-market.aab
+          mv out/${TARGET_NAME_aab}.aab ${TARGET_NAME_aab}.aab
 
       - name: prepare_release_message
+        env:
+          RELEASE_REPOSITORY: ${{ github.repository }}
+          RELEASE_DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main' }}
         run: |
-          sed 's|RELEASE_TAG|${{ env.TAG_NAME }}|g' ./.github/release_message.md >> release.md
+          sed \
+            -e "s|RELEASE_TAG|${{ env.TAG_NAME }}|g" \
+            -e "s|RELEASE_REPOSITORY|${RELEASE_REPOSITORY}|g" \
+            -e "s|RELEASE_HISTORY_URL|https://github.com/${RELEASE_REPOSITORY}/blob/${RELEASE_DEFAULT_BRANCH}/HISTORY.md|g" \
+            ./.github/release_message.md > release.md
 
       - name: Upload Release
         uses: softprops/action-gh-release@v2
@@ -461,10 +426,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # prerelease: ${{ env.CHANNEL == 'dev' }}
           prerelease: true
           tag_name: ${{ env.TAG_NAME }}
-          body_path: './release.md'
+          body_path: ./release.md
           files: ./out/*
 
       - name: Create service_account.json
@@ -474,16 +438,14 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: service_account.json
-          packageName: app.hiddify.com
+          packageName: ${{ env.APP_ANDROID_PACKAGE }}
           releaseName: ${{ env.TAG_NAME }}
-          releaseFiles: ./hiddify-android-market.aab
-          track: 'beta'
-
+          releaseFiles: ./${{ env.TARGET_NAME_aab }}.aab
+          track: beta
 
   upload-to-testflight:
     needs: [build]
-    if: ${{ inputs.upload-artifact &&  inputs.tag-name != 'draft' }}
-    #if: ${{ inputs.upload-artifact }}
+    if: ${{ inputs.upload-artifact && inputs.tag-name != 'draft' }}
     runs-on: macOS-latest
     timeout-minutes: 30
     steps:
@@ -505,24 +467,22 @@ jobs:
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
+
       - uses: Apple-Actions/download-provisioning-profiles@v1
         with:
           bundle-id: app.hiddify.com.SingBoxPacketTunnel
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}
-  
-
 
       - name: Import Apple Mobile Provisioning Profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{secrets.APPLE_DIST_PROVISIONING_PROFILES_TARGZ_BASE64}}"|base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
-        #echo "${{secrets.NEW_APPLE_STORE_PROVISIONING_PROFILES_TARXZ_BASE64}}"|base64 --decode | tar xJ -C ~/Library/MobileDevice/Provisioning\ Profiles
+          echo "${{ secrets.APPLE_DIST_PROVISIONING_PROFILES_TARGZ_BASE64 }}" | base64 --decode | tar xz -C ~/Library/MobileDevice/Provisioning\ Profiles
 
       - uses: Apple-Actions/upload-testflight-build@v4
         with:
-          app-path: 'out/Hiddify-iOS.ipa' 
+          app-path: out/Hiddify-iOS.ipa
           issuer-id: ${{ secrets.APPSTORE_ISSUER_ID }}
           api-key-id: ${{ secrets.APPSTORE_API_KEY_ID }}
           api-private-key: ${{ secrets.APPSTORE_API_PRIVATE_KEY }}

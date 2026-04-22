@@ -1,0 +1,478 @@
+name: Fork Android + Windows Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Release tag (example: v1.0.0)"
+        required: true
+        type: string
+      channel:
+        description: "Core channel used by Makefile"
+        required: true
+        default: "prod"
+        type: choice
+        options:
+          - prod
+          - dev
+      create_github_release:
+        description: "Create/update GitHub release with produced artifacts"
+        required: true
+        default: true
+        type: boolean
+      upload_to_play:
+        description: "Upload generated AAB to Google Play"
+        required: true
+        default: false
+        type: boolean
+      play_track:
+        description: "Google Play track"
+        required: true
+        default: "beta"
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      push_to_mirror:
+        description: "Copy artifacts to mirror host through SCP"
+        required: true
+        default: false
+        type: boolean
+      mirror_target_dir:
+        description: "Target directory on mirror host"
+        required: false
+        default: "/var/www/downloads/pokrov"
+        type: string
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fork-android-windows-release-${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  IS_GITHUB_ACTIONS: 1
+  FLUTTER_VERSION: "3.38.5"
+  APP_SLUG: "pokrov"
+  APP_ANDROID_PACKAGE: ${{ vars.ANDROID_PACKAGE_NAME || 'space.pokrov.vpn' }}
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.meta.outputs.tag }}
+      channel: ${{ steps.meta.outputs.channel }}
+      create_release: ${{ steps.meta.outputs.create_release }}
+      upload_to_play: ${{ steps.meta.outputs.upload_to_play }}
+      play_track: ${{ steps.meta.outputs.play_track }}
+      push_to_mirror: ${{ steps.meta.outputs.push_to_mirror }}
+      mirror_target_dir: ${{ steps.meta.outputs.mirror_target_dir }}
+    steps:
+      - name: Resolve metadata
+        id: meta
+        shell: bash
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            TAG="${{ inputs.release_tag }}"
+            CHANNEL="${{ inputs.channel }}"
+            CREATE_RELEASE="${{ inputs.create_github_release }}"
+            UPLOAD_TO_PLAY="${{ inputs.upload_to_play }}"
+            PLAY_TRACK="${{ inputs.play_track }}"
+            PUSH_TO_MIRROR="${{ inputs.push_to_mirror }}"
+            MIRROR_TARGET="${{ inputs.mirror_target_dir }}"
+          else
+            TAG="${GITHUB_REF_NAME}"
+            CHANNEL="prod"
+            CREATE_RELEASE="true"
+            UPLOAD_TO_PLAY="false"
+            PLAY_TRACK="beta"
+            PUSH_TO_MIRROR="false"
+            MIRROR_TARGET="/var/www/downloads/${APP_SLUG}"
+          fi
+
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+          echo "channel=${CHANNEL}" >> "$GITHUB_OUTPUT"
+          echo "create_release=${CREATE_RELEASE}" >> "$GITHUB_OUTPUT"
+          echo "upload_to_play=${UPLOAD_TO_PLAY}" >> "$GITHUB_OUTPUT"
+          echo "play_track=${PLAY_TRACK}" >> "$GITHUB_OUTPUT"
+          echo "push_to_mirror=${PUSH_TO_MIRROR}" >> "$GITHUB_OUTPUT"
+          echo "mirror_target_dir=${MIRROR_TARGET}" >> "$GITHUB_OUTPUT"
+
+  validate-release-inputs:
+    needs: prepare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate signing and publishing inputs
+        shell: bash
+        env:
+          UPLOAD_TO_PLAY: ${{ needs.prepare.outputs.upload_to_play }}
+          ANDROID_SIGNING_KEY: ${{ secrets.ANDROID_SIGNING_KEY }}
+          ANDROID_SIGNING_STORE_PASSWORD: ${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+          ANDROID_SIGNING_KEY_PASSWORD: ${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+          ANDROID_SIGNING_KEY_ALIAS: ${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+          WINDOWS_SIGNING_KEY: ${{ secrets.WINDOWS_SIGNING_KEY }}
+          WINDOWS_SIGNING_PASSWORD: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for key in \
+            ANDROID_SIGNING_KEY \
+            ANDROID_SIGNING_STORE_PASSWORD \
+            ANDROID_SIGNING_KEY_PASSWORD \
+            ANDROID_SIGNING_KEY_ALIAS \
+            WINDOWS_SIGNING_KEY \
+            WINDOWS_SIGNING_PASSWORD
+          do
+            if [[ -z "${!key:-}" ]]; then
+              missing+=("$key")
+            fi
+          done
+
+          if (( ${#missing[@]} > 0 )); then
+            echo "Missing required release signing inputs:"
+            printf ' - %s\n' "${missing[@]}"
+            exit 1
+          fi
+
+          if [[ "${UPLOAD_TO_PLAY}" == "true" && -z "${GOOGLE_PLAY_SERVICE_ACCOUNT_JSON:-}" ]]; then
+            echo "GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is required when upload_to_play=true"
+            exit 1
+          fi
+
+  build-android:
+    needs: [prepare, validate-release-inputs]
+    runs-on: ubuntu-latest
+    env:
+      CHANNEL: ${{ needs.prepare.outputs.channel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Apply fork branding overrides
+        env:
+          FORK_BRAND_NAME: POKROV
+          FORK_REPO_URL: https://github.com/${{ github.repository }}
+          FORK_ANDROID_APPLICATION_ID: ${{ vars.ANDROID_APPLICATION_ID || 'space.pokrov.vpn' }}
+          FORK_ANDROID_NAMESPACE: ${{ vars.ANDROID_NAMESPACE || 'com.hiddify.hiddify' }}
+          FORK_ANDROID_TEST_NAMESPACE: ${{ vars.ANDROID_TEST_NAMESPACE || 'test.com.hiddify.hiddify' }}
+          FORK_URI_SCHEME: ${{ vars.URI_SCHEME || 'pokrov' }}
+          FORK_WINDOWS_IDENTITY_NAME: ${{ vars.WINDOWS_IDENTITY_NAME || 'Pokrov.Vpn' }}
+          FORK_WINDOWS_PUBLISHER_NAME: ${{ vars.WINDOWS_PUBLISHER_NAME || 'POKROV' }}
+          FORK_WINDOWS_PUBLISHER_URL: ${{ vars.WINDOWS_PUBLISHER_URL || 'https://pokrov.space/' }}
+          FORK_WINDOWS_INSTALL_DIR: ${{ vars.WINDOWS_INSTALL_DIR || 'POKROV' }}
+          FORK_WINDOWS_EXE_STEM: ${{ vars.WINDOWS_EXE_STEM || 'POKROVVPN' }}
+          FORK_WINDOWS_OUTPUT_BASE_FILE_NAME: ${{ vars.WINDOWS_OUTPUT_BASE_FILE_NAME || 'pokrov-windows-setup-x64' }}
+          FORK_COPYRIGHT: ${{ vars.BRAND_COPYRIGHT || 'Copyright (C) POKROV. All rights reserved.' }}
+          FORK_TELEGRAM_CHANNEL_URL: https://t.me/pokrov_vpn
+          FORK_PRIVACY_POLICY_URL: https://pokrov.space/privacy-policy/
+          FORK_TERMS_URL: https://pokrov.space/terms/
+        run: python .github/scripts/apply_fork_branding.py
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: zulu
+          java-version: "17"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Cache Gradle
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          make android-apk-install-deps
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
+      - name: Setup Android signing
+        shell: bash
+        run: |
+          echo "${{ secrets.ANDROID_SIGNING_KEY }}" | base64 --decode > android/key.jks
+          cat > android/key.properties <<EOF
+          storeFile=$(pwd)/android/key.jks
+          storePassword=${{ secrets.ANDROID_SIGNING_STORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_SIGNING_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_SIGNING_KEY_ALIAS }}
+          EOF
+
+      - name: Prepare Android
+        run: make android-apk-prepare
+
+      - name: Build Android APK
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make android-apk-release
+
+      - name: Build Android AAB
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make android-aab-release
+
+      - name: Collect Android artifacts
+        shell: bash
+        run: |
+          mkdir -p out
+          cp ./build/app/outputs/flutter-apk/app-release.apk "out/${APP_SLUG}-android-universal.apk"
+          cp ./build/app/outputs/bundle/release/app-release.aab "out/${APP_SLUG}-android-market.aab"
+          (cd out && sha256sum * > SHA256SUMS-android.txt)
+          ls -la out
+
+      - name: Upload Android artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: android-release
+          path: out/*
+          retention-days: 7
+
+      - name: Upload AAB to Google Play
+        if: ${{ needs.prepare.outputs.upload_to_play == 'true' }}
+        shell: bash
+        run: |
+          cat > service_account.json <<'EOF'
+          ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          EOF
+
+      - name: Publish to Google Play
+        if: ${{ needs.prepare.outputs.upload_to_play == 'true' }}
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: ${{ env.APP_ANDROID_PACKAGE }}
+          releaseName: ${{ needs.prepare.outputs.tag }}
+          releaseFiles: out/${{ env.APP_SLUG }}-android-market.aab
+          track: ${{ needs.prepare.outputs.play_track }}
+
+  build-windows:
+    needs: [prepare, validate-release-inputs]
+    runs-on: windows-2022
+    env:
+      CHANNEL: ${{ needs.prepare.outputs.channel }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2.21.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Apply fork branding overrides
+        env:
+          FORK_BRAND_NAME: POKROV
+          FORK_REPO_URL: https://github.com/${{ github.repository }}
+          FORK_ANDROID_APPLICATION_ID: ${{ vars.ANDROID_APPLICATION_ID || 'space.pokrov.vpn' }}
+          FORK_ANDROID_NAMESPACE: ${{ vars.ANDROID_NAMESPACE || 'com.hiddify.hiddify' }}
+          FORK_ANDROID_TEST_NAMESPACE: ${{ vars.ANDROID_TEST_NAMESPACE || 'test.com.hiddify.hiddify' }}
+          FORK_URI_SCHEME: ${{ vars.URI_SCHEME || 'pokrov' }}
+          FORK_WINDOWS_IDENTITY_NAME: ${{ vars.WINDOWS_IDENTITY_NAME || 'Pokrov.Vpn' }}
+          FORK_WINDOWS_PUBLISHER_NAME: ${{ vars.WINDOWS_PUBLISHER_NAME || 'POKROV' }}
+          FORK_WINDOWS_PUBLISHER_URL: ${{ vars.WINDOWS_PUBLISHER_URL || 'https://pokrov.space/' }}
+          FORK_WINDOWS_INSTALL_DIR: ${{ vars.WINDOWS_INSTALL_DIR || 'POKROV' }}
+          FORK_WINDOWS_EXE_STEM: ${{ vars.WINDOWS_EXE_STEM || 'POKROVVPN' }}
+          FORK_WINDOWS_OUTPUT_BASE_FILE_NAME: ${{ vars.WINDOWS_OUTPUT_BASE_FILE_NAME || 'pokrov-windows-setup-x64' }}
+          FORK_COPYRIGHT: ${{ vars.BRAND_COPYRIGHT || 'Copyright (C) POKROV. All rights reserved.' }}
+          FORK_TELEGRAM_CHANNEL_URL: https://t.me/pokrov_vpn
+          FORK_PRIVACY_POLICY_URL: https://pokrov.space/privacy-policy/
+          FORK_TERMS_URL: https://pokrov.space/terms/
+        run: python .github/scripts/apply_fork_branding.py
+
+      - name: Install dependencies
+        shell: pwsh
+        run: make windows-install-deps
+
+      - name: Setup Windows signing
+        shell: pwsh
+        run: |
+          [IO.File]::WriteAllBytes("windows\sign.pfx", [Convert]::FromBase64String("${{ secrets.WINDOWS_SIGNING_KEY }}"))
+          (Get-Content "windows\packaging\msix\make_config.yaml") `
+            -replace '^certificate_password:.*$', 'certificate_password: ${{ secrets.WINDOWS_SIGNING_PASSWORD }}' `
+            | Set-Content "windows\packaging\msix\make_config.yaml"
+
+      - name: Prepare Windows
+        shell: pwsh
+        run: make windows-prepare
+
+      - name: Build Windows
+        shell: pwsh
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+        run: make windows-release
+
+      - name: Package Windows outputs
+        shell: pwsh
+        run: .\scripts\package_windows.ps1
+
+      - name: Normalize Windows artifacts
+        shell: pwsh
+        run: |
+          $outDir = Join-Path (Get-Location) "out"
+          $renames = @{
+            "Hiddify-Windows-Setup-x64.exe" = "pokrov-windows-setup-x64.exe"
+            "Hiddify-Windows-Setup-x64.msix" = "pokrov-windows-setup-x64.msix"
+            "Hiddify-Windows-Portable-x64.zip" = "pokrov-windows-portable-x64.zip"
+          }
+
+          foreach ($sourceName in $renames.Keys) {
+            $sourcePath = Join-Path $outDir $sourceName
+            $targetPath = Join-Path $outDir $renames[$sourceName]
+            if (Test-Path $sourcePath) {
+              Move-Item -Path $sourcePath -Destination $targetPath -Force
+            } elseif (-not (Test-Path $targetPath)) {
+              throw "Missing expected Windows artifact: $sourceName"
+            }
+          }
+
+          $portablePath = Join-Path $outDir "pokrov-windows-portable-x64.zip"
+          $portableTemp = Join-Path $env:RUNNER_TEMP "portable-normalized"
+          if (Test-Path $portableTemp) {
+            Remove-Item -Path $portableTemp -Recurse -Force
+          }
+          Expand-Archive -Path $portablePath -DestinationPath $portableTemp -Force
+          Get-ChildItem -Path $portableTemp -Recurse -Filter *.url | Remove-Item -Force
+
+          $children = Get-ChildItem -Path $portableTemp
+          $portableRoot = $portableTemp
+          if ($children.Count -eq 1 -and $children[0].PSIsContainer) {
+            $normalizedRoot = Join-Path $portableTemp "POKROV"
+            if ($children[0].FullName -ne $normalizedRoot) {
+              Move-Item -Path $children[0].FullName -Destination $normalizedRoot -Force
+            }
+            $portableRoot = $normalizedRoot
+          }
+
+          Set-Content -Path (Join-Path $portableRoot "POKROV Install.url") -Value "[InternetShortcut]`r`nURL=https://pokrov.space/install/`r`n"
+          Remove-Item -Path $portablePath -Force
+          Compress-Archive -Path (Join-Path $portableTemp '*') -DestinationPath $portablePath -Force
+
+          $hashFile = Join-Path $outDir "SHA256SUMS-windows.txt"
+          foreach ($file in Get-ChildItem -Path $outDir -File | Sort-Object Name) {
+            $hash = (Get-FileHash -Path $file.FullName -Algorithm SHA256).Hash.ToLower()
+            "$hash  $($file.Name)" | Out-File -FilePath $hashFile -Append -Encoding utf8
+          }
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: windows-release
+          path: out/*
+          retention-days: 7
+
+  publish-release:
+    needs: [prepare, validate-release-inputs, build-android, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v7
+        with:
+          merge-multiple: true
+          path: release-out
+
+      - name: Build handoff env file
+        shell: bash
+        run: |
+          TAG="${{ needs.prepare.outputs.tag }}"
+          REPO="${{ github.repository }}"
+          mkdir -p release-meta
+          cat > release-meta/release-links.env <<EOF
+          APP_ANDROID_PLAY_URL=
+          APP_ANDROID_APK_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-android-universal.apk
+          APP_ANDROID_MIRROR_URL=
+          APP_ANDROID_AAB_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-android-market.aab
+          APP_WINDOWS_EXE_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-windows-setup-x64.exe
+          APP_WINDOWS_MIRROR_URL=
+          APP_WINDOWS_MSIX_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-windows-setup-x64.msix
+          APP_WINDOWS_PORTABLE_URL=https://github.com/${REPO}/releases/download/${TAG}/${APP_SLUG}-windows-portable-x64.zip
+          APP_DOCS_URL=https://pokrov.space/install/
+          EOF
+
+      - name: Generate updater feed
+        shell: bash
+        run: |
+          TAG="${{ needs.prepare.outputs.tag }}"
+          VERSION="${TAG#v}"
+          REPO="${{ github.repository }}"
+          PUB_DATE="$(date -u '+%a, %d %b %Y %H:%M:%S +0000')"
+          mkdir -p release-meta
+          cat > release-meta/appcast.xml <<EOF
+          <?xml version="1.0" encoding="utf-8"?>
+          <rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+              <channel>
+                  <title>POKROV Release Feed</title>
+                  <item>
+                      <title>Version ${VERSION}</title>
+                      <pubDate>${PUB_DATE}</pubDate>
+                      <enclosure
+                          url="https://github.com/${REPO}/releases/download/${TAG}/pokrov-android-universal.apk"
+                          sparkle:version="${VERSION}"
+                          sparkle:os="android" />
+                  </item>
+                  <item>
+                      <title>Version ${VERSION}</title>
+                      <pubDate>${PUB_DATE}</pubDate>
+                      <enclosure
+                          url="https://github.com/${REPO}/releases/download/${TAG}/pokrov-windows-setup-x64.exe"
+                          sparkle:version="${VERSION}"
+                          sparkle:os="windows" />
+                  </item>
+              </channel>
+          </rss>
+          EOF
+
+      - name: Upload handoff env
+        uses: actions/upload-artifact@v6
+        with:
+          name: release-handoff
+          path: release-meta/release-links.env
+          retention-days: 7
+
+      - name: Upload updater feed
+        uses: actions/upload-artifact@v6
+        with:
+          name: release-appcast
+          path: release-meta/appcast.xml
+          retention-days: 7
+
+      - name: Create GitHub Release
+        if: ${{ needs.prepare.outputs.create_release == 'true' }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.prepare.outputs.tag }}
+          files: |
+            release-out/*
+            release-meta/appcast.xml
+          prerelease: ${{ needs.prepare.outputs.channel != 'prod' }}
+          generate_release_notes: true
+
+      - name: Upload to mirror host
+        if: ${{ needs.prepare.outputs.push_to_mirror == 'true' && secrets.MIRROR_SSH_HOST != '' && secrets.MIRROR_SSH_USER != '' && secrets.MIRROR_SSH_KEY != '' }}
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.MIRROR_SSH_HOST }}
+          username: ${{ secrets.MIRROR_SSH_USER }}
+          key: ${{ secrets.MIRROR_SSH_KEY }}
+          source: "release-out/*.apk,release-out/*.aab,release-out/*.exe,release-out/*.msix,release-out/*.zip,release-out/*.txt"
+          target: ${{ needs.prepare.outputs.mirror_target_dir }}

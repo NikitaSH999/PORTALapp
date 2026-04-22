@@ -108,9 +108,12 @@ void main() {
         final schema = await verifier.schemaAt(3);
         addTearDown(() => schema.rawDatabase.dispose());
 
-        schema.rawDatabase.execute(
+        final oldDb = v3.DatabaseAtV3(schema.newConnection());
+        await oldDb.customSelect('PRAGMA table_info(profile_entries);').get();
+        await oldDb.customStatement(
           'ALTER TABLE profile_entries ADD COLUMN test_url TEXT NULL;',
         );
+        await oldDb.close();
 
         final migratedDb = Db(schema.newConnection());
         await verifier.migrateAndValidate(migratedDb, 4);

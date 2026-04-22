@@ -1,11 +1,41 @@
 #include "utils.h"
 
+#include <algorithm>
+#include <cctype>
 #include <flutter_windows.h>
 #include <io.h>
 #include <stdio.h>
 #include <windows.h>
 
 #include <iostream>
+
+namespace {
+
+bool StartsWithInsensitive(const std::string& value, const std::string& prefix) {
+  if (value.size() < prefix.size()) {
+    return false;
+  }
+
+  return std::equal(
+      prefix.begin(), prefix.end(), value.begin(),
+      [](unsigned char left, unsigned char right) {
+        return std::tolower(left) == std::tolower(right);
+      });
+}
+
+std::string NormalizeDeepLinkArgument(std::string argument) {
+  // The upstream Dart parser still recognizes hiddify://. Keep Windows launch
+  // compatibility for branded URI schemes until the parser lane is reapplied.
+  if (StartsWithInsensitive(argument, "pokrov://")) {
+    return "hiddify://" + argument.substr(sizeof("pokrov://") - 1);
+  }
+  if (StartsWithInsensitive(argument, "pokrovvpn://")) {
+    return "hiddify://" + argument.substr(sizeof("pokrovvpn://") - 1);
+  }
+  return argument;
+}
+
+}  // namespace
 
 void CreateAndAttachConsole() {
   if (::AllocConsole()) {
@@ -33,7 +63,8 @@ std::vector<std::string> GetCommandLineArguments() {
 
   // Skip the first argument as it's the binary name.
   for (int i = 1; i < argc; i++) {
-    command_line_arguments.push_back(Utf8FromUtf16(argv[i]));
+    command_line_arguments.push_back(
+        NormalizeDeepLinkArgument(Utf8FromUtf16(argv[i])));
   }
 
   ::LocalFree(argv);

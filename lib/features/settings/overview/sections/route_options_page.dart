@@ -29,18 +29,35 @@ class RouteOptionsPage extends HookConsumerWidget {
               trailing: Switch(
                 value: perAppProxy,
                 onChanged: (value) async {
-                  final newMode = perAppProxy ? PerAppProxyMode.off : PerAppProxyMode.exclude;
-                  await ref.read(Preferences.perAppProxyMode.notifier).update(newMode);
-                  if (!perAppProxy && context.mounted) context.goNamed('perAppProxy');
+                  final newMode = perAppProxy
+                      ? PerAppProxyMode.off
+                      : PerAppProxyMode.exclude;
+                  await ref
+                      .read(Preferences.perAppProxyMode.notifier)
+                      .update(newMode);
+                  if (!perAppProxy && context.mounted)
+                    context.goNamed('perAppProxy');
                 },
               ),
               onTap: () async {
                 if (!perAppProxy) {
-                  await ref.read(Preferences.perAppProxyMode.notifier).update(PerAppProxyMode.exclude);
+                  await ref
+                      .read(Preferences.perAppProxyMode.notifier)
+                      .update(PerAppProxyMode.exclude);
                 }
                 if (context.mounted) context.goNamed('perAppProxy');
               },
             ),
+          ChoicePreferenceWidget(
+            title: 'Routing mode',
+            icon: Icons.alt_route_rounded,
+            selected: ref.watch(ConfigOptions.routingMode),
+            preferences: ref.watch(ConfigOptions.routingMode.notifier),
+            choices: consumerRoutingChoices(
+              selected: ref.watch(ConfigOptions.routingMode),
+            ),
+            presentChoice: (value) => presentConsumerRoutingMode(value, t),
+          ),
           ChoicePreferenceWidget(
             selected: ref.watch(ConfigOptions.region),
             preferences: ref.watch(ConfigOptions.region.notifier),
@@ -58,13 +75,15 @@ class RouteOptionsPage extends HookConsumerWidget {
                   val != Region.other &&
                   mode != null &&
                   PlatformUtils.isAndroid) {
-                await ref
-                    .read(dialogNotifierProvider.notifier)
-                    .showOk(
-                      t.pages.settings.routing.perAppProxy.autoSelection.dialog.title,
-                      t.pages.settings.routing.perAppProxy.autoSelection.dialog.msg(region: val.name),
+                await ref.read(dialogNotifierProvider.notifier).showOk(
+                      t.pages.settings.routing.perAppProxy.autoSelection.dialog
+                          .title,
+                      t.pages.settings.routing.perAppProxy.autoSelection.dialog
+                          .msg(region: val.name),
                     );
-                await ref.read(PerAppProxyProvider(mode).notifier).clearAutoSelected();
+                await ref
+                    .read(PerAppProxyProvider(mode).notifier)
+                    .clearAutoSelected();
               }
             },
           ),
@@ -92,7 +111,8 @@ class RouteOptionsPage extends HookConsumerWidget {
             title: Text(t.pages.settings.routing.resolveDestination),
             secondary: const Icon(Icons.security_rounded),
             value: ref.watch(ConfigOptions.resolveDestination),
-            onChanged: ref.read(ConfigOptions.resolveDestination.notifier).update,
+            onChanged:
+                ref.read(ConfigOptions.resolveDestination.notifier).update,
           ),
           ChoicePreferenceWidget(
             selected: ref.watch(ConfigOptions.ipv6Mode),

@@ -62,16 +62,26 @@ Name: "{userstartup}\\{{DISPLAY_NAME}}"; Filename: "{app}\\{{EXECUTABLE_NAME}}";
 [Run]
 Filename: "{app}\\{{EXECUTABLE_NAME}}"; Description: "{cm:LaunchProgram,{{DISPLAY_NAME}}}"; Flags: {% if PRIVILEGES_REQUIRED == 'admin' %}runascurrentuser{% endif %} nowait postinstall skipifsilent
 
-[UninstallDelete]
-Type: filesandordirs; Name: "{userappdata}\Hiddify"
+[Registry]
+Root: HKCU; Subkey: "Software\Classes\pokrov"; ValueType: string; ValueName: ""; ValueData: "URL:POKROV"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\pokrov"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\pokrov\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{{EXECUTABLE_NAME}},0"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\pokrov\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{{EXECUTABLE_NAME}}"" ""%1"""; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\pokrovvpn"; ValueType: string; ValueName: ""; ValueData: "URL:POKROV compatibility"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\pokrovvpn"; ValueType: string; ValueName: "URL Protocol"; ValueData: ""; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\pokrovvpn\DefaultIcon"; ValueType: string; ValueName: ""; ValueData: "{app}\{{EXECUTABLE_NAME}},0"; Flags: uninsdeletekey
+Root: HKCU; Subkey: "Software\Classes\pokrovvpn\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{{EXECUTABLE_NAME}}"" ""%1"""; Flags: uninsdeletekey
 
 [Code]
 function InitializeSetup(): Boolean;
 var
   ResultCode: Integer;
 begin
-  Exec('taskkill', '/F /IM hiddify.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
-  Exec('net', 'stop "HiddifyTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
-  Exec('sc.exe', 'delete "HiddifyTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode)
+  Exec('taskkill', '/F /IM POKROV.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('taskkill', '/F /IM hiddify.exe', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('net', 'stop "POKROVTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('net', 'stop "HiddifyTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('sc.exe', 'delete "POKROVTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('sc.exe', 'delete "HiddifyTunnelService"', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   Result := True;
 end;
